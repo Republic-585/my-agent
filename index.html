@@ -37,13 +37,15 @@ textarea{resize:none;height:44px}
 <div id="set">
 <h2 style="margin:0">Настройки</h2>
 <label>Главная модель</label>
-<select id="prov"><option value="groq">Groq (Llama 3.3)</option><option value="gemini">Google Gemini</option><option value="openrouter">OpenRouter (free-модели)</option></select>
+<select id="prov"><option value="auto">AUTO — каскад моделей</option><option value="groq">Groq</option><option value="gemini">Google Gemini</option><option value="openrouter">OpenRouter (free-модели)</option><option value="nvidia">NVIDIA NIM</option></select>
 <label>Ключ Groq</label><input id="k_groq" type="password" autocomplete="off"><p>console.groq.com → API Keys</p>
 <label>Ключ Gemini</label><input id="k_gemini" type="password" autocomplete="off"><p>aistudio.google.com → Get API key</p>
 <label>Ключ OpenRouter</label><input id="k_openrouter" type="password" autocomplete="off"><p>openrouter.ai → Keys</p>
+<label>Ключ NVIDIA NIM</label><input id="k_nvidia" type="password" autocomplete="off"><p>build.nvidia.com → API Key</p>
 <label>Модель Gemini (если старая отключат, впиши новую)</label><input id="m_gemini" placeholder="gemini-3.8-flash">
-<label>Модель Groq</label><input id="m_groq" placeholder="llama-3.3-70b-versatile">
-<label>Модель OpenRouter</label><input id="m_openrouter" placeholder="meta-llama/llama-3.3-70b-instruct:free">
+<label>Модель Groq</label><input id="m_groq" placeholder="openai/gpt-oss-20b">
+<label>Модель OpenRouter</label><input id="m_openrouter" placeholder="openrouter/free">
+<label>Модель NVIDIA</label><input id="m_nvidia" placeholder="nvidia/nemotron-3-super-120b-a12b"><p>Бесплатный endpoint с tool calling.</p>
 <label>GitHub token (classic, право repo)</label><input id="k_github" type="password" autocomplete="off"><p>github.com/settings/tokens</p>
 <label>Telegram Bot Token</label><input id="k_tg" type="password" autocomplete="off"><p>@BotFather → /newbot</p>
 <label>Supabase URL</label><input id="k_sburl" placeholder="https://xxxx.supabase.co">
@@ -58,9 +60,10 @@ textarea{resize:none;height:44px}
 <script>
 const $=id=>document.getElementById(id);
 const P={
- groq:{url:"https://api.groq.com/openai/v1/chat/completions",model:"llama-3.3-70b-versatile"},
+ groq:{url:"https://api.groq.com/openai/v1/chat/completions",model:"openai/gpt-oss-20b"},
  gemini:{url:"https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",model:"gemini-3.8-flash"},
- openrouter:{url:"https://openrouter.ai/api/v1/chat/completions",model:"meta-llama/llama-3.3-70b-instruct:free"}
+ openrouter:{url:"https://openrouter.ai/api/v1/chat/completions",model:"openrouter/free"},
+ nvidia:{url:"https://integrate.api.nvidia.com/v1/chat/completions",model:"nvidia/nemotron-3-super-120b-a12b"}
 };
 const DEF_SYS=`Ты — автономный AI-инженер и операционный директор Telegram-бизнеса. Пользователь ставит задачу и почти не участвует: ты сам планируешь, делаешь, публикуешь, проверяешь и докладываешь итог в 3-6 строк со ссылками. Только бесплатные сервисы, пользователь работает с iPhone. Отвечай по-русски.
 ПЛАТФОРМА (инструмент scaffold_platform): рантайм на Cloudflare Worker работает 24/7 и читает всю логику из Supabase, поэтому правки бота делаются записью в таблицы через supabase, без передеплоя. Таблицы: users(id,plan,plan_until,ref_by), settings(key,value jsonb: welcome, ai_prompt, ai_premium_only), commands(cmd,label,reply,buttons[{text,url|cb}],premium,in_menu), products(id,title,description,stars,days,sub,active), payments, posts(chat_id или 'all',text,photo,buttons,send_at,sent) — посты в канал и рассылки по расписанию. Секреты Worker: BOT_TOKEN, BOT_NAME, WEBHOOK_SECRET, SB_URL, SB_KEY, ADMIN_ID, опц. AI_KEY. Cron: * * * * *. Эндпоинты для Mini App: POST /api/me и /api/invoice с initData.
@@ -73,7 +76,7 @@ const DEF_SYS=`Ты — автономный AI-инженер и операци
 ПРАВИЛА: после изменений проверяй результат (getWebhookInfo, чтение таблиц, preview). Секреты не выводи и не клади в код или репозиторий. С деньгами проверяй логику дважды. Не выдумывай API, если не уверен, так и скажи. Правки существующего проекта: сначала list_files и read_file, меняй точечно.`;
 const S=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}};
 let hist=[];try{hist=JSON.parse(localStorage.getItem("hist")||"[]")}catch(e){}
-const KEYS=["k_groq","k_gemini","k_openrouter","m_openrouter","m_gemini","m_groq","k_github","k_tg","k_sburl","k_sbkey"];
+const KEYS=["k_groq","k_gemini","k_openrouter","k_nvidia","m_openrouter","m_gemini","m_groq","m_nvidia","k_github","k_tg","k_sburl","k_sbkey"];
 
 // ---------- tools ----------
 const J=async u=>{const r=await fetch(u);if(!r.ok)throw new Error("HTTP "+r.status);return r.json()};
@@ -176,16 +179,28 @@ const tools={
 const schema=Object.entries(tools).map(([n,t])=>({type:"function",function:{name:n,description:t.d,parameters:{type:"object",properties:Object.fromEntries(Object.entries(t.p).map(([k,v])=>[k,{type:"string",description:v}])),required:Object.keys(t.p).filter(k=>!t.p[k].includes("необяз"))}}}));
 
 // ---------- LLM ----------
-async function llm(prov,msgs,useTools=true){
+async function llmOnce(prov,msgs,useTools=true){
  const cfg=P[prov];if(!cfg)throw new Error("Неизвестный провайдер: "+prov);
  const key=S("k_"+prov);if(!key)throw new Error("Нет ключа для "+prov+". Добавь в настройках.");
  const model=S("m_"+prov)||cfg.model;
- const body={model,messages:[{role:"system",content:S("sys4")||DEF_SYS},...msgs]};
+ const body={model,messages:[{role:"system",content:S("sys4")||DEF_SYS},...msgs],max_tokens:1800};
  if(useTools){body.tools=schema;body.tool_choice="auto"}
  const r=await fetch(cfg.url,{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+key},body:JSON.stringify(body)});
  const j=await r.json().catch(()=>({}));
- if(!r.ok)throw new Error(prov+" "+r.status+": "+(j.error?.message||JSON.stringify(j).slice(0,200)));
+ if(!r.ok){const e=new Error(prov+" "+r.status+": "+(j.error?.message||JSON.stringify(j).slice(0,300)));e.status=r.status;e.retryAfter=r.headers.get("retry-after")||"";throw e}
+ if(!j.choices?.[0]?.message)throw new Error(prov+" вернул неожиданный ответ");
  return j.choices[0].message;
+}
+async function llm(prov,msgs,useTools=true){
+ const selected=prov||"groq";
+ const order=selected==="auto"?["groq","gemini","nvidia","openrouter"]:[selected,"gemini","nvidia","openrouter","groq"].filter((x,i,a)=>a.indexOf(x)===i);
+ const errors=[];
+ for(const p of order){
+  if(!S("k_"+p))continue;
+  try{const m=await llmOnce(p,msgs,useTools);if(selected==="auto"&&p!==order[0])add("t","↪️ Переключился на "+p);return m}
+  catch(e){errors.push(e.message);if(selected!=="auto"&&! [429,500,502,503,504].includes(e.status))throw e;add("t","⚠️ "+p+" недоступен: "+e.message.slice(0,180))}
+ }
+ throw new Error("Все настроенные LLM недоступны. "+errors.join(" | "));
 }
 
 // ---------- agent loop ----------
@@ -209,7 +224,7 @@ async function run(text){
 
 // ---------- UI ----------
 function add(c,t){const d=document.createElement("div");d.className="m "+c;d.textContent=t;$("log").appendChild(d);$("log").scrollTop=1e9}
-function sub(){$("sub").textContent=(S("prov")||"groq")+" · "+Object.keys(tools).length+" инструментов"}
+function sub(){$("sub").textContent=(S("prov")||"groq")+" · "+Object.keys(tools).length+" инструментов"+(S("prov")==="auto"?" · fallback включён":"")}
 $("f").onsubmit=async e=>{
  e.preventDefault();const t=$("q").value.trim();if(!t)return;
  $("q").value="";add("u",t);
