@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "agent-skill-loader": {
+      "command": "npx",
+      "args": ["-y", "agent-skill-loader@1.0.2"]
+    }
+  }
+}
