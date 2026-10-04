@@ -61,7 +61,7 @@ body.dark form{background:var(--bg)}
 </style>
 </head>
 <body>
-<header><div id="agentTitle">Мой агент<small id="sub"></small></div><div class="head-actions"><button class="g" id="clr">Очистить</button><button id="gear" aria-label="Настройки" title="Настройки">⚙︎</button></div></header>
+<header><div id="agentTitle">Мой агент<small id="sub"></small></div><div class="head-actions"><button class="g" id="clr">Очистить</button><button id="gear">Настройки</button></div></header>
 <div id="log"></div>
 <form id="f"><textarea id="q" placeholder="Напиши задачу…" enterkeyhint="send" rows="1"></textarea><button id="sendBtn" type="submit" aria-label="Отправить" title="Отправить">↑</button></form>
 
@@ -319,7 +319,8 @@ $("save").onclick=()=>{
  S("skills",JSON.stringify([...document.querySelectorAll("#skillsList input:checked")].map(x=>x.value)));
  S("sys4",$("sys").value);S("auto",$("auto").checked?"1":"");applyTheme();$("set").classList.remove("on");sub()};
 $("clr").onclick=()=>{hist=[];S("hist","");$("log").innerHTML="";add("a","Контекст очищен.")};
-$("pvx").onclick=()=>{$("pv").style.display="none";$("pvf").srcdoc=""};\n$("setClose").onclick=()=>$("set").classList.remove("on");
+$("pvx").onclick=()=>{$("pv").style.display="none";$("pvf").srcdoc=""};
+$("setClose").onclick=()=>$("set").classList.remove("on");
 applyTheme();sub();
 add("a",S("k_"+(S("prov")||"groq"))?"Готов. Чем помочь?":"Привет! Нажми «Настройки» и вставь бесплатный API-ключ.");
 </script>
