@@ -178,11 +178,22 @@ const tools={
 const schema=Object.entries(tools).map(([n,t])=>({type:"function",function:{name:n,description:t.d,parameters:{type:"object",properties:Object.fromEntries(Object.entries(t.p).map(([k,v])=>[k,{type:"string",description:v}])),required:Object.keys(t.p).filter(k=>!t.p[k].includes("необяз"))}}}));
 
 // ---------- LLM ----------
+function compactMessages(h){
+ const max=14;
+ let start=Math.max(0,h.length-max);
+ while(start>0&&h[start]?.role==="tool")start--;
+ if(start>0&&h[start]?.role==="assistant"&&h[start]?.tool_calls)start--;
+ return h.slice(start).map(x=>{
+  const y={...x};
+  if(typeof y.content==="string")y.content=y.content.slice(0,y.role==="tool"?2500:4500);
+  return y;
+ });
+}
 async function llmOnce(prov,msgs,useTools=true,keyOverride){
  const cfg=P[prov];if(!cfg)throw new Error("Неизвестный провайдер: "+prov);
  const key=keyOverride||S("k_"+prov);if(!key)throw new Error("Нет ключа для "+prov+". Добавь в настройках.");
  const model=S("m_"+prov)||cfg.model;
- const body={model,messages:[{role:"system",content:S("sys4")||DEF_SYS},...msgs],max_tokens:1800};
+ const body={model,messages:[{role:"system",content:S("sys4")||DEF_SYS},...compactMessages(msgs)],max_tokens:1200};
  if(useTools){body.tools=schema;body.tool_choice="auto"}
  const r=await fetch(cfg.url,{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+key},body:JSON.stringify(body)});
  const j=await r.json().catch(()=>({}));
@@ -194,6 +205,7 @@ async function llm(prov,msgs,useTools=true){
  const selected=prov||"groq";
  const order=selected==="auto"?["mistral","xkiro","gemini","groq","openrouter"]:[selected,"mistral","xkiro","gemini","groq","openrouter"].filter((x,i,a)=>a.indexOf(x)===i);
  const errors=[];
+ const retryable=[429,500,502,503,504];
  for(const p of order){
   if(!S("k_"+p))continue;
   try{
@@ -202,11 +214,11 @@ async function llm(prov,msgs,useTools=true){
    return m
   }catch(e){
    errors.push(e.message);
-   if(p==="mistral"&&[429,500,502,503,504].includes(e.status)&&S("k_mistral2")&&S("k_mistral2")!==S("k_mistral")){
+   if(p==="mistral"&&retryable.includes(e.status)&&S("k_mistral2")&&S("k_mistral2")!==S("k_mistral")){
     try{const m=await llmOnce("mistral",msgs,useTools,S("k_mistral2"));add("t","↪️ Mistral: использован резервный ключ");return m}catch(e2){errors.push(e2.message)}
    }
-   if(selected!=="auto"&&! [429,500,502,503,504].includes(e.status))throw e;
-   add("t","⚠️ "+p+" недоступен: "+e.message.slice(0,180))
+   if(selected!=="auto"&&!retryable.includes(e.status))throw e;
+   add("t","⚠️ "+p+" недоступен: "+(e.status===429?"лимит/квота"+(e.retryAfter?" · повторить через "+e.retryAfter+"с":""):(!e.status?"сетевая ошибка (проверь CORS/endpoint) ":e.message)).slice(0,180))
   }
  }
  throw new Error("Все настроенные LLM недоступны. "+errors.join(" | "));
@@ -216,7 +228,7 @@ async function llm(prov,msgs,useTools=true){
 async function run(text){
  hist.push({role:"user",content:text});
  const prov=S("prov")||"groq";
- for(let i=0;i<30;i++){
+ for(let i=0;i<18;i++){
   const m=await llm(prov,hist);
   hist.push({role:"assistant",content:m.content||"",...(m.tool_calls?{tool_calls:m.tool_calls}:{})});
   if(!m.tool_calls?.length){add("a",m.content||"(пустой ответ)");return}
@@ -225,7 +237,7 @@ async function run(text){
    try{args=JSON.parse(c.function.arguments||"{}");add("t","🔧 "+c.function.name+" "+JSON.stringify(args));
     const T=tools[c.function.name];out=!T?"нет такого инструмента":(T.ask&&T.ask(args)&&(S("auto")!=="1"||(T.hard&&T.hard(args)))&&!confirm("Разрешить: "+c.function.name+"\n"+JSON.stringify(args).slice(0,300)))?"Пользователь отклонил действие":String(await T.f(args))}
    catch(e){out="Ошибка: "+e.message}
-   hist.push({role:"tool",tool_call_id:c.id,name:c.function.name,content:out.slice(0,8000)});
+   hist.push({role:"tool",tool_call_id:c.id,name:c.function.name,content:out.slice(0,2500)});
   }
  }
  add("a","Остановился: слишком много шагов.");
