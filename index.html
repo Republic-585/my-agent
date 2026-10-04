@@ -37,13 +37,27 @@ textarea{resize:none;height:44px}
 <div id="set">
 <h2 style="margin:0">Настройки</h2>
 <label>Главная модель</label>
-<select id="prov"><option value="auto">AUTO — каскад моделей</option><option value="mistral">Mistral</option><option value="xkiro">xKiro</option><option value="gemini">Google Gemini</option><option value="groq">Groq</option><option value="openrouter">OpenRouter (free-модели)</option></select>
+<select id="prov"><option value="auto">AUTO — каскад моделей</option><option value="mistral">Mistral</option><option value="xkiro">xKiro</option><option value="gemini">Google Gemini</option><option value="groq">Groq</option><option value="openrouter">OpenRouter (модели)</option><option value="kilo">Kilo</option><option value="pollinations">Pollinations</option><option value="ovh">OVHcloud AI Endpoints</option><option value="aihorde">AI Horde</option><option value="unorouter">UnoRouter</option><option value="huggingface">Hugging Face</option><option value="modelscope">ModelScope</option></select>
 <label>Ключ Mistral</label><input id="k_mistral" type="password" autocomplete="off"><p>Основной ключ Mistral</p><label>Резервный ключ Mistral</label><input id="k_mistral2" type="password" autocomplete="off"><p>Второй ключ используется при временной ошибке основного.</p><label>Ключ xKiro</label><input id="k_xkiro" type="password" autocomplete="off"><p>OpenAI-compatible gateway</p><label>Ключ Groq</label><input id="k_groq" type="password" autocomplete="off"><p>console.groq.com → API Keys</p>
 <label>Ключ Gemini</label><input id="k_gemini" type="password" autocomplete="off"><p>aistudio.google.com → Get API key</p>
 <label>Ключ OpenRouter</label><input id="k_openrouter" type="password" autocomplete="off"><p>openrouter.ai → Keys</p>
 <label>Модель Mistral</label><input id="m_mistral" placeholder="mistral-small-latest"><label>Модель xKiro</label><input id="m_xkiro" placeholder="openai/gpt-5.6-sol"><label>Модель Gemini</label><input id="m_gemini" placeholder="gemini-3.7-flash">
 <label>Модель Groq</label><input id="m_groq" placeholder="openai/gpt-oss-20b">
-<label>Модель OpenRouter</label><input id="m_openrouter" placeholder="openrouter/free">
+<label>Ключ Kilo</label><input id="k_kilo" type="password" autocomplete="off"><p>Не обязателен для бесплатных моделей Kilo.</p>
+<label>Ключ Pollinations</label><input id="k_pollinations" type="password" autocomplete="off"><p>Создаётся на enter.pollinations.ai</p>
+<label>Ключ OVHcloud AI Endpoints</label><input id="k_ovh" type="password" autocomplete="off"><p>Public Cloud → AI Endpoints → API key</p>
+<label>Ключ AI Horde</label><input id="k_aihorde" type="password" autocomplete="off"><p>Зарегистрированный ключ AI Horde. Модель выбирается отдельно.</p>
+<label>Ключ UnoRouter</label><input id="k_unorouter" type="password" autocomplete="off"><p>Settings → API access</p>
+<label>Ключ Hugging Face</label><input id="k_hf" type="password" autocomplete="off"><p>HF token с правом inference</p>
+<label>Ключ ModelScope</label><input id="k_modelscope" type="password" autocomplete="off"><p>ModelScope SDK Token</p>
+<label>Модель OpenRouter</label><select id="m_openrouter"><option value="z-ai/glm-5.3-flash:free">GLM 5.3 Flash — free</option><option value="moonshotai/kimi-k3">Kimi K3</option><option value="qwen/qwen3.8-2.4t-a95b">Qwen3.8 2.4T A95B</option><option value="dots-studio/dots-3-note-preview:free">Dots3 Note Preview — free</option><option value="deepseek/deepseek-v4-pro-0813">DeepSeek V4 Pro 0813</option><option value="deepseek/deepseek-v4-flash">DeepSeek V4 Flash</option><option value="deepseek/deepseek-v4-flash-0731:free">DeepSeek V4 Flash 0731 — free</option><option value="z-ai/glm-5.2:free">GLM-5.2 — free</option></select>
+<label>Модель Kilo</label><input id="m_kilo" placeholder="kilo-auto/free">
+<label>Модель Pollinations</label><input id="m_pollinations" placeholder="openai/gpt-5.4-nano">
+<label>Модель OVHcloud</label><input id="m_ovh" placeholder="mistral@latest">
+<label>Модель AI Horde</label><input id="m_aihorde" placeholder="выбери актуальную модель AI Horde">
+<label>Модель UnoRouter</label><input id="m_unorouter" placeholder="glm-5.3:free">
+<label>Модель Hugging Face</label><input id="m_hf" placeholder="zai-org/GLM-5.2">
+<label>Модель ModelScope</label><input id="m_modelscope" placeholder="ZhipuAI/GLM-5.2">
 <label>GitHub token (classic, право repo)</label><input id="k_github" type="password" autocomplete="off"><p>github.com/settings/tokens</p>
 <label>Telegram Bot Token</label><input id="k_tg" type="password" autocomplete="off"><p>@BotFather → /newbot</p>
 <label>Supabase URL</label><input id="k_sburl" placeholder="https://xxxx.supabase.co">
@@ -62,7 +76,14 @@ const P={
  gemini:{url:"https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",model:"gemini-3.7-flash"},
  mistral:{url:"https://api.mistral.ai/v1/chat/completions",model:"mistral-small-latest"},
  xkiro:{url:"https://api.xkiro.com/v1/chat/completions",model:"openai/gpt-5.6-sol"},
- openrouter:{url:"https://openrouter.ai/api/v1/chat/completions",model:"openrouter/free"},
+ openrouter:{url:"https://openrouter.ai/api/v1/chat/completions",model:"z-ai/glm-5.3-flash:free"},
+ kilo:{url:"https://api.kilo.ai/api/gateway/chat/completions",model:"kilo-auto/free",noKey:true},
+ pollinations:{url:"https://gen.pollinations.ai/v1/chat/completions",model:"openai/gpt-5.4-nano",key:"k_pollinations"},
+ ovh:{url:"https://oai.endpoints.kepler.ai.cloud.ovh.net/v1/chat/completions",model:"mistral@latest",key:"k_ovh"},
+ aihorde:{url:"https://oai.aihorde.net/v1/chat/completions",model:"",key:"k_aihorde"},
+ unorouter:{url:"https://api.unorouter.com/v1/chat/completions",model:"glm-5.3:free",key:"k_unorouter"},
+ huggingface:{url:"https://router.huggingface.co/v1/chat/completions",model:"zai-org/GLM-5.2",key:"k_hf"},
+ modelscope:{url:"https://api-inference.modelscope.cn/v1/chat/completions",model:"ZhipuAI/GLM-5.2",key:"k_modelscope"},
 };
 const DEF_SYS=`Ты — автономный AI-инженер и операционный директор Telegram-бизнеса. Пользователь ставит задачу и почти не участвует: ты сам планируешь, делаешь, публикуешь, проверяешь и докладываешь итог в 3-6 строк со ссылками. Только бесплатные сервисы, пользователь работает с iPhone. Отвечай по-русски.
 ПЛАТФОРМА (инструмент scaffold_platform): рантайм на Cloudflare Worker работает 24/7 и читает всю логику из Supabase, поэтому правки бота делаются записью в таблицы через supabase, без передеплоя. Таблицы: users(id,plan,plan_until,ref_by), settings(key,value jsonb: welcome, ai_prompt, ai_premium_only), commands(cmd,label,reply,buttons[{text,url|cb}],premium,in_menu), products(id,title,description,stars,days,sub,active), payments, posts(chat_id или 'all',text,photo,buttons,send_at,sent) — посты в канал и рассылки по расписанию. Секреты Worker: BOT_TOKEN, BOT_NAME, WEBHOOK_SECRET, SB_URL, SB_KEY, ADMIN_ID, опц. AI_KEY. Cron: * * * * *. Эндпоинты для Mini App: POST /api/me и /api/invoice с initData.
@@ -75,7 +96,7 @@ const DEF_SYS=`Ты — автономный AI-инженер и операци
 ПРАВИЛА: после изменений проверяй результат (getWebhookInfo, чтение таблиц, preview). Секреты не выводи и не клади в код или репозиторий. С деньгами проверяй логику дважды. Не выдумывай API, если не уверен, так и скажи. Правки существующего проекта: сначала list_files и read_file, меняй точечно.`;
 const S=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}};
 let hist=[];try{hist=JSON.parse(localStorage.getItem("hist")||"[]")}catch(e){}
-const KEYS=["k_mistral","k_mistral2","k_xkiro","k_groq","k_gemini","k_openrouter","m_mistral","m_xkiro","m_openrouter","m_gemini","m_groq","k_github","k_tg","k_sburl","k_sbkey"];
+const KEYS=["k_mistral","k_mistral2","k_xkiro","k_groq","k_gemini","k_openrouter","k_kilo","k_pollinations","k_ovh","k_aihorde","k_unorouter","k_hf","k_modelscope","m_mistral","m_xkiro","m_openrouter","m_gemini","m_groq","m_kilo","m_pollinations","m_ovh","m_aihorde","m_unorouter","m_hf","m_modelscope","k_github","k_tg","k_sburl","k_sbkey"];
 
 // ---------- tools ----------
 const J=async u=>{const r=await fetch(u);if(!r.ok)throw new Error("HTTP "+r.status);return r.json()};
@@ -172,7 +193,7 @@ const tools={
  http_request:{ask:a=>(a.method||"GET").toUpperCase()!=="GET",hard:()=>1,d:"Произвольный HTTP-запрос (только к API с разрешённым CORS)",p:{method:"string",url:"string",headers_json:"string (необязательно)",body:"string (необязательно)"},f:async a=>{
    const m=(a.method||"GET").toUpperCase();const r=await fetch(a.url,{method:m,headers:a.headers_json?JSON.parse(a.headers_json):{},body:m==="GET"?undefined:a.body});
    return r.status+" "+(await r.text()).slice(0,6000)}},
- ask_other_llm:{d:"Задать вопрос другой LLM (mistral, xkiro, gemini, groq или openrouter) и получить её ответ. Полезно для второго мнения.",p:{provider:"string (mistral|xkiro|gemini|groq|openrouter)",question:"string"},f:async a=>{
+ ask_other_llm:{d:"Задать вопрос другой LLM (mistral, xkiro, gemini, groq, openrouter, kilo, pollinations, unorouter, huggingface, modelscope, ovh или aihorde) и получить её ответ. Полезно для второго мнения.",p:{provider:"string (mistral|xkiro|gemini|groq|openrouter|kilo|pollinations|unorouter|huggingface|modelscope|ovh|aihorde)",question:"string"},f:async a=>{
    const m=await llm(a.provider,[{role:"user",content:a.question}],false);return m.content}}
 };
 const schema=Object.entries(tools).map(([n,t])=>({type:"function",function:{name:n,description:t.d,parameters:{type:"object",properties:Object.fromEntries(Object.entries(t.p).map(([k,v])=>[k,{type:"string",description:v}])),required:Object.keys(t.p).filter(k=>!t.p[k].includes("необяз"))}}}));
@@ -191,11 +212,12 @@ function compactMessages(h){
 }
 async function llmOnce(prov,msgs,useTools=true,keyOverride){
  const cfg=P[prov];if(!cfg)throw new Error("Неизвестный провайдер: "+prov);
- const key=keyOverride||S("k_"+prov);if(!key)throw new Error("Нет ключа для "+prov+". Добавь в настройках.");
- const model=S("m_"+prov)||cfg.model;
+ const key=keyOverride||S(cfg.key||("k_"+prov));if(!key&&!cfg.noKey)throw new Error("Нет ключа для "+prov+". Добавь в настройках.");
+ const model=S("m_"+prov)||cfg.model;if(!model)throw new Error("Не указана модель для "+prov+". Выбери модель в настройках.");
  const body={model,messages:[{role:"system",content:S("sys4")||DEF_SYS},...compactMessages(msgs)],max_tokens:1200};
  if(useTools){body.tools=schema;body.tool_choice="auto"}
- const r=await fetch(cfg.url,{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+key},body:JSON.stringify(body)});
+ const headers={"Content-Type":"application/json"};if(key)headers.Authorization="Bearer "+key;
+ const r=await fetch(cfg.url,{method:"POST",headers,body:JSON.stringify(body)});
  const j=await r.json().catch(()=>({}));
  if(!r.ok){const e=new Error(prov+" "+r.status+": "+(j.error?.message||JSON.stringify(j).slice(0,300)));e.status=r.status;e.retryAfter=r.headers.get("retry-after")||"";throw e}
  if(!j.choices?.[0]?.message)throw new Error(prov+" вернул неожиданный ответ");
@@ -203,11 +225,11 @@ async function llmOnce(prov,msgs,useTools=true,keyOverride){
 }
 async function llm(prov,msgs,useTools=true){
  const selected=prov||"groq";
- const order=selected==="auto"?["mistral","xkiro","gemini","groq","openrouter"]:[selected,"mistral","xkiro","gemini","groq","openrouter"].filter((x,i,a)=>a.indexOf(x)===i);
+ const order=selected==="auto"?["mistral","xkiro","gemini","groq","openrouter","kilo","pollinations","unorouter","huggingface","modelscope","ovh","aihorde"]:[selected,"mistral","xkiro","gemini","groq","openrouter","kilo","pollinations","unorouter","huggingface","modelscope","ovh","aihorde"].filter((x,i,a)=>a.indexOf(x)===i);
  const errors=[];
  const retryable=[429,500,502,503,504];
  for(const p of order){
-  if(!S("k_"+p))continue;
+  if(!S(P[p]?.key||("k_"+p))&&!P[p]?.noKey)continue;
   try{
    const m=await llmOnce(p,msgs,useTools);
    if(selected==="auto"&&p!==order[0])add("t","↪️ Переключился на "+p);
