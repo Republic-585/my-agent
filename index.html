@@ -56,8 +56,8 @@ textarea{resize:none;height:44px}
 <label>Модель OVHcloud</label><input id="m_ovh" placeholder="mistral@latest">
 <label>Модель AI Horde</label><input id="m_aihorde" placeholder="выбери актуальную модель AI Horde">
 <label>Модель UnoRouter</label><input id="m_unorouter" placeholder="glm-5.3:free">
-<label>Модель Hugging Face</label><input id="m_hf" placeholder="zai-org/GLM-5.2">
-<label>Модель ModelScope</label><input id="m_modelscope" placeholder="ZhipuAI/GLM-5.2">
+<label>Модель Hugging Face</label><select id="m_hf"><option value="moonshotai/Kimi-K3">Kimi K3</option><option value="zai-org/GLM-5.3-Flash">GLM 5.3 Flash</option><option value="zai-org/GLM-5.2">GLM-5.2</option><option value="zai-org/GLM-5.2-FP8">GLM 5.2 FP8</option></select>
+<label>Модель ModelScope</label><select id="m_modelscope"><option value="ZhipuAI/GLM-5.2">GLM-5.2</option></select>
 <label>GitHub token (classic, право repo)</label><input id="k_github" type="password" autocomplete="off"><p>github.com/settings/tokens</p>
 <label>Telegram Bot Token</label><input id="k_tg" type="password" autocomplete="off"><p>@BotFather → /newbot</p>
 <label>Supabase URL</label><input id="k_sburl" placeholder="https://xxxx.supabase.co">
