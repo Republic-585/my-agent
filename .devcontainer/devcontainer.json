@@ -1,0 +1,16 @@
+{
+  "name": "my-agent",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-22-bookworm",
+  "customizations": {
+    "vscode": {
+      "mcp": {
+        "servers": {
+          "agent-skill-loader": {
+            "command": "npx",
+            "args": ["-y", "agent-skill-loader@1.0.2"]
+          }
+        }
+      }
+    }
+  }
+}
