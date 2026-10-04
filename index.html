@@ -238,7 +238,7 @@ async function llmOnce(prov,msgs,useTools=true,keyOverride){
  const cfg=P[prov];if(!cfg)throw new Error("Неизвестный провайдер: "+prov);
  const key=keyOverride||S(cfg.key||("k_"+prov));if(!key&&!cfg.noKey)throw new Error("Нет ключа для "+prov+". Добавь в настройках.");
  const model=S("m_"+prov)||cfg.model;if(!model)throw new Error("Не указана модель для "+prov+". Выбери модель в настройках.");
- const body={model,messages:[{role:"system",content:(S("sys4")||DEF_SYS)+skillsPrompt()},...compactMessages(msgs)],max_tokens:1200};
+ const body={model,messages:[{role:"system",content:(S("sys4")||DEF_SYS)+skillsPrompt()+"\n\nСТИЛЬ ОТВЕТА: отвечай кратко и профессионально. Давай только самое необходимое и важное. Не повторяй условие задачи, не добавляй лишние пояснения и не используй пустые вводные фразы. Если требуется действие — сразу выполняй или сообщай конкретный следующий шаг."},...compactMessages(msgs)],max_tokens:1200};
  if(useTools){body.tools=schema;body.tool_choice="auto"}
  const headers={"Content-Type":"application/json"};if(key)headers.Authorization="Bearer "+key;
  const r=await fetch(cfg.url,{method:"POST",headers,body:JSON.stringify(body)});
@@ -290,7 +290,7 @@ async function run(text){
 }
 
 // ---------- UI ----------
-function add(c,t){const d=document.createElement("div");d.className="m "+c;d.textContent=t;$("log").appendChild(d);$("log").scrollTop=1e9}
+const ownerMode=()=>location.hash==="#owner";function add(c,t){if(c==="t"&&!ownerMode())return;const d=document.createElement("div");d.className="m "+c;d.textContent=t;$("log").appendChild(d);$("log").scrollTop=1e9}
 function sub(){$("agentTitle").firstChild.textContent=agentName();$("sub").textContent=(S("prov")||"groq")+" · "+Object.keys(tools).length+" инструментов"}
 $("f").onsubmit=async e=>{
  e.preventDefault();const t=$("q").value.trim();if(!t)return;
