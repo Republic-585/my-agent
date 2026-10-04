@@ -11,9 +11,9 @@
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
 body{font:16px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",system-ui,sans-serif;background:var(--bg);color:var(--ink);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;font-weight:700}
-header small{font-weight:400;color:var(--mut);display:block;font-size:12px}
-.head-actions{margin-left:auto;display:flex;align-items:center;justify-content:flex-end;gap:8px}
+header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;font-weight:700;gap:10px}
+header>div:first-child{min-width:0} header small{font-weight:400;color:var(--mut);display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.head-actions{margin-left:auto;display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-shrink:0}
 button{font:inherit;border:0;border-radius:10px;padding:9px 14px;background:var(--acc);color:#fff}
 #sendBtn{width:44px;height:44px;min-width:44px;padding:0;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;line-height:1}
 #sendBtn:disabled{opacity:.55}
@@ -37,7 +37,7 @@ body.dark .settings-group-body input,body.dark .settings-group-body select,body.
 .thinking{align-self:flex-start;font-size:13px;color:var(--mut);padding:3px 8px 5px;min-height:24px}
 .thinking::after{content:"";animation:dots 1.2s infinite}
 @keyframes dots{0%,20%{content:""}40%{content:"."}60%{content:".."}80%,100%{content:"..."}}
-button.g{background:var(--ok);color:var(--ink)}
+button.g{background:var(--ok);color:var(--ink);white-space:nowrap}
 #log{flex:1;overflow-y:auto;padding:6px 14px 14px;display:flex;flex-direction:column;gap:8px}
 .m{max-width:88%;padding:9px 12px;border-radius:14px;white-space:pre-wrap;word-wrap:break-word}
 .u{align-self:flex-end;background:var(--acc);color:#fff;border-bottom-right-radius:4px}
@@ -61,7 +61,7 @@ body.dark form{background:var(--bg)}
 </style>
 </head>
 <body>
-<header><div id="agentTitle">Мой агент<small id="sub"></small></div><div class="head-actions"><button class="g" id="clr">Очистить</button><button id="gear">Настройки</button></div></header>
+<header><div id="agentTitle">Мой агент<small id="sub"></small></div><div class="head-actions"><button class="g" id="clr">Очистить</button><button id="gear" aria-label="Настройки" title="Настройки">⚙︎</button></div></header>
 <div id="log"></div>
 <form id="f"><textarea id="q" placeholder="Напиши задачу…" enterkeyhint="send" rows="1"></textarea><button id="sendBtn" type="submit" aria-label="Отправить" title="Отправить">↑</button></form>
 
