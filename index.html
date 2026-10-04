@@ -13,16 +13,30 @@ html,body{height:100%;margin:0}
 body{font:16px/1.45 -apple-system,system-ui,sans-serif;background:var(--bg);color:var(--ink);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top)}
 header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;font-weight:700}
 header small{font-weight:400;color:var(--mut);display:block;font-size:12px}
+.head-actions{margin-left:auto;display:flex;align-items:center;justify-content:flex-end;gap:8px}
 button{font:inherit;border:0;border-radius:10px;padding:9px 14px;background:var(--acc);color:#fff}
+#sendBtn{width:44px;height:44px;min-width:44px;padding:0;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;line-height:1}
+#sendBtn:disabled{opacity:.55}
+.thinking{align-self:flex-start;font-size:13px;color:var(--mut);padding:3px 8px 5px;min-height:24px}
+.thinking::after{content:"";animation:dots 1.2s infinite}
+@keyframes dots{0%,20%{content:""}40%{content:"."}60%{content:".."}80%,100%{content:"..."}}
 button.g{background:var(--ok);color:var(--ink)}
 #log{flex:1;overflow-y:auto;padding:6px 14px 14px;display:flex;flex-direction:column;gap:8px}
 .m{max-width:88%;padding:9px 12px;border-radius:14px;white-space:pre-wrap;word-wrap:break-word}
 .u{align-self:flex-end;background:var(--acc);color:#fff;border-bottom-right-radius:4px}
 .a{align-self:flex-start;background:var(--card);border-bottom-left-radius:4px}
 .t{align-self:flex-start;font-size:12.5px;color:var(--mut);background:none;padding:0 4px;border-left:3px solid var(--hi);border-radius:0;padding-left:8px}
-form{display:flex;gap:8px;padding:8px 14px calc(8px + env(safe-area-inset-bottom));background:var(--bg)}
+form{display:flex;align-items:flex-end;gap:8px;padding:8px 14px calc(8px + env(safe-area-inset-bottom));background:var(--bg)}
+form textarea{flex:1;min-height:44px;max-height:180px;overflow-y:auto}
 textarea,input,select{font:inherit;width:100%;border:1px solid #cfd4de;border-radius:10px;padding:9px 11px;background:#fff;color:var(--ink)}
 textarea{resize:none;height:44px}
+.skills{display:grid;gap:7px;margin:6px 0 12px}
+.skill-option{display:flex;align-items:center;gap:9px;margin:0!important;font-weight:400!important}
+.skill-option input{width:auto;margin:0}
+body.dark{--bg:#111318;--ink:#f2f4f8;--mut:#9ba3b2;--card:#1b1f27;--acc:#2f6fed;--hi:#7aa2ff;--ok:#252b35}
+body.dark textarea,body.dark input,body.dark select{background:#1b1f27;color:var(--ink);border-color:#3a414d}
+body.dark #set{background:var(--bg)}
+body.dark form{background:var(--bg)}
 #set{position:fixed;inset:0;background:var(--bg);overflow:auto;padding:calc(14px + env(safe-area-inset-top)) 14px 30px;display:none}
 #set.on{display:block}
 #set label{display:block;margin:12px 0 4px;font-weight:600}
@@ -30,12 +44,29 @@ textarea{resize:none;height:44px}
 </style>
 </head>
 <body>
-<header><div>Мой агент<small id="sub"></small></div><div><button class="g" id="clr">Очистить</button> <button id="gear">Настройки</button></div></header>
+<header><div id="agentTitle">Мой агент<small id="sub"></small></div><div class="head-actions"><button class="g" id="clr">Очистить</button><button id="gear">Настройки</button></div></header>
 <div id="log"></div>
-<form id="f"><textarea id="q" placeholder="Напиши задачу…" enterkeyhint="send"></textarea><button>Отправить</button></form>
+<form id="f"><textarea id="q" placeholder="Напиши задачу…" enterkeyhint="send" rows="1"></textarea><button id="sendBtn" type="submit" aria-label="Отправить" title="Отправить">↑</button></form>
 
 <div id="set">
 <h2 style="margin:0">Настройки</h2>
+<label>Имя Агента</label><input id="agentName" placeholder="Мой агент">
+<label>Тема</label><select id="theme"><option value="light">Светлая</option><option value="dark">Тёмная</option></select>
+<label>Навыки (инструменты) агента</label><div class="skills" id="skillsList">
+<label class="skill-option"><input type="checkbox" value="strategy"> strategy</label>
+<label class="skill-option"><input type="checkbox" value="telegram_pro"> telegram_pro</label>
+<label class="skill-option"><input type="checkbox" value="miniapp_ui"> miniapp_ui</label>
+<label class="skill-option"><input type="checkbox" value="stars_money"> stars_money</label>
+<label class="skill-option"><input type="checkbox" value="supabase_pro"> supabase_pro</label>
+<label class="skill-option"><input type="checkbox" value="growth_channel"> growth_channel</label>
+<label class="skill-option"><input type="checkbox" value="funnel_copy"> funnel_copy</label>
+<label class="skill-option"><input type="checkbox" value="ai_features"> ai_features</label>
+<label class="skill-option"><input type="checkbox" value="analytics"> analytics</label>
+<label class="skill-option"><input type="checkbox" value="security"> security</label>
+<label class="skill-option"><input type="checkbox" value="deploy_cf"> deploy_cf</label>
+<label class="skill-option"><input type="checkbox" value="code_quality"> code_quality</label>
+<label class="skill-option"><input type="checkbox" value="debugging"> debugging</label>
+</div>
 <label>Главная модель</label>
 <select id="prov"><option value="auto">AUTO — каскад моделей</option><option value="mistral">Mistral</option><option value="xkiro">xKiro</option><option value="gemini">Google Gemini</option><option value="groq">Groq</option><option value="openrouter">OpenRouter (модели)</option><option value="kilo">Kilo</option><option value="pollinations">Pollinations</option><option value="ovh">OVHcloud AI Endpoints</option><option value="aihorde">AI Horde</option><option value="unorouter">UnoRouter</option><option value="huggingface">Hugging Face</option><option value="modelscope">ModelScope</option></select>
 <label>Ключ Mistral</label><input id="k_mistral" type="password" autocomplete="off"><p>Основной ключ Mistral</p><label>Резервный ключ Mistral</label><input id="k_mistral2" type="password" autocomplete="off"><p>Второй ключ используется при временной ошибке основного.</p><label>Ключ xKiro</label><input id="k_xkiro" type="password" autocomplete="off"><p>OpenAI-compatible gateway</p><label>Ключ Groq</label><input id="k_groq" type="password" autocomplete="off"><p>console.groq.com → API Keys</p>
@@ -95,6 +126,10 @@ const DEF_SYS=`Ты — автономный AI-инженер и операци
 НАВЫКИ: перед задачей вызови load_skill для 1-3 подходящих: strategy (новый проект), telegram_pro, miniapp_ui, stars_money, supabase_pro, growth_channel, funnel_copy, ai_features, analytics, security, deploy_cf; code_quality перед каждым github_push; debugging при любой ошибке. Чужой проект: github_repos, github_pull, правки, github_push. Документацию читай через read_url.
 ПРАВИЛА: после изменений проверяй результат (getWebhookInfo, чтение таблиц, preview). Секреты не выводи и не клади в код или репозиторий. С деньгами проверяй логику дважды. Не выдумывай API, если не уверен, так и скажи. Правки существующего проекта: сначала list_files и read_file, меняй точечно.`;
 const S=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}};
+function applyTheme(){document.body.classList.toggle("dark",S("theme")==="dark")}
+function agentName(){return S("agentName")||"Мой агент"}
+function selectedSkills(){try{return JSON.parse(S("skills")||"[]")}catch(e){return []}}
+function skillsPrompt(){const a=selectedSkills();if(!a.length)return "";return "\n\nАКТИВНЫЕ НАВЫКИ:\n"+a.map(n=>SKILLS[n]?"["+n+"]\n"+SKILLS[n]:"").filter(Boolean).join("\n\n")}
 let hist=[];try{hist=JSON.parse(localStorage.getItem("hist")||"[]")}catch(e){}
 const KEYS=["k_mistral","k_mistral2","k_xkiro","k_groq","k_gemini","k_openrouter","k_kilo","k_pollinations","k_ovh","k_aihorde","k_unorouter","k_hf","k_modelscope","m_mistral","m_xkiro","m_openrouter","m_gemini","m_groq","m_kilo","m_pollinations","m_ovh","m_aihorde","m_unorouter","m_hf","m_modelscope","k_github","k_tg","k_sburl","k_sbkey"];
 
@@ -214,7 +249,7 @@ async function llmOnce(prov,msgs,useTools=true,keyOverride){
  const cfg=P[prov];if(!cfg)throw new Error("Неизвестный провайдер: "+prov);
  const key=keyOverride||S(cfg.key||("k_"+prov));if(!key&&!cfg.noKey)throw new Error("Нет ключа для "+prov+". Добавь в настройках.");
  const model=S("m_"+prov)||cfg.model;if(!model)throw new Error("Не указана модель для "+prov+". Выбери модель в настройках.");
- const body={model,messages:[{role:"system",content:S("sys4")||DEF_SYS},...compactMessages(msgs)],max_tokens:1200};
+ const body={model,messages:[{role:"system",content:(S("sys4")||DEF_SYS)+skillsPrompt()},...compactMessages(msgs)],max_tokens:1200};
  if(useTools){body.tools=schema;body.tool_choice="auto"}
  const headers={"Content-Type":"application/json"};if(key)headers.Authorization="Bearer "+key;
  const r=await fetch(cfg.url,{method:"POST",headers,body:JSON.stringify(body)});
@@ -267,25 +302,32 @@ async function run(text){
 
 // ---------- UI ----------
 function add(c,t){const d=document.createElement("div");d.className="m "+c;d.textContent=t;$("log").appendChild(d);$("log").scrollTop=1e9}
-function sub(){$("sub").textContent=(S("prov")||"groq")+" · "+Object.keys(tools).length+" инструментов"+(S("prov")==="auto"?" · fallback включён":"")}
+function sub(){$("agentTitle").firstChild.textContent=agentName();$("sub").textContent=(S("prov")||"groq")+" · "+Object.keys(tools).length+" инструментов"}
 $("f").onsubmit=async e=>{
  e.preventDefault();const t=$("q").value.trim();if(!t)return;
- $("q").value="";add("u",t);
- try{await run(t)}catch(err){add("a","⚠️ "+err.message)}
+ $("q").value="";resizeInput();add("u",t);$("sendBtn").disabled=true;
+ const thinking=document.createElement("div");thinking.className="thinking";thinking.textContent="Модель думает";$("log").appendChild(thinking);$("log").scrollTop=1e9;
+ try{await run(t)}catch(err){add("a","⚠️ "+err.message)}finally{thinking.remove();$("sendBtn").disabled=false;$("q").focus()}
  S("hist",JSON.stringify((h=>h.slice(Math.max(0,h.findIndex(x=>x.role==="user"))))(hist.slice(-40))));
 };
+function resizeInput(){const q=$("q");q.style.height="44px";q.style.height=Math.min(q.scrollHeight,180)+"px"}
+$("q").oninput=resizeInput;
 $("q").onkeydown=e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){e.preventDefault();$("f").requestSubmit()}};
 $("gear").onclick=()=>{
  $("prov").value=S("prov")||"groq";
  for(const k of KEYS)$(k).value=S(k)||"";
+ $("agentName").value=agentName();$("theme").value=S("theme")||"light";
+ const ss=selectedSkills();document.querySelectorAll("#skillsList input").forEach(x=>x.checked=ss.includes(x.value));
  $("sys").value=S("sys4")||DEF_SYS;$("auto").checked=S("auto")==="1";$("set").classList.add("on")};
 $("save").onclick=()=>{
  S("prov",$("prov").value);
  for(const k of KEYS)S(k,$(k).value.trim());
- S("sys4",$("sys").value);S("auto",$("auto").checked?"1":"");$("set").classList.remove("on");sub()};
+ S("agentName",$("agentName").value.trim()||"Мой агент");S("theme",$("theme").value);
+ S("skills",JSON.stringify([...document.querySelectorAll("#skillsList input:checked")].map(x=>x.value)));
+ S("sys4",$("sys").value);S("auto",$("auto").checked?"1":"");applyTheme();$("set").classList.remove("on");sub()};
 $("clr").onclick=()=>{hist=[];S("hist","");$("log").innerHTML="";add("a","Контекст очищен.")};
 $("pvx").onclick=()=>{$("pv").style.display="none";$("pvf").srcdoc=""};
-sub();
+applyTheme();sub();
 add("a",S("k_"+(S("prov")||"groq"))?"Готов. Чем помочь?":"Привет! Нажми «Настройки» и вставь бесплатный API-ключ.");
 </script>
 </body>
