@@ -37,15 +37,13 @@ textarea{resize:none;height:44px}
 <div id="set">
 <h2 style="margin:0">Настройки</h2>
 <label>Главная модель</label>
-<select id="prov"><option value="auto">AUTO — каскад моделей</option><option value="groq">Groq</option><option value="gemini">Google Gemini</option><option value="openrouter">OpenRouter (free-модели)</option><option value="nvidia">NVIDIA NIM</option></select>
-<label>Ключ Groq</label><input id="k_groq" type="password" autocomplete="off"><p>console.groq.com → API Keys</p>
+<select id="prov"><option value="auto">AUTO — каскад моделей</option><option value="mistral">Mistral</option><option value="xkiro">xKiro</option><option value="gemini">Google Gemini</option><option value="groq">Groq</option><option value="openrouter">OpenRouter (free-модели)</option></select>
+<label>Ключ Mistral</label><input id="k_mistral" type="password" autocomplete="off"><p>Основной ключ Mistral</p><label>Резервный ключ Mistral</label><input id="k_mistral2" type="password" autocomplete="off"><p>Второй ключ используется при временной ошибке основного.</p><label>Ключ xKiro</label><input id="k_xkiro" type="password" autocomplete="off"><p>OpenAI-compatible gateway</p><label>Ключ Groq</label><input id="k_groq" type="password" autocomplete="off"><p>console.groq.com → API Keys</p>
 <label>Ключ Gemini</label><input id="k_gemini" type="password" autocomplete="off"><p>aistudio.google.com → Get API key</p>
 <label>Ключ OpenRouter</label><input id="k_openrouter" type="password" autocomplete="off"><p>openrouter.ai → Keys</p>
-<label>Ключ NVIDIA NIM</label><input id="k_nvidia" type="password" autocomplete="off"><p>build.nvidia.com → API Key</p>
-<label>Модель Gemini (если старая отключат, впиши новую)</label><input id="m_gemini" placeholder="gemini-3.8-flash">
+<label>Модель Mistral</label><input id="m_mistral" placeholder="mistral-small-latest"><label>Модель xKiro</label><input id="m_xkiro" placeholder="openai/gpt-5.6-sol"><label>Модель Gemini</label><input id="m_gemini" placeholder="gemini-3.7-flash">
 <label>Модель Groq</label><input id="m_groq" placeholder="openai/gpt-oss-20b">
 <label>Модель OpenRouter</label><input id="m_openrouter" placeholder="openrouter/free">
-<label>Модель NVIDIA</label><input id="m_nvidia" placeholder="nvidia/nemotron-3-super-120b-a12b"><p>Бесплатный endpoint с tool calling.</p>
 <label>GitHub token (classic, право repo)</label><input id="k_github" type="password" autocomplete="off"><p>github.com/settings/tokens</p>
 <label>Telegram Bot Token</label><input id="k_tg" type="password" autocomplete="off"><p>@BotFather → /newbot</p>
 <label>Supabase URL</label><input id="k_sburl" placeholder="https://xxxx.supabase.co">
@@ -61,9 +59,10 @@ textarea{resize:none;height:44px}
 const $=id=>document.getElementById(id);
 const P={
  groq:{url:"https://api.groq.com/openai/v1/chat/completions",model:"openai/gpt-oss-20b"},
- gemini:{url:"https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",model:"gemini-3.8-flash"},
+ gemini:{url:"https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",model:"gemini-3.7-flash"},
+ mistral:{url:"https://api.mistral.ai/v1/chat/completions",model:"mistral-small-latest"},
+ xkiro:{url:"https://api.xkiro.com/v1/chat/completions",model:"openai/gpt-5.6-sol"},
  openrouter:{url:"https://openrouter.ai/api/v1/chat/completions",model:"openrouter/free"},
- nvidia:{url:"https://integrate.api.nvidia.com/v1/chat/completions",model:"nvidia/nemotron-3-super-120b-a12b"}
 };
 const DEF_SYS=`Ты — автономный AI-инженер и операционный директор Telegram-бизнеса. Пользователь ставит задачу и почти не участвует: ты сам планируешь, делаешь, публикуешь, проверяешь и докладываешь итог в 3-6 строк со ссылками. Только бесплатные сервисы, пользователь работает с iPhone. Отвечай по-русски.
 ПЛАТФОРМА (инструмент scaffold_platform): рантайм на Cloudflare Worker работает 24/7 и читает всю логику из Supabase, поэтому правки бота делаются записью в таблицы через supabase, без передеплоя. Таблицы: users(id,plan,plan_until,ref_by), settings(key,value jsonb: welcome, ai_prompt, ai_premium_only), commands(cmd,label,reply,buttons[{text,url|cb}],premium,in_menu), products(id,title,description,stars,days,sub,active), payments, posts(chat_id или 'all',text,photo,buttons,send_at,sent) — посты в канал и рассылки по расписанию. Секреты Worker: BOT_TOKEN, BOT_NAME, WEBHOOK_SECRET, SB_URL, SB_KEY, ADMIN_ID, опц. AI_KEY. Cron: * * * * *. Эндпоинты для Mini App: POST /api/me и /api/invoice с initData.
@@ -76,7 +75,7 @@ const DEF_SYS=`Ты — автономный AI-инженер и операци
 ПРАВИЛА: после изменений проверяй результат (getWebhookInfo, чтение таблиц, preview). Секреты не выводи и не клади в код или репозиторий. С деньгами проверяй логику дважды. Не выдумывай API, если не уверен, так и скажи. Правки существующего проекта: сначала list_files и read_file, меняй точечно.`;
 const S=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}};
 let hist=[];try{hist=JSON.parse(localStorage.getItem("hist")||"[]")}catch(e){}
-const KEYS=["k_groq","k_gemini","k_openrouter","k_nvidia","m_openrouter","m_gemini","m_groq","m_nvidia","k_github","k_tg","k_sburl","k_sbkey"];
+const KEYS=["k_mistral","k_mistral2","k_xkiro","k_groq","k_gemini","k_openrouter","m_mistral","m_xkiro","m_openrouter","m_gemini","m_groq","k_github","k_tg","k_sburl","k_sbkey"];
 
 // ---------- tools ----------
 const J=async u=>{const r=await fetch(u);if(!r.ok)throw new Error("HTTP "+r.status);return r.json()};
@@ -173,15 +172,15 @@ const tools={
  http_request:{ask:a=>(a.method||"GET").toUpperCase()!=="GET",hard:()=>1,d:"Произвольный HTTP-запрос (только к API с разрешённым CORS)",p:{method:"string",url:"string",headers_json:"string (необязательно)",body:"string (необязательно)"},f:async a=>{
    const m=(a.method||"GET").toUpperCase();const r=await fetch(a.url,{method:m,headers:a.headers_json?JSON.parse(a.headers_json):{},body:m==="GET"?undefined:a.body});
    return r.status+" "+(await r.text()).slice(0,6000)}},
- ask_other_llm:{d:"Задать вопрос другой LLM (groq, gemini или openrouter) и получить её ответ. Полезно для второго мнения.",p:{provider:"string (groq|gemini|openrouter)",question:"string"},f:async a=>{
+ ask_other_llm:{d:"Задать вопрос другой LLM (mistral, xkiro, gemini, groq или openrouter) и получить её ответ. Полезно для второго мнения.",p:{provider:"string (mistral|xkiro|gemini|groq|openrouter)",question:"string"},f:async a=>{
    const m=await llm(a.provider,[{role:"user",content:a.question}],false);return m.content}}
 };
 const schema=Object.entries(tools).map(([n,t])=>({type:"function",function:{name:n,description:t.d,parameters:{type:"object",properties:Object.fromEntries(Object.entries(t.p).map(([k,v])=>[k,{type:"string",description:v}])),required:Object.keys(t.p).filter(k=>!t.p[k].includes("необяз"))}}}));
 
 // ---------- LLM ----------
-async function llmOnce(prov,msgs,useTools=true){
+async function llmOnce(prov,msgs,useTools=true,keyOverride){
  const cfg=P[prov];if(!cfg)throw new Error("Неизвестный провайдер: "+prov);
- const key=S("k_"+prov);if(!key)throw new Error("Нет ключа для "+prov+". Добавь в настройках.");
+ const key=keyOverride||S("k_"+prov);if(!key)throw new Error("Нет ключа для "+prov+". Добавь в настройках.");
  const model=S("m_"+prov)||cfg.model;
  const body={model,messages:[{role:"system",content:S("sys4")||DEF_SYS},...msgs],max_tokens:1800};
  if(useTools){body.tools=schema;body.tool_choice="auto"}
@@ -193,12 +192,22 @@ async function llmOnce(prov,msgs,useTools=true){
 }
 async function llm(prov,msgs,useTools=true){
  const selected=prov||"groq";
- const order=selected==="auto"?["groq","gemini","nvidia","openrouter"]:[selected,"gemini","nvidia","openrouter","groq"].filter((x,i,a)=>a.indexOf(x)===i);
+ const order=selected==="auto"?["mistral","xkiro","gemini","groq","openrouter"]:[selected,"mistral","xkiro","gemini","groq","openrouter"].filter((x,i,a)=>a.indexOf(x)===i);
  const errors=[];
  for(const p of order){
   if(!S("k_"+p))continue;
-  try{const m=await llmOnce(p,msgs,useTools);if(selected==="auto"&&p!==order[0])add("t","↪️ Переключился на "+p);return m}
-  catch(e){errors.push(e.message);if(selected!=="auto"&&! [429,500,502,503,504].includes(e.status))throw e;add("t","⚠️ "+p+" недоступен: "+e.message.slice(0,180))}
+  try{
+   const m=await llmOnce(p,msgs,useTools);
+   if(selected==="auto"&&p!==order[0])add("t","↪️ Переключился на "+p);
+   return m
+  }catch(e){
+   errors.push(e.message);
+   if(p==="mistral"&&[429,500,502,503,504].includes(e.status)&&S("k_mistral2")&&S("k_mistral2")!==S("k_mistral")){
+    try{const m=await llmOnce("mistral",msgs,useTools,S("k_mistral2"));add("t","↪️ Mistral: использован резервный ключ");return m}catch(e2){errors.push(e2.message)}
+   }
+   if(selected!=="auto"&&! [429,500,502,503,504].includes(e.status))throw e;
+   add("t","⚠️ "+p+" недоступен: "+e.message.slice(0,180))
+  }
  }
  throw new Error("Все настроенные LLM недоступны. "+errors.join(" | "));
 }
