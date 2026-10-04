@@ -7,51 +7,51 @@
 <meta name="apple-mobile-web-app-title" content="Агент">
 <title>Мой агент</title>
 <style>
-:root{--bg:#eceef2;--ink:#14213d;--mut:#6b7385;--card:#fff;--acc:#14213d;--hi:#fca311;--ok:#e3e8f2}
+:root{--bg:#f4f0e8;--ink:#171716;--mut:#746f67;--card:#fffdf8;--acc:#b08b4f;--hi:#176b55;--ok:#e7dfd0;--line:rgba(43,38,30,.12);--glow:rgba(176,139,79,.18)}
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
-body{font:16px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",system-ui,sans-serif;background:var(--bg);color:var(--ink);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;font-weight:700;gap:10px}
+body{font:16px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",system-ui,sans-serif;background:var(--bg);color:var(--ink);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;overflow:hidden;position:relative}body::before{content:"";position:fixed;inset:-20%;pointer-events:none;background:radial-gradient(circle at 85% 5%,rgba(176,139,79,.10),transparent 30%),radial-gradient(circle at 8% 92%,rgba(23,107,85,.07),transparent 26%);z-index:-1}
+header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;font-weight:700;gap:10px;animation:riseIn .45s ease both}
 header>div:first-child{min-width:0} header small{font-weight:400;color:var(--mut);display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .head-actions{margin-left:auto;display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-shrink:0}
-button{font:inherit;border:0;border-radius:10px;padding:9px 14px;background:var(--acc);color:#fff}
-#sendBtn{width:44px;height:44px;min-width:44px;padding:0;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;line-height:1}
-#sendBtn:disabled{opacity:.55}
+button{font:inherit;border:0;border-radius:11px;padding:9px 14px;background:var(--acc);color:#fff;box-shadow:0 6px 18px rgba(176,139,79,.18);transition:transform .18s ease,box-shadow .18s ease,filter .18s ease}button:hover{filter:brightness(1.04);box-shadow:0 9px 24px rgba(176,139,79,.24)}button:active{transform:scale(.97)}
+#sendBtn{width:44px;height:44px;min-width:44px;padding:0;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;line-height:1;background:linear-gradient(145deg,#c6a76a,#a67f43);box-shadow:0 8px 24px rgba(176,139,79,.28)}
+#sendBtn:disabled{opacity:.55;box-shadow:none}#sendBtn:hover{transform:translateY(-1px) scale(1.02)}
 #gear{width:40px;height:40px;min-width:40px;padding:0;border-radius:50%;display:flex;align-items:center;justify-content:center;background:transparent;color:var(--ink);font-size:21px;line-height:1;border:1px solid transparent}
-#gear:hover,#gear:focus-visible{background:var(--ok);outline:none}
+#gear:hover,#gear:focus-visible{background:var(--ok);outline:none;box-shadow:0 0 0 5px var(--glow)}
 #set{backdrop-filter:saturate(180%) blur(18px)}
 .settings-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 18px}
 .settings-header h2{margin:0;font-size:28px;letter-spacing:-.03em}
 .settings-close{width:38px;height:38px;min-width:38px;border-radius:50%;padding:0;background:var(--ok);color:var(--ink);font-size:20px;line-height:1}
-.settings-group{background:var(--card);border:1px solid rgba(127,127,127,.14);border-radius:16px;margin:0 0 12px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.03)}
-.settings-group-title{padding:13px 15px 8px;font-size:13px;font-weight:600;color:var(--mut);letter-spacing:.01em}
+.settings-group{background:linear-gradient(180deg,rgba(255,253,248,.96),rgba(255,251,243,.9));border:1px solid var(--line);border-radius:16px;margin:0 0 12px;overflow:hidden;box-shadow:0 10px 28px rgba(50,42,30,.06);animation:cardIn .38s ease both}.settings-group:nth-of-type(2){animation-delay:.03s}.settings-group:nth-of-type(3){animation-delay:.06s}.settings-group:nth-of-type(4){animation-delay:.09s}.settings-group:nth-of-type(5){animation-delay:.12s}
+.settings-group-title{padding:13px 15px 8px;font-size:13px;font-weight:650;color:#8b6b39;letter-spacing:.02em}
 .settings-group-body{padding:0 15px 14px}
 .settings-group-body>label:not(.skill-option){margin:12px 0 5px}
 .settings-group-body>label:first-child{margin-top:4px}
-.settings-group-body input,.settings-group-body select,.settings-group-body textarea{border-color:rgba(127,127,127,.22);background:var(--bg);border-radius:11px}
+.settings-group-body input,.settings-group-body select,.settings-group-body textarea{border-color:var(--line);background:rgba(255,255,255,.72);border-radius:11px;transition:border-color .18s ease,box-shadow .18s ease,background .18s ease}.settings-group-body input:focus,.settings-group-body select:focus,.settings-group-body textarea:focus{outline:none;border-color:rgba(176,139,79,.62);box-shadow:0 0 0 4px var(--glow);background:#fff}
 .settings-group-body p{margin:5px 0 8px}
 .settings-save{position:sticky;bottom:12px;display:flex;justify-content:flex-end;margin-top:4px}
-.settings-save button{min-height:44px;padding:0 20px;border-radius:12px}
-body.dark .settings-group{border-color:rgba(255,255,255,.08)}
-body.dark .settings-group-body input,body.dark .settings-group-body select,body.dark .settings-group-body textarea{background:#111318;border-color:#343a45}
+.settings-save button{min-height:44px;padding:0 20px;border-radius:12px;background:linear-gradient(145deg,#c6a76a,#a67f43)}
+body.dark .settings-group{border-color:var(--line)}
+body.dark .settings-group-body input,body.dark .settings-group-body select,body.dark .settings-group-body textarea{background:#111417;border-color:#30353b}
 .thinking{align-self:flex-start;font-size:13px;color:var(--mut);padding:3px 8px 5px;min-height:24px}
 .thinking::after{content:"";animation:dots 1.2s infinite}
-@keyframes dots{0%,20%{content:""}40%{content:"."}60%{content:".."}80%,100%{content:"..."}}
-button.g{background:var(--ok);color:var(--ink);white-space:nowrap}
+@keyframes dots{0%,20%{content:""}40%{content:"."}60%{content:".."}80%,100%{content:"..."}}@keyframes riseIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:none}}@keyframes cardIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}@keyframes messageIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}}
+button.g{background:var(--ok);color:var(--ink);white-space:nowrap;box-shadow:none}
 #log{flex:1;overflow-y:auto;padding:6px 14px 14px;display:flex;flex-direction:column;gap:8px}
 .m{max-width:88%;padding:9px 12px;border-radius:14px;white-space:pre-wrap;word-wrap:break-word}
-.u{align-self:flex-end;background:var(--acc);color:#fff;border-bottom-right-radius:4px}
-.a{align-self:flex-start;background:var(--card);border-bottom-left-radius:4px}
-.t{align-self:flex-start;font-size:12.5px;color:var(--mut);background:none;padding:0 4px;border-left:3px solid var(--hi);border-radius:0;padding-left:8px}
+.u{align-self:flex-end;background:linear-gradient(145deg,#b7955d,#9f783e);color:#fff;border-bottom-right-radius:4px;box-shadow:0 6px 18px rgba(176,139,79,.16);animation:messageIn .22s ease both}
+.a{align-self:flex-start;background:rgba(255,253,248,.9);border:1px solid var(--line);border-bottom-left-radius:4px;box-shadow:0 5px 18px rgba(40,35,28,.045);animation:messageIn .22s ease both}
+.t{align-self:flex-start;font-size:12.5px;color:var(--mut);background:none;padding:0 4px;border-left:3px solid var(--hi);border-radius:0;padding-left:8px;animation:messageIn .2s ease both}
 form{display:flex;align-items:flex-end;gap:8px;padding:8px 14px calc(8px + env(safe-area-inset-bottom));background:var(--bg)}
 form textarea{flex:1;min-height:44px;max-height:180px;overflow-y:auto}
-textarea,input,select{font:inherit;width:100%;border:1px solid #cfd4de;border-radius:10px;padding:9px 11px;background:#fff;color:var(--ink)}
+textarea,input,select{font:inherit;width:100%;border:1px solid var(--line);border-radius:10px;padding:9px 11px;background:rgba(255,255,255,.86);color:var(--ink);transition:border-color .18s ease,box-shadow .18s ease}
 textarea{resize:none;height:44px}
 .skills{display:grid;gap:7px;margin:6px 0 12px}
 .skill-option{display:flex;align-items:center;gap:9px;margin:0!important;font-weight:400!important}
 .skill-option input{width:auto;margin:0}
-body.dark{--bg:#111318;--ink:#f2f4f8;--mut:#9ba3b2;--card:#1b1f27;--acc:#2f6fed;--hi:#7aa2ff;--ok:#252b35}
-body.dark textarea,body.dark input,body.dark select{background:#1b1f27;color:var(--ink);border-color:#3a414d}
+body.dark{--bg:#0b0d0f;--ink:#f2eee6;--mut:#9a958d;--card:#14171a;--acc:#c1a268;--hi:#3f9a7a;--ok:#1b1e22;--line:rgba(233,222,201,.11);--glow:rgba(193,162,104,.18)}
+body.dark textarea,body.dark input,body.dark select{background:#111417;color:var(--ink);border-color:#30353b}body.dark .settings-group{background:linear-gradient(180deg,rgba(20,23,26,.98),rgba(17,20,23,.96));border-color:var(--line);box-shadow:0 12px 32px rgba(0,0,0,.22)}body.dark .settings-group-title{color:#c7a96d}body.dark .settings-group-body input:focus,body.dark .settings-group-body select:focus,body.dark .settings-group-body textarea:focus{background:#15191d}
 body.dark #set{background:var(--bg)}
 body.dark form{background:var(--bg)}
 #set{position:fixed;inset:0;background:var(--bg);overflow:auto;padding:calc(14px + env(safe-area-inset-top)) 14px 30px;display:none}
@@ -75,14 +75,10 @@ body.dark form{background:var(--bg)}
 <label>Навыки (инструменты) агента</label><div class="skills" id="skillsList">
 <label class="skill-option"><input type="checkbox" value="strategy"> strategy</label><label class="skill-option"><input type="checkbox" value="telegram_pro"> telegram_pro</label><label class="skill-option"><input type="checkbox" value="miniapp_ui"> miniapp_ui</label><label class="skill-option"><input type="checkbox" value="stars_money"> stars_money</label><label class="skill-option"><input type="checkbox" value="supabase_pro"> supabase_pro</label><label class="skill-option"><input type="checkbox" value="growth_channel"> growth_channel</label><label class="skill-option"><input type="checkbox" value="funnel_copy"> funnel_copy</label><label class="skill-option"><input type="checkbox" value="ai_features"> ai_features</label><label class="skill-option"><input type="checkbox" value="analytics"> analytics</label><label class="skill-option"><input type="checkbox" value="security"> security</label><label class="skill-option"><input type="checkbox" value="deploy_cf"> deploy_cf</label><label class="skill-option"><input type="checkbox" value="code_quality"> code_quality</label><label class="skill-option"><input type="checkbox" value="debugging"> debugging</label>
 </div></div></section>
-<section class="settings-group"><div class="settings-group-title">Модели и провайдеры</div><div class="settings-group-body">
-<label>Главная модель</label><select id="prov"><option value="auto">AUTO — каскад моделей</option><option value="mistral">Mistral</option><option value="xkiro">xKiro</option><option value="gemini">Google Gemini</option><option value="groq">Groq</option><option value="openrouter">OpenRouter (модели)</option><option value="kilo">Kilo</option><option value="pollinations">Pollinations</option><option value="ovh">OVHcloud AI Endpoints</option><option value="aihorde">AI Horde</option><option value="unorouter">UnoRouter</option><option value="huggingface">Hugging Face</option><option value="modelscope">ModelScope</option></select>
+<section class="settings-group"><div class="settings-group-title">Провайдеры и API</div><div class="settings-group-body">
+<label>Провайдер</label><select id="prov"><option value="auto">AUTO — автоматический каскад</option><option value="mistral">Mistral</option><option value="xkiro">xKiro</option><option value="gemini">Google Gemini</option><option value="groq">Groq</option><option value="openrouter">OpenRouter</option><option value="kilo">Kilo</option><option value="pollinations">Pollinations</option><option value="ovh">OVHcloud AI Endpoints</option><option value="aihorde">AI Horde</option><option value="unorouter">UnoRouter</option><option value="huggingface">Hugging Face</option><option value="modelscope">ModelScope</option></select>
 <label>Ключ Mistral</label><input id="k_mistral" type="password" autocomplete="off"><p>Основной ключ Mistral</p><label>Резервный ключ Mistral</label><input id="k_mistral2" type="password" autocomplete="off"><p>Второй ключ используется при временной ошибке основного.</p><label>Ключ xKiro</label><input id="k_xkiro" type="password" autocomplete="off"><p>OpenAI-compatible gateway</p><label>Ключ Groq</label><input id="k_groq" type="password" autocomplete="off"><p>console.groq.com → API Keys</p><label>Ключ Gemini</label><input id="k_gemini" type="password" autocomplete="off"><p>aistudio.google.com → Get API key</p><label>Ключ OpenRouter</label><input id="k_openrouter" type="password" autocomplete="off"><p>openrouter.ai → Keys</p>
-<label>Модель Mistral</label><input id="m_mistral" placeholder="mistral-small-latest"><label>Модель xKiro</label><input id="m_xkiro" placeholder="openai/gpt-5.6-sol"><label>Модель Gemini</label><input id="m_gemini" placeholder="gemini-3.7-flash"><label>Модель Groq</label><input id="m_groq" placeholder="openai/gpt-oss-20b">
-<label>Ключ Kilo</label><input id="k_kilo" type="password" autocomplete="off"><p>Не обязателен для бесплатных моделей Kilo.</p><label>Ключ Pollinations</label><input id="k_pollinations" type="password" autocomplete="off"><p>Создаётся на enter.pollinations.ai</p><label>Ключ OVHcloud AI Endpoints</label><input id="k_ovh" type="password" autocomplete="off"><p>Public Cloud → AI Endpoints → API key</p><label>Ключ AI Horde</label><input id="k_aihorde" type="password" autocomplete="off"><p>Зарегистрированный ключ AI Horde. Модель выбирается отдельно.</p><label>Ключ UnoRouter</label><input id="k_unorouter" type="password" autocomplete="off"><p>Settings → API access</p><label>Ключ Hugging Face</label><input id="k_hf" type="password" autocomplete="off"><p>HF token с правом inference</p><label>Ключ ModelScope</label><input id="k_modelscope" type="password" autocomplete="off"><p>ModelScope SDK Token</p>
-<label>Модель OpenRouter</label><select id="m_openrouter"><option value="z-ai/glm-5.3-flash:free">GLM 5.3 Flash — free</option><option value="moonshotai/kimi-k3">Kimi K3</option><option value="qwen/qwen3.8-2.4t-a95b">Qwen3.8 2.4T A95B</option><option value="dots-studio/dots-3-note-preview:free">Dots3 Note Preview — free</option><option value="deepseek/deepseek-v4-pro-0813">DeepSeek V4 Pro 0813</option><option value="deepseek/deepseek-v4-flash">DeepSeek V4 Flash</option><option value="deepseek/deepseek-v4-flash-0731:free">DeepSeek V4 Flash 0731 — free</option><option value="z-ai/glm-5.2:free">GLM-5.2 — free</option></select>
-<label>Модель Kilo</label><input id="m_kilo" placeholder="kilo-auto/free"><label>Модель Pollinations</label><input id="m_pollinations" placeholder="openai/gpt-5.4-nano"><label>Модель OVHcloud</label><input id="m_ovh" placeholder="mistral@latest"><label>Модель AI Horde</label><input id="m_aihorde" placeholder="выбери актуальную модель AI Horde"><label>Модель UnoRouter</label><input id="m_unorouter" placeholder="glm-5.3:free">
-<label>Модель Hugging Face</label><select id="m_hf"><option value="moonshotai/Kimi-K3">Kimi K3</option><option value="zai-org/GLM-5.3-Flash">GLM 5.3 Flash</option><option value="zai-org/GLM-5.2">GLM-5.2</option><option value="zai-org/GLM-5.2-FP8">GLM 5.2 FP8</option></select><label>Модель ModelScope</label><select id="m_modelscope"><option value="ZhipuAI/GLM-5.2">GLM-5.2</option></select>
+<label>Ключ Kilo</label><input id="k_kilo" type="password" autocomplete="off"><p>Можно использовать без ключа, если провайдер разрешает.</p><label>Ключ Pollinations</label><input id="k_pollinations" type="password" autocomplete="off"><p>Создаётся на enter.pollinations.ai</p><label>Ключ OVHcloud AI Endpoints</label><input id="k_ovh" type="password" autocomplete="off"><p>Public Cloud → AI Endpoints → API key</p><label>Ключ AI Horde</label><input id="k_aihorde" type="password" autocomplete="off"><p>Зарегистрированный ключ AI Horde. Провайдер использует доступную конфигурацию автоматически.</p><label>Ключ UnoRouter</label><input id="k_unorouter" type="password" autocomplete="off"><p>Settings → API access</p><label>Ключ Hugging Face</label><input id="k_hf" type="password" autocomplete="off"><p>HF token с правом inference</p><label>Ключ ModelScope</label><input id="k_modelscope" type="password" autocomplete="off"><p>ModelScope SDK Token</p>
 </div></section>
 <section class="settings-group"><div class="settings-group-title">Интеграции и доступ</div><div class="settings-group-body">
 <label>GitHub token (classic, право repo)</label><input id="k_github" type="password" autocomplete="off"><p>github.com/settings/tokens</p><label>Telegram Bot Token</label><input id="k_tg" type="password" autocomplete="off"><p>@BotFather → /newbot</p><label>Supabase URL</label><input id="k_sburl" placeholder="https://xxxx.supabase.co"><label>Supabase ключ (secret / service_role)</label><input id="k_sbkey" type="password" autocomplete="off"><p>Project Settings → API Keys. Секретный ключ даёт полный доступ к базе: держи его только в этом приложении.</p>
@@ -124,7 +120,7 @@ function agentName(){return S("agentName")||"Мой агент"}
 function selectedSkills(){try{return JSON.parse(S("skills")||"[]")}catch(e){return []}}
 function skillsPrompt(){const a=selectedSkills();if(!a.length)return "";return "\n\nАКТИВНЫЕ НАВЫКИ:\n"+a.map(n=>SKILLS[n]?"["+n+"]\n"+SKILLS[n]:"").filter(Boolean).join("\n\n")}
 let hist=[];try{hist=JSON.parse(localStorage.getItem("hist")||"[]")}catch(e){}
-const KEYS=["k_mistral","k_mistral2","k_xkiro","k_groq","k_gemini","k_openrouter","k_kilo","k_pollinations","k_ovh","k_aihorde","k_unorouter","k_hf","k_modelscope","m_mistral","m_xkiro","m_openrouter","m_gemini","m_groq","m_kilo","m_pollinations","m_ovh","m_aihorde","m_unorouter","m_hf","m_modelscope","k_github","k_tg","k_sburl","k_sbkey"];
+const KEYS=["k_mistral","k_mistral2","k_xkiro","k_groq","k_gemini","k_openrouter","k_kilo","k_pollinations","k_ovh","k_aihorde","k_unorouter","k_hf","k_modelscope","k_github","k_tg","k_sburl","k_sbkey"];
 
 // ---------- tools ----------
 const J=async u=>{const r=await fetch(u);if(!r.ok)throw new Error("HTTP "+r.status);return r.json()};
