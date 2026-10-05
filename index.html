@@ -438,7 +438,7 @@ $("save").onclick=()=>{
  S("agentName",$("agentName").value.trim()||"Мой агент");S("theme",$("theme").value);
  S("skills",JSON.stringify([...document.querySelectorAll("#skillsList input:checked")].map(x=>x.value)));
  S("sys4",$("sys").value);S("auto",$("auto").checked?"1":"");applyTheme();$("set").classList.remove("on");sub()};
-$("clr").onclick=()=>{hist=[];S("hist","");$("log").innerHTML="";add("a","Контекст очищен.")};
+if($("clr"))$("clr").onclick=()=>{hist=[];S("hist","");$("log").innerHTML="";add("a","Контекст очищен.")};
 $("pvx").onclick=()=>{$("pv").style.display="none";$("pvf").srcdoc=""};
 $("setClose").onclick=()=>$("set").classList.remove("on");
 applyTheme();sub();
