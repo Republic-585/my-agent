@@ -71,7 +71,7 @@ body.dark form{background:var(--bg)}
 </style>
 </head>
 <body>
-<header><div id="agentTitle">Мой агент<small id="sub"></small></div><div class="head-actions"><button class="g" id="clr">Очистить</button><button id="gear" aria-label="Настройки" title="Настройки">⚙︎</button></div></header>
+<header><div id="agentTitle">Мой агент<small id="sub"></small></div><div class="head-actions"><button class="g" id="clr">Очистить</button><button class="g" id="adminBtn" type="button" title="Админ-панель">Админ</button><button id="gear" aria-label="Настройки" title="Настройки">⚙︎</button></div></header>
 <div id="log"></div>
 <form id="f"><div class="input-island"><button id="attachBtn" class="attach-btn" type="button" aria-label="Прикрепить файл или фото" title="Прикрепить">+</button><input id="fileInput" type="file" hidden multiple accept="image/*,.txt,.md,.csv,.json,.js,.ts,.html,.css,.pdf,.doc,.docx,.xlsx"><div class="input-main"><div id="attachPreview" class="attach-preview"></div><textarea id="q" placeholder="Напишите задачу…" enterkeyhint="enter" rows="1"></textarea></div><button id="sendBtn" type="submit" aria-label="Отправить" title="Отправить">↑</button></div></form>
 
@@ -97,7 +97,118 @@ body.dark form{background:var(--bg)}
 </div></section>
 </div>
 
+
+<style>
+#adminPanel{position:fixed;inset:0;z-index:20;background:var(--bg);color:var(--ink);display:none;overflow:auto;padding:calc(12px + env(safe-area-inset-top)) 14px calc(28px + env(safe-area-inset-bottom))}
+#adminPanel.on{display:block}
+.admin-wrap{max-width:980px;margin:0 auto}
+.admin-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.admin-title{font-size:26px;font-weight:800;letter-spacing:-.04em}
+.admin-sub{font-size:12px;color:var(--mut);margin-top:2px}
+.admin-actions{display:flex;gap:7px}
+.admin-btn{background:var(--acc);color:#fff;border:0;border-radius:11px;padding:10px 13px;box-shadow:none}
+.admin-btn.secondary{background:var(--ok);color:var(--ink)}
+.admin-login{max-width:430px;margin:12vh auto 0}
+.admin-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px;margin-bottom:12px;box-shadow:0 8px 26px rgba(0,0,0,.06)}
+.admin-login h2{margin:0 0 6px;font-size:23px}
+.admin-login p{color:var(--mut);font-size:13px;margin:0 0 16px}
+.admin-login label,.admin-form label{display:block;font-size:12px;font-weight:650;color:var(--mut);margin:10px 0 5px}
+.admin-login input,.admin-form input,.admin-form select{background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:10px}
+.admin-error{min-height:20px;color:#b44a4a;font-size:13px;margin-top:8px}
+.admin-tabs{display:flex;gap:6px;overflow:auto;margin:4px 0 12px;padding-bottom:2px}
+.admin-tab{white-space:nowrap;background:var(--ok);color:var(--ink);box-shadow:none;border:1px solid var(--line);padding:9px 12px;border-radius:10px}
+.admin-tab.on{background:var(--acc);color:#fff}
+.admin-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.admin-stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px}
+.admin-stat b{display:block;font-size:25px;letter-spacing:-.03em}
+.admin-stat span{display:block;color:var(--mut);font-size:12px;margin-top:3px}
+.admin-section{display:none}.admin-section.on{display:block}
+.admin-table{width:100%;border-collapse:collapse;font-size:12px}
+.admin-table th{text-align:left;color:var(--mut);font-weight:600;padding:8px 5px;border-bottom:1px solid var(--line)}
+.admin-table td{padding:9px 5px;border-bottom:1px solid var(--line);vertical-align:top}
+.admin-table .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.admin-scroll{overflow:auto}
+.admin-pill{display:inline-block;padding:4px 7px;border-radius:999px;background:var(--ok);font-size:11px}
+.admin-pill.active{color:#2f7a4d}.admin-pill.revoked{color:#a23b3b}.admin-pill.paused{color:#986d2e}
+.admin-toolbar{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+.admin-toolbar input{flex:1;background:var(--bg)}
+.admin-empty{color:var(--mut);font-size:13px;padding:16px 4px}
+.admin-modal{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.46);display:none;align-items:flex-end;padding:12px}
+.admin-modal.on{display:flex}
+.admin-modal-card{width:100%;max-width:560px;margin:auto;background:var(--card);border-radius:18px;padding:16px;border:1px solid var(--line)}
+.admin-modal-card h3{margin:0 0 8px}.admin-key-output{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all;padding:12px;border-radius:11px;background:var(--ok);margin:10px 0}
+.admin-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(min-width:720px){.admin-grid{grid-template-columns:repeat(4,1fr)}.admin-modal{align-items:center}}
+@media(max-width:560px){.admin-form-grid{grid-template-columns:1fr}}
+</style>
+<div id="adminPanel">
+ <div class="admin-wrap">
+  <div id="adminLogin" class="admin-login admin-card">
+   <h2>Админ-панель</h2>
+   <p>Вход выполняется через Supabase Auth. Только пользователи из списка администраторов получат доступ.</p>
+   <div class="admin-form"><label>Email</label><input id="adminEmail" type="email" autocomplete="username" placeholder="email"></div>
+   <div class="admin-form"><label>Пароль</label><input id="adminPassword" type="password" autocomplete="current-password" placeholder="••••••••"></div>
+   <button class="admin-btn" id="adminLoginBtn" type="button" style="width:100%;margin-top:12px">Войти</button>
+   <div id="adminLoginError" class="admin-error"></div>
+  </div>
+  <div id="adminApp" style="display:none">
+   <div class="admin-top">
+    <div><div class="admin-title">Админ-панель</div><div class="admin-sub" id="adminIdentity"></div></div>
+    <div class="admin-actions"><button class="admin-btn secondary" id="adminRefresh">Обновить</button><button class="admin-btn secondary" id="adminLogout">Выйти</button></div>
+   </div>
+   <div class="admin-tabs">
+    <button class="admin-tab on" data-tab="dashboard">Обзор</button>
+    <button class="admin-tab" data-tab="users">Пользователи</button>
+    <button class="admin-tab" data-tab="keys">AI-доступ</button>
+    <button class="admin-tab" data-tab="orders">Платежи</button>
+    <button class="admin-tab" data-tab="plans">Тарифы</button>
+   </div>
+   <section class="admin-section on" id="admin-dashboard">
+    <div class="admin-grid" id="adminStats"></div>
+    <div class="admin-card"><b>Состояние системы</b><div id="adminSystem" class="admin-empty">Загрузка…</div></div>
+   </section>
+   <section class="admin-section" id="admin-users">
+    <div class="admin-card"><div class="admin-toolbar"><input id="userSearch" placeholder="Поиск по email или ID"></div><div class="admin-scroll"><table class="admin-table"><thead><tr><th>Пользователь</th><th>ID</th><th>Имя</th></tr></thead><tbody id="usersBody"></tbody></table></div></div>
+   </section>
+   <section class="admin-section" id="admin-keys">
+    <div class="admin-card">
+     <div class="admin-toolbar"><input id="keySearch" placeholder="Поиск по ключу, user ID, тарифу"><button class="admin-btn" id="newKeyBtn" type="button">+ Ключ</button></div>
+     <div class="admin-scroll"><table class="admin-table"><thead><tr><th>Ключ</th><th>Пользователь</th><th>Тариф</th><th>Статус</th><th>Лимиты</th><th></th></tr></thead><tbody id="keysBody"></tbody></table></div>
+    </div>
+   </section>
+   <section class="admin-section" id="admin-orders">
+    <div class="admin-card"><div class="admin-scroll"><table class="admin-table"><thead><tr><th>Дата</th><th>Пользователь</th><th>Тариф</th><th>Сумма</th><th>Статус</th><th>Провайдер</th></tr></thead><tbody id="ordersBody"></tbody></table></div></div>
+   </section>
+   <section class="admin-section" id="admin-plans">
+    <div class="admin-card"><div class="admin-scroll"><table class="admin-table"><thead><tr><th>ID</th><th>Тариф</th><th>Цена</th><th>Дни</th><th>Дневной лимит</th><th>Месячный</th><th>Активен</th></tr></thead><tbody id="plansBody"></tbody></table></div></div>
+   </section>
+  </div>
+ </div>
+</div>
+<div id="adminKeyModal" class="admin-modal">
+ <div class="admin-modal-card">
+  <h3>Новый ключ создан</h3>
+  <div>Скопируй ключ сейчас. В базе хранится только его хэш.</div>
+  <div id="newKeyOutput" class="admin-key-output"></div>
+  <div class="admin-actions"><button class="admin-btn" id="copyNewKey">Скопировать</button><button class="admin-btn secondary" id="closeKeyModal">Закрыть</button></div>
+ </div>
+</div>
+<div id="adminCreateModal" class="admin-modal">
+ <div class="admin-modal-card">
+  <h3>Создать доступ к AI агенту</h3>
+  <div class="admin-form-grid">
+   <div class="admin-form"><label>Пользователь</label><select id="newKeyUser"></select></div>
+   <div class="admin-form"><label>Тариф</label><select id="newKeyPlan"></select></div>
+   <div class="admin-form"><label>Срок действия</label><input id="newKeyExpires" type="datetime-local"></div>
+   <div class="admin-form"><label>Дневной лимит</label><input id="newKeyDaily" type="number" value="500" min="1"></div>
+   <div class="admin-form"><label>Месячный лимит</label><input id="newKeyMonthly" type="number" value="10000" min="1"></div>
+  </div>
+  <div class="admin-actions" style="margin-top:14px"><button class="admin-btn" id="createKeySubmit">Создать</button><button class="admin-btn secondary" id="cancelKeyCreate">Отмена</button></div>
+  <div id="createKeyError" class="admin-error"></div>
+ </div>
+</div>
 <div id="pv" style="display:none;position:fixed;inset:0;z-index:9;background:#fff;padding-top:env(safe-area-inset-top)"><div style="padding:6px 10px"><button id="pvx">Закрыть предпросмотр</button></div><iframe id="pvf" sandbox="allow-scripts allow-forms" style="width:100%;height:calc(100% - 52px);border:0"></iframe></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $=id=>document.getElementById(id);
 const GATEWAY_URL="https://dfvztoazthliaobqnndv.supabase.co/functions/v1/agent-gateway";
@@ -332,6 +443,87 @@ $("pvx").onclick=()=>{$("pv").style.display="none";$("pvf").srcdoc=""};
 $("setClose").onclick=()=>$("set").classList.remove("on");
 applyTheme();sub();
 add("a",S("agent_key")?"Готов. Чем помочь?":"Привет! Открой «Настройки», вставь ключ доступа к агенту и нажми «Проверить».");
+
+const ADMIN_SUPABASE_URL="https://dfvztoazthliaobqnndv.supabase.co";
+const ADMIN_SUPABASE_KEY="sb_publishable_rklL_02gyQi9Va_Ow6BS-w_d1QeN947";
+const ADMIN_FUNCTION_URL=ADMIN_SUPABASE_URL+"/functions/v1/agent-admin";
+let adminClient=null,adminData={users:[],keys:[],orders:[],plans:[],stats:{}};
+
+function initAdminClient(){if(!adminClient&&window.supabase?.createClient)adminClient=window.supabase.createClient(ADMIN_SUPABASE_URL,ADMIN_SUPABASE_KEY);return adminClient}
+async function adminApi(action,payload={}){
+ const c=initAdminClient();if(!c)throw new Error("auth_library");
+ const {data:{session}}=await c.auth.getSession();if(!session?.access_token)throw new Error("login_required");
+ const r=await fetch(ADMIN_FUNCTION_URL,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token},body:JSON.stringify({action,...payload})});
+ const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||"admin_error");return j;
+}
+function adminSetTab(tab){
+ document.querySelectorAll(".admin-tab").forEach(b=>b.classList.toggle("on",b.dataset.tab===tab));
+ document.querySelectorAll(".admin-section").forEach(s=>s.classList.toggle("on",s.id==="admin-"+tab));
+}
+function adminStatus(s){return '<span class="admin-pill '+String(s||"").toLowerCase()+'">'+String(s||"—")+'</span>'}
+function fmtDate(x){return x?new Date(x).toLocaleString("ru-RU",{dateStyle:"short",timeStyle:"short"}):"—"}
+function renderAdmin(){
+ const st=adminData.stats||{};
+ const vals=[
+  ["Пользователи",st.users??st.total_users??adminData.users.length],
+  ["Активные пользователи",st.active_users??st.active_users_30d??"—"],
+  ["Активные AI-ключи",st.active_keys??st.active_access_keys??adminData.keys.filter(x=>x.status==="active").length],
+  ["Запросы",st.requests??st.total_requests??"—"]
+ ];
+ $("adminStats").innerHTML=vals.map(x=>'<div class="admin-stat"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>').join("");
+ $("adminSystem").textContent="База подключена · администратор подтверждён · Edge Function отвечает. Платежный слой подготовлен отдельно от доступа к AI.";
+ $("usersBody").innerHTML=adminData.users.length?adminData.users.map(u=>'<tr><td>'+esc(u.email)+'</td><td class="mono">'+esc(u.id)+'</td><td>'+esc(u.name||"—")+'</td></tr>').join(""):'<tr><td colspan="3" class="admin-empty">Пользователей нет</td></tr>';
+ $("keysBody").innerHTML=adminData.keys.length?adminData.keys.map(k=>'<tr><td class="mono">'+esc(k.key_prefix||"—")+'…</td><td class="mono">'+esc(k.user_id||"—")+'</td><td>'+esc(k.plan||"—")+'</td><td>'+adminStatus(k.status)+'</td><td>'+Number(k.daily_limit||0)+' / '+Number(k.monthly_limit||0)+'</td><td><button class="admin-btn secondary" style="padding:6px 8px;font-size:11px" data-key-action="'+(k.status==="active"?"pause":"resume")+'" data-key-id="'+k.id+'">'+(k.status==="active"?"Пауза":"Вкл.")+'</button> <button class="admin-btn secondary" style="padding:6px 8px;font-size:11px" data-key-action="revoke" data-key-id="'+k.id+'">Отозвать</button></td></tr>').join(""):'<tr><td colspan="6" class="admin-empty">Ключей пока нет</td></tr>';
+ $("ordersBody").innerHTML=adminData.orders.length?adminData.orders.map(o=>'<tr><td>'+fmtDate(o.created_at)+'</td><td class="mono">'+esc(o.user_id||"—")+'</td><td>'+esc(o.plan_id||"—")+'</td><td>'+((Number(o.amount_cents||0)/100).toFixed(2))+' '+esc(o.currency||"")+'</td><td>'+adminStatus(o.status)+'</td><td>'+esc(o.provider||"—")+'</td></tr>').join(""):'<tr><td colspan="6" class="admin-empty">Платежей пока нет</td></tr>';
+ $("plansBody").innerHTML=adminData.plans.length?adminData.plans.map(p=>'<tr><td class="mono">'+esc(p.id)+'</td><td>'+esc(p.title)+'</td><td>'+((Number(p.price_cents||0)/100).toFixed(2))+' '+esc(p.currency||"")+'</td><td>'+p.days+'</td><td>'+p.daily_limit+'</td><td>'+p.monthly_limit+'</td><td>'+adminStatus(p.active?"active":"paused")+'</td></tr>').join(""):'<tr><td colspan="7" class="admin-empty">Тарифов нет</td></tr>';
+}
+function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+async function loadAdmin(){
+ try{
+  const [s,u,k,o,p]=await Promise.all([adminApi("stats"),adminApi("users"),adminApi("list"),adminApi("orders"),adminApi("plans")]);
+  adminData.stats=s.stats||{};adminData.users=u.users||[];adminData.keys=k.keys||[];adminData.orders=o.orders||[];adminData.plans=p.plans||[];
+  renderAdmin();populateKeyForm();
+ }catch(e){$("adminSystem").textContent="Ошибка: "+e.message}
+}
+function populateKeyForm(){
+ $("newKeyUser").innerHTML='<option value="">Без привязки</option>'+adminData.users.map(u=>'<option value="'+esc(u.id)+'">'+esc(u.email||u.id)+'</option>').join("");
+ $("newKeyPlan").innerHTML=(adminData.plans.length?adminData.plans:[{id:"pro",title:"Pro",days:30,daily_limit:500,monthly_limit:10000}]).map(p=>'<option value="'+esc(p.id)+'">'+esc(p.title||p.id)+'</option>').join("");
+}
+async function openAdmin(){
+ location.hash="admin";$("adminPanel").classList.add("on");$("adminLoginError").textContent="";
+ const c=initAdminClient();if(!c)return;
+ const {data:{session}}=await c.auth.getSession();
+ if(session){try{const x=await adminApi("list");$("adminLogin").style.display="none";$("adminApp").style.display="block";$("adminIdentity").textContent=x.admin?.email||session.user.email||"";await loadAdmin()}catch(e){$("adminLogin").style.display="block";$("adminApp").style.display="none";$("adminLoginError").textContent=e.message==="admin_required"?"У этого аккаунта нет прав администратора.":e.message}}
+ else{$("adminLogin").style.display="block";$("adminApp").style.display="none"}
+}
+function closeAdmin(){if(location.hash==="#admin")history.replaceState(null,"",location.pathname+location.search);$("adminPanel").classList.remove("on")}
+$("adminBtn").onclick=openAdmin;
+$("adminLoginBtn").onclick=async()=>{
+ const c=initAdminClient(),email=$("adminEmail").value.trim(),password=$("adminPassword").value;
+ $("adminLoginError").textContent="Выполняю вход…";
+ const {error}=await c.auth.signInWithPassword({email,password});
+ if(error){$("adminLoginError").textContent=error.message;return}
+ await openAdmin();
+};
+$("adminLogout").onclick=async()=>{await initAdminClient().auth.signOut();$("adminApp").style.display="none";$("adminLogin").style.display="block";$("adminLoginError").textContent="Вы вышли."};
+$("adminRefresh").onclick=loadAdmin;
+document.querySelectorAll(".admin-tab").forEach(b=>b.onclick=()=>adminSetTab(b.dataset.tab));
+$("userSearch").oninput=e=>{const q=e.target.value.toLowerCase();document.querySelectorAll("#usersBody tr").forEach(r=>r.style.display=r.textContent.toLowerCase().includes(q)?"":"none")};
+$("keySearch").oninput=e=>{const q=e.target.value.toLowerCase();document.querySelectorAll("#keysBody tr").forEach(r=>r.style.display=r.textContent.toLowerCase().includes(q)?"":"none")};
+$("newKeyBtn").onclick=()=>{$("createKeyError").textContent="";$("adminCreateModal").classList.add("on")};
+$("cancelKeyCreate").onclick=()=>$("adminCreateModal").classList.remove("on");
+$("createKeySubmit").onclick=async()=>{
+ try{
+  $("createKeyError").textContent="Создаю…";
+  const j=await adminApi("create",{user_id:$("newKeyUser").value||null,plan:$("newKeyPlan").value||"pro",expires_at:$("newKeyExpires").value?new Date($("newKeyExpires").value).toISOString():null,daily_limit:Number($("newKeyDaily").value||500),monthly_limit:Number($("newKeyMonthly").value||10000)});
+  $("adminCreateModal").classList.remove("on");$("newKeyOutput").textContent=j.key;$("adminKeyModal").classList.add("on");await loadAdmin();
+ }catch(e){$("createKeyError").textContent=e.message}
+};
+$("closeKeyModal").onclick=()=>$("adminKeyModal").classList.remove("on");
+$("copyNewKey").onclick=async()=>{await navigator.clipboard?.writeText($("newKeyOutput").textContent);$("copyNewKey").textContent="Скопировано"};
+$("keysBody").onclick=async e=>{const b=e.target.closest("[data-key-action]");if(!b)return;const a=b.dataset.keyAction,id=b.dataset.keyId;if(a==="revoke"&&!confirm("Отозвать ключ? Действие нельзя отменить."))return;try{await adminApi(a,{id});await loadAdmin()}catch(x){alert("Ошибка: "+x.message)}};
+window.addEventListener("hashchange",()=>{if(location.hash==="#admin")openAdmin();else $("adminPanel").classList.remove("on")});
+if(location.hash==="#admin")setTimeout(openAdmin,0);
 </script>
 </body>
 </html>
