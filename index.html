@@ -71,12 +71,12 @@ body.dark form{background:var(--bg)}
 </style>
 </head>
 <body>
-<header><div id="agentTitle">Мой агент<small id="sub"></small></div><div class="head-actions"><button class="g" id="clr">Очистить</button><button class="g" id="adminBtn" type="button" title="Админ-панель">Админ</button><button id="gear" aria-label="Настройки" title="Настройки">⚙︎</button></div></header>
+<header><div id="agentTitle">Мой агент<small id="sub"></small></div><div class="head-actions"><button id="gear" aria-label="Настройки" title="Настройки">⚙︎</button></div></header>
 <div id="log"></div>
 <form id="f"><div class="input-island"><button id="attachBtn" class="attach-btn" type="button" aria-label="Прикрепить файл или фото" title="Прикрепить">+</button><input id="fileInput" type="file" hidden multiple accept="image/*,.txt,.md,.csv,.json,.js,.ts,.html,.css,.pdf,.doc,.docx,.xlsx"><div class="input-main"><div id="attachPreview" class="attach-preview"></div><textarea id="q" placeholder="Напишите задачу…" enterkeyhint="enter" rows="1"></textarea></div><button id="sendBtn" type="submit" aria-label="Отправить" title="Отправить">↑</button></div></form>
 
 <div id="set">
-<div class="settings-header"><h2>Настройки</h2><button class="settings-close" id="setClose" aria-label="Закрыть" title="Закрыть">×</button></div>
+<div class="settings-header"><button class="settings-admin" id="adminBtn" type="button">Админ-панель</button><h2>Настройки</h2><button class="settings-close" id="setClose" aria-label="Закрыть" title="Закрыть">×</button></div>
 <section class="settings-group"><div class="settings-group-title">Общие</div><div class="settings-group-body"><label>Имя Агента</label><input id="agentName" placeholder="Мой агент">
 <label>Тема</label><select id="theme"><option value="light">Светлая</option><option value="dark">Тёмная</option></select>
 </div></section>
