@@ -17,13 +17,17 @@ concurrency:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -32,6 +36,7 @@ jobs:
         uses: actions/upload-pages-artifact@v4
         with:
           path: .
+          retention-days: 1
 
       - name: Deploy to GitHub Pages
         id: deployment
