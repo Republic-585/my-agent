@@ -342,7 +342,7 @@ document.querySelectorAll(".check-provider[data-provider]").forEach(b=>b.onclick
 });
 $("checkAccess").onclick=checkAccess;
 $("gear").onclick=()=>{
- $("prov").value=S("prov")||"auto";
+ $("prov").value="auto";
  for(const k of KEYS)if($(k))$(k).value=S(k)||"";
  $("agentKey").value=S("agent_key")||"";
  $("agentName").value=agentName();$("theme").value=S("theme")||"light";
