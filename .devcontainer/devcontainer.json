@@ -1,20 +1,6 @@
 {
   "name": "my-agent",
   "image": "mcr.microsoft.com/devcontainers/javascript-node:1-22-bookworm",
-  "forwardPorts": [6080, 8090],
-  "portsAttributes": {
-    "6080": {
-      "label": "DeepSeek Login Browser",
-      "protocol": "http",
-      "onAutoForward": "openBrowser"
-    },
-    "8090": {
-      "label": "DeepSeek Bridge API",
-      "protocol": "http"
-    }
-  },
-  "postCreateCommand": "bash deepseek-bridge/codespace-browser/install.sh",
-  "postStartCommand": "bash deepseek-bridge/codespace-browser/start-auth.sh",
   "customizations": {
     "vscode": {
       "mcp": {
