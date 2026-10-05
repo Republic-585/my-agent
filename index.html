@@ -387,7 +387,7 @@ async function run(text){
 }
 // ---------- UI ----------
 const ownerMode=()=>location.hash==="#owner";function add(c,t){if(c==="t"&&!ownerMode())return;const d=document.createElement("div");d.className="m "+c;d.textContent=t;$("log").appendChild(d);$("log").scrollTop=1e9}
-function sub(){$("agentTitle").firstChild.textContent=agentName();const s=$("sub");const ok=!!S("agent_key");s.textContent=(ok?"AI подключён":"AI не подключён")+" · "+Object.keys(tools).length+" инструментов";s.className=ok?"ai-on":"ai-off"}
+function sub(){$("agentTitle").firstChild.textContent=agentName();const s=$("sub");const ok=!!S("agent_key");s.textContent=ok?"AI подключён":"AI не подключён";s.className=ok?"ai-on":"ai-off"}
 let pendingAttachments=[];
 function renderAttachments(){
  const box=$("attachPreview");box.innerHTML="";
