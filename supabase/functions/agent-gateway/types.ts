@@ -1,0 +1,1 @@
+export type ChatMessage={role:string;content:any;tool_calls?:any[];tool_call_id?:string;name?:string};export type ProviderResult={message:any;usage:any;provider:string;model:string};export type Access={key_id:string;user_id:string|null;plan:string;expires_at:string|null;daily_used:number;daily_limit:number;monthly_used:number;monthly_limit:number};
