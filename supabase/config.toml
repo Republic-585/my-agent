@@ -1,0 +1,7 @@
+project_id = "dfvztoazthliaobqnndv"
+
+[functions.agent-gateway]
+verify_jwt = false
+
+[functions.agent-admin]
+verify_jwt = false
