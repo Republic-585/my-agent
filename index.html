@@ -17,6 +17,17 @@ header>div:first-child{min-width:0} header small{font-weight:400;color:var(--mut
 button{font:inherit;border:0;border-radius:11px;padding:9px 14px;background:var(--acc);color:#fff;box-shadow:0 6px 18px rgba(45,52,60,.18);transition:transform .18s ease,box-shadow .18s ease,filter .18s ease}button:hover{filter:brightness(1.04);box-shadow:0 9px 24px rgba(45,52,60,.24)}button:active{transform:scale(.97)}
 #sendBtn{width:44px;height:44px;min-width:44px;padding:0;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;line-height:1;background:linear-gradient(145deg,#707983,#555e68);box-shadow:0 8px 24px rgba(45,52,60,.28)}
 #sendBtn:disabled{opacity:.55;box-shadow:none}#sendBtn:hover{transform:translateY(-1px) scale(1.02)}
+.head-icon{width:40px;height:40px;min-width:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;text-decoration:none;color:var(--ink);font-size:22px;background:rgba(255,255,255,.7);border:1px solid var(--line);box-shadow:0 4px 14px rgba(45,52,60,.08)}
+.head-icon:hover{background:var(--ok);transform:translateY(-1px)}
+#f{padding:8px 12px calc(10px + env(safe-area-inset-bottom));background:linear-gradient(180deg,transparent,var(--bg) 28%);display:flex}
+.input-island{width:100%;display:flex;align-items:flex-end;gap:7px;padding:6px;border:1px solid var(--line);border-radius:24px;background:rgba(255,255,255,.92);box-shadow:0 8px 28px rgba(35,40,45,.10);backdrop-filter:saturate(180%) blur(18px)}
+body.dark .input-island{background:rgba(23,26,30,.94)}
+.input-main{min-width:0;flex:1}.input-main textarea{border:0!important;background:transparent!important;box-shadow:none!important;padding:7px 3px;min-height:38px}
+.attach-btn{width:38px;height:38px;min-width:38px;border-radius:50%;padding:0;background:transparent;color:var(--ink);box-shadow:none;font-size:26px;font-weight:300;line-height:1}
+.attach-btn:hover{background:var(--ok);box-shadow:none}
+#sendBtn{width:38px;height:38px;min-width:38px}
+.attach-preview{display:flex;gap:6px;overflow-x:auto;padding:0 3px 3px}.attach-chip{display:flex;align-items:center;gap:5px;max-width:180px;padding:5px 8px;border-radius:12px;background:var(--ok);font-size:12px;white-space:nowrap}.attach-chip button{width:20px;height:20px;padding:0;background:none;color:var(--ink);box-shadow:none}
+.provider-checks{display:grid;gap:6px;margin-top:8px}.provider-row{display:grid;grid-template-columns:1fr auto 56px;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px}.check-provider{min-height:34px;padding:6px 11px;border-radius:17px;font-size:12px}.provider-status{text-align:right;color:var(--mut);font-variant-numeric:tabular-nums}.cabinet-link{display:block!important;margin:4px 0 10px!important;padding:12px 14px;border:1px solid var(--line);border-radius:13px;text-decoration:none;color:var(--ink);background:var(--ok);font-weight:600}
 #gear{width:40px;height:40px;min-width:40px;padding:0;border-radius:50%;display:flex;align-items:center;justify-content:center;background:transparent;color:var(--ink);font-size:21px;line-height:1;border:1px solid transparent}
 #gear:hover,#gear:focus-visible{background:var(--ok);outline:none;box-shadow:0 0 0 5px var(--glow)}
 #set{backdrop-filter:saturate(180%) blur(18px)}
@@ -61,13 +72,13 @@ body.dark form{background:var(--bg)}
 </style>
 </head>
 <body>
-<header><div id="agentTitle">Мой агент<small id="sub"></small></div><div class="head-actions"><button class="g" id="clr">Очистить</button><button id="gear" aria-label="Настройки" title="Настройки">⚙︎</button></div></header>
+<header><div id="agentTitle">Мой агент<small id="sub"></small></div><div class="head-actions"><a class="head-icon" href="auth.html" aria-label="Личный кабинет" title="Личный кабинет">⌁</a><button class="g" id="clr">Очистить</button><button id="gear" aria-label="Настройки" title="Настройки">⚙︎</button></div></header>
 <div id="log"></div>
-<form id="f"><textarea id="q" placeholder="Напиши задачу…" enterkeyhint="send" rows="1"></textarea><button id="sendBtn" type="submit" aria-label="Отправить" title="Отправить">↑</button></form>
+<form id="f"><div class="input-island"><button id="attachBtn" class="attach-btn" type="button" aria-label="Прикрепить файл или фото" title="Прикрепить">+</button><input id="fileInput" type="file" hidden multiple accept="image/*,.txt,.md,.csv,.json,.js,.ts,.html,.css,.pdf,.doc,.docx,.xlsx"><div class="input-main"><div id="attachPreview" class="attach-preview"></div><textarea id="q" placeholder="Напишите задачу…" enterkeyhint="enter" rows="1"></textarea></div><button id="sendBtn" type="submit" aria-label="Отправить" title="Отправить">↑</button></div></form>
 
 <div id="set">
 <div class="settings-header"><h2>Настройки</h2><button class="settings-close" id="setClose" aria-label="Закрыть" title="Закрыть">×</button></div>
-<section class="settings-group"><div class="settings-group-title">Общие</div><div class="settings-group-body">
+<section class="settings-group"><div class="settings-group-title">Общие</div><div class="settings-group-body"><a class="cabinet-link" href="auth.html">Личный кабинет · вход и защищённые данные →</a>
 <label>Имя Агента</label><input id="agentName" placeholder="Мой агент">
 <label>Тема</label><select id="theme"><option value="light">Светлая</option><option value="dark">Тёмная</option></select>
 </div></section>
@@ -76,11 +87,15 @@ body.dark form{background:var(--bg)}
 <label class="skill-option"><input type="checkbox" value="strategy"> strategy</label><label class="skill-option"><input type="checkbox" value="telegram_pro"> telegram_pro</label><label class="skill-option"><input type="checkbox" value="miniapp_ui"> miniapp_ui</label><label class="skill-option"><input type="checkbox" value="stars_money"> stars_money</label><label class="skill-option"><input type="checkbox" value="supabase_pro"> supabase_pro</label><label class="skill-option"><input type="checkbox" value="growth_channel"> growth_channel</label><label class="skill-option"><input type="checkbox" value="funnel_copy"> funnel_copy</label><label class="skill-option"><input type="checkbox" value="ai_features"> ai_features</label><label class="skill-option"><input type="checkbox" value="analytics"> analytics</label><label class="skill-option"><input type="checkbox" value="security"> security</label><label class="skill-option"><input type="checkbox" value="deploy_cf"> deploy_cf</label><label class="skill-option"><input type="checkbox" value="code_quality"> code_quality</label><label class="skill-option"><input type="checkbox" value="debugging"> debugging</label>
 </div></div></section>
 <section class="settings-group"><div class="settings-group-title">Провайдеры и API</div><div class="settings-group-body">
-<label>Провайдер</label><select id="prov"><option value="auto">AUTO — автоматический каскад</option><option value="mistral">Mistral</option><option value="xkiro">xKiro</option><option value="gemini">Google Gemini</option><option value="groq">Groq</option><option value="openrouter">OpenRouter</option><option value="kilo">Kilo</option><option value="pollinations">Pollinations</option><option value="ovh">OVHcloud AI Endpoints</option><option value="aihorde">AI Horde</option><option value="unorouter">UnoRouter</option><option value="huggingface">Hugging Face</option><option value="modelscope">ModelScope</option><option value="opencode_deepseek">opencode-deepseek — DeepSeek</option></select>
+<label>Провайдер</label><select id="prov"><option value="auto">Авто</option><option value="mistral">Mistral</option><option value="xkiro">xKiro</option><option value="gemini">Google Gemini</option><option value="groq">Groq</option><option value="openrouter">OpenRouter</option><option value="kilo">Kilo</option><option value="pollinations">Pollinations</option><option value="ovh">OVHcloud AI Endpoints</option><option value="aihorde">AI Horde</option><option value="unorouter">UnoRouter</option><option value="huggingface">Hugging Face</option><option value="modelscope">ModelScope</option></select>
 <label>Ключ Mistral</label><input id="k_mistral" type="password" autocomplete="off"><p>Основной ключ Mistral</p><label>Резервный ключ Mistral</label><input id="k_mistral2" type="password" autocomplete="off"><p>Второй ключ используется при временной ошибке основного.</p><label>Ключ xKiro</label><input id="k_xkiro" type="password" autocomplete="off"><p>OpenAI-compatible gateway</p><label>Ключ Groq</label><input id="k_groq" type="password" autocomplete="off"><p>console.groq.com → API Keys</p><label>Ключ Gemini</label><input id="k_gemini" type="password" autocomplete="off"><p>aistudio.google.com → Get API key</p><label>Ключ OpenRouter</label><input id="k_openrouter" type="password" autocomplete="off"><p>openrouter.ai → Keys</p>
-<label>Ключ Kilo</label><input id="k_kilo" type="password" autocomplete="off"><p>Можно использовать без ключа, если провайдер разрешает.</p><label>Ключ Pollinations</label><input id="k_pollinations" type="password" autocomplete="off"><p>Создаётся на enter.pollinations.ai</p><label>Ключ OVHcloud AI Endpoints</label><input id="k_ovh" type="password" autocomplete="off"><p>Public Cloud → AI Endpoints → API key</p><label>Ключ AI Horde</label><input id="k_aihorde" type="password" autocomplete="off"><p>Зарегистрированный ключ AI Horde. Провайдер использует доступную конфигурацию автоматически.</p><label>Ключ UnoRouter</label><input id="k_unorouter" type="password" autocomplete="off"><p>Settings → API access</p><label>Ключ Hugging Face</label><input id="k_hf" type="password" autocomplete="off"><p>HF token с правом inference</p><label>Ключ ModelScope</label><input id="k_modelscope" type="password" autocomplete="off"><p>ModelScope SDK Token</p><label>DeepSeek Bridge URL</label><input id="k_dsbridge" placeholder="https://dfvztoazthliaobqnndv.supabase.co/functions/v1/opencode-deepseek"><p>Необязательно. По умолчанию используется защищённый Supabase gateway для opencode-deepseek.</p>
+<label>Ключ Kilo</label><input id="k_kilo" type="password" autocomplete="off"><p>Можно использовать без ключа, если провайдер разрешает.</p><label>Ключ Pollinations</label><input id="k_pollinations" type="password" autocomplete="off"><p>Создаётся на enter.pollinations.ai</p><label>Ключ OVHcloud AI Endpoints</label><input id="k_ovh" type="password" autocomplete="off"><p>Public Cloud → AI Endpoints → API key</p><label>Ключ AI Horde</label><input id="k_aihorde" type="password" autocomplete="off"><p>Зарегистрированный ключ AI Horde. Провайдер использует доступную конфигурацию автоматически.</p><label>Ключ UnoRouter</label><input id="k_unorouter" type="password" autocomplete="off"><p>Settings → API access</p><label>Ключ Hugging Face</label><input id="k_hf" type="password" autocomplete="off"><p>HF token с правом inference</p><label>Ключ ModelScope</label><input id="k_modelscope" type="password" autocomplete="off"><p>ModelScope SDK Token</p>
 </div></section>
-<section class="settings-group"><div class="settings-group-title">Интеграции и доступ</div><div class="settings-group-body">
+<section class="settings-group"><div class="settings-group-title">Проверка провайдеров</div><div class="settings-group-body">
+<p>Проверка отправляет короткий запрос. Результат остаётся здесь и не появляется в чате.</p>
+<div id="providerChecks" class="provider-checks">
+<div class="provider-row"><span>Groq · GPT-OSS 20B</span><button type="button" class="check-provider" data-provider="groq">Проверить</button><span class="provider-status" id="status-groq">—</span></div><div class="provider-row"><span>Google · Gemini 3.7 Flash</span><button type="button" class="check-provider" data-provider="gemini">Проверить</button><span class="provider-status" id="status-gemini">—</span></div><div class="provider-row"><span>Mistral · Small</span><button type="button" class="check-provider" data-provider="mistral">Проверить</button><span class="provider-status" id="status-mistral">—</span></div><div class="provider-row"><span>xKiro</span><button type="button" class="check-provider" data-provider="xkiro">Проверить</button><span class="provider-status" id="status-xkiro">—</span></div><div class="provider-row"><span>OpenRouter · Free Router</span><button type="button" class="check-provider" data-provider="openrouter">Проверить</button><span class="provider-status" id="status-openrouter">—</span></div><div class="provider-row"><span>Kilo</span><button type="button" class="check-provider" data-provider="kilo">Проверить</button><span class="provider-status" id="status-kilo">—</span></div><div class="provider-row"><span>Pollinations</span><button type="button" class="check-provider" data-provider="pollinations">Проверить</button><span class="provider-status" id="status-pollinations">—</span></div><div class="provider-row"><span>OVHcloud AI</span><button type="button" class="check-provider" data-provider="ovh">Проверить</button><span class="provider-status" id="status-ovh">—</span></div><div class="provider-row"><span>AI Horde</span><button type="button" class="check-provider" data-provider="aihorde">Проверить</button><span class="provider-status" id="status-aihorde">—</span></div><div class="provider-row"><span>UnoRouter</span><button type="button" class="check-provider" data-provider="unorouter">Проверить</button><span class="provider-status" id="status-unorouter">—</span></div><div class="provider-row"><span>Hugging Face</span><button type="button" class="check-provider" data-provider="huggingface">Проверить</button><span class="provider-status" id="status-huggingface">—</span></div><div class="provider-row"><span>ModelScope</span><button type="button" class="check-provider" data-provider="modelscope">Проверить</button><span class="provider-status" id="status-modelscope">—</span></div>
+</div></div></section><section class="settings-group"><div class="settings-group-title">Интеграции и доступ</div><div class="settings-group-body">
 <label>GitHub token (classic, право repo)</label><input id="k_github" type="password" autocomplete="off"><p>github.com/settings/tokens</p><label>Telegram Bot Token</label><input id="k_tg" type="password" autocomplete="off"><p>@BotFather → /newbot</p><label>Supabase URL</label><input id="k_sburl" placeholder="https://xxxx.supabase.co"><label>Supabase ключ (secret / service_role)</label><input id="k_sbkey" type="password" autocomplete="off"><p>Project Settings → API Keys. Секретный ключ даёт полный доступ к базе: держи его только в этом приложении.</p>
 </div></section>
 <section class="settings-group"><div class="settings-group-title">Поведение агента</div><div class="settings-group-body">
@@ -92,11 +107,11 @@ body.dark form{background:var(--bg)}
 <script>
 const $=id=>document.getElementById(id);
 const P={
- groq:{url:"https://api.groq.com/openai/v1/chat/completions",model:"openai/gpt-oss-20b"},
- gemini:{url:"https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",model:"gemini-3.7-flash"},
- mistral:{url:"https://api.mistral.ai/v1/chat/completions",model:"mistral-small-latest"},
+ groq:{url:"https://api.groq.com/openai/v1/chat/completions",model:"openai/gpt-oss-20b",label:"Groq · GPT-OSS 20B"},
+ gemini:{url:"https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",model:"gemini-3.7-flash",label:"Google · Gemini 3.7 Flash"},
+ mistral:{url:"https://api.mistral.ai/v1/chat/completions",model:"mistral-small-latest",label:"Mistral · Small"},
  xkiro:{url:"https://api.xkiro.com/v1/chat/completions",model:"openai/gpt-5.6-sol"},
- openrouter:{url:"https://openrouter.ai/api/v1/chat/completions",model:"z-ai/glm-5.3-flash:free"},
+ openrouter:{url:"https://openrouter.ai/api/v1/chat/completions",model:"openrouter/free",label:"OpenRouter · Free Router"},
  kilo:{url:"https://api.kilo.ai/api/gateway/chat/completions",model:"kilo-auto/free",noKey:true},
  pollinations:{url:"https://gen.pollinations.ai/v1/chat/completions",model:"openai/gpt-5.4-nano",key:"k_pollinations"},
  ovh:{url:"https://oai.endpoints.kepler.ai.cloud.ovh.net/v1/chat/completions",model:"mistral@latest",key:"k_ovh"},
@@ -104,7 +119,6 @@ const P={
  unorouter:{url:"https://api.unorouter.com/v1/chat/completions",model:"glm-5.3:free",key:"k_unorouter"},
  huggingface:{url:"https://router.huggingface.co/v1/chat/completions",model:"zai-org/GLM-5.2",key:"k_hf"},
  modelscope:{url:"https://api-inference.modelscope.cn/v1/chat/completions",model:"ZhipuAI/GLM-5.2",key:"k_modelscope"},
- opencode_deepseek:{url:"https://dfvztoazthliaobqnndv.supabase.co/functions/v1/opencode-deepseek/v1/chat/completions",model:"deepseek-v4-pro",noKey:true},
 };
 const DEF_SYS=`Ты — автономный AI-инженер и операционный директор Telegram-бизнеса. Пользователь ставит задачу и почти не участвует: ты сам планируешь, делаешь, публикуешь, проверяешь и докладываешь итог в 3-6 строк со ссылками. Только бесплатные сервисы, пользователь работает с iPhone. Отвечай по-русски.
 ПЛАТФОРМА (инструмент scaffold_platform): рантайм на Cloudflare Worker работает 24/7 и читает всю логику из Supabase, поэтому правки бота делаются записью в таблицы через supabase, без передеплоя. Таблицы: users(id,plan,plan_until,ref_by), settings(key,value jsonb: welcome, ai_prompt, ai_premium_only), commands(cmd,label,reply,buttons[{text,url|cb}],premium,in_menu), products(id,title,description,stars,days,sub,active), payments, posts(chat_id или 'all',text,photo,buttons,send_at,sent) — посты в канал и рассылки по расписанию. Секреты Worker: BOT_TOKEN, BOT_NAME, WEBHOOK_SECRET, SB_URL, SB_KEY, ADMIN_ID, опц. AI_KEY. Cron: * * * * *. Эндпоинты для Mini App: POST /api/me и /api/invoice с initData.
@@ -225,56 +239,55 @@ const schema=Object.entries(tools).map(([n,t])=>({type:"function",function:{name
 
 // ---------- LLM ----------
 function compactMessages(h){
- const max=14;
+ const max=10;
  let start=Math.max(0,h.length-max);
  while(start>0&&h[start]?.role==="tool")start--;
  if(start>0&&h[start]?.role==="assistant"&&h[start]?.tool_calls)start--;
  return h.slice(start).map(x=>{
   const y={...x};
-  if(typeof y.content==="string")y.content=y.content.slice(0,y.role==="tool"?2500:4500);
+  if(typeof y.content==="string")y.content=y.content.slice(0,y.role==="tool"?1600:3000);
   return y;
  });
 }
 async function llmOnce(prov,msgs,useTools=true,keyOverride){
- let cfg=P[prov];if(!cfg)throw new Error("Неизвестный провайдер: "+prov);if(prov==="opencode_deepseek"&&S("k_dsbridge"))cfg={...cfg,url:S("k_dsbridge").replace(/\/$/,"")+"/v1/chat/completions"};
- const key=keyOverride||S(cfg.key||("k_"+prov));if(!key&&!cfg.noKey)throw new Error("Нет ключа для "+prov+". Добавь в настройках.");
- const model=S("m_"+prov)||cfg.model;if(!model)throw new Error("Не указана модель для "+prov+". Выбери модель в настройках.");
- const body={model,messages:[{role:"system",content:(S("sys4")||DEF_SYS)+skillsPrompt()+"\n\nСТИЛЬ ОТВЕТА: отвечай кратко и профессионально. Давай только самое необходимое и важное. Не повторяй условие задачи, не добавляй лишние пояснения и не используй пустые вводные фразы. Если требуется действие — сразу выполняй или сообщай конкретный следующий шаг."},...compactMessages(msgs)],max_tokens:1200};
+ let cfg=P[prov];if(!cfg)throw new Error("provider");
+ const key=keyOverride||S(cfg.key||("k_"+prov));
+ if(!key&&!cfg.noKey)throw new Error("key");
+ const model=S("m_"+prov)||cfg.model;if(!model)throw new Error("model");
+ const style="\\n\\nСТИЛЬ: отвечай кратко, профессионально и по делу. Не показывай внутренние рассуждения, названия инструментов, технические ошибки, служебные данные или сведения о провайдере. Не повторяй условие.";
+ const body={model,messages:[{role:"system",content:(S("sys4")||DEF_SYS)+skillsPrompt()+style},...compactMessages(msgs)],max_tokens:700};
+ if(prov==="groq")body.reasoning_effort="low";
+ if(prov==="mistral")body.reasoning_effort="none";
+ if(prov==="gemini")body.reasoning_effort="low";
  if(useTools){body.tools=schema;body.tool_choice="auto"}
- const headers={"Content-Type":"application/json"};if(prov==="opencode_deepseek")headers.Authorization="Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRmdnp0b2F6dGhsaWFvYnFubmR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA4NzAzMDIsImV4cCI6MjEwNjQ0NjMwMn0.cRW7gBNcUmR3s05hn7bYx03QfcgWX1mCySopCco9u_4";else if(key)headers.Authorization="Bearer "+key;
- const r=await fetch(cfg.url,{method:"POST",headers,body:JSON.stringify(body)});
- const j=await r.json().catch(()=>({}));
- if(!r.ok){const e=new Error(prov+" "+r.status+": "+(j.error?.message||JSON.stringify(j).slice(0,300)));e.status=r.status;e.retryAfter=r.headers.get("retry-after")||"";throw e}
- if(!j.choices?.[0]?.message)throw new Error(prov+" вернул неожиданный ответ");
- return j.choices[0].message;
+ const headers={"Content-Type":"application/json"};if(key)headers.Authorization="Bearer "+key;
+ const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),30000);
+ try{
+  const r=await fetch(cfg.url,{method:"POST",headers,body:JSON.stringify(body),signal:controller.signal});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok){const e=new Error("provider");e.status=r.status;e.retryAfter=r.headers.get("retry-after")||"";throw e}
+  if(!j.choices?.[0]?.message)throw new Error("provider");
+  return j.choices[0].message;
+ }finally{clearTimeout(timer)}
 }
 async function llm(prov,msgs,useTools=true){
- const selected=prov||"groq";
- const order=selected==="auto"?["mistral","xkiro","gemini","groq","openrouter","kilo","pollinations","unorouter","huggingface","modelscope","ovh","aihorde"]:[selected,"opencode_deepseek","mistral","xkiro","gemini","groq","openrouter","kilo","pollinations","unorouter","huggingface","modelscope","ovh","aihorde"].filter((x,i,a)=>a.indexOf(x)===i);
- const errors=[];
- const retryable=[429,500,502,503,504];
- for(const p of order){
-  if(!S(P[p]?.key||("k_"+p))&&!P[p]?.noKey)continue;
-  try{
-   const m=await llmOnce(p,msgs,useTools);
-   if(selected==="auto"&&p!==order[0])add("t","↪️ Переключился на "+p);
-   return m
-  }catch(e){
-   errors.push(e.message);
-   if(p==="mistral"&&retryable.includes(e.status)&&S("k_mistral2")&&S("k_mistral2")!==S("k_mistral")){
-    try{const m=await llmOnce("mistral",msgs,useTools,S("k_mistral2"));add("t","↪️ Mistral: использован резервный ключ");return m}catch(e2){errors.push(e2.message)}
-   }
-   if(selected!=="auto"&&!retryable.includes(e.status))throw e;
-   add("t","⚠️ "+p+" недоступен: "+(e.status===429?"лимит/квота"+(e.retryAfter?" · повторить через "+e.retryAfter+"с":""):(!e.status?"сетевая ошибка (проверь CORS/endpoint) ":e.message)).slice(0,180))
-  }
- }
- throw new Error("Все настроенные LLM недоступны. "+errors.join(" | "));
+ const selected=prov||"auto";
+ const actual=selected==="auto"?"groq":selected;
+ return llmOnce(actual,msgs,useTools);
 }
-
+async function checkProvider(prov){
+ const cfg=P[prov];if(!cfg)return {ok:false};
+ const key=S(cfg.key||("k_"+prov));if(!key&&!cfg.noKey)return {ok:false,reason:"key"};
+ const started=performance.now();
+ try{
+  const m=await llmOnce(prov,[{role:"user",content:"Ответь только: OK"}],false);
+  return {ok:String(m.content||"").trim().toUpperCase().includes("OK"),ms:Math.round(performance.now()-started)};
+ }catch(e){return {ok:false,ms:Math.round(performance.now()-started),status:e.status||0}}
+}
 // ---------- agent loop ----------
 async function run(text){
  hist.push({role:"user",content:text});
- const prov=S("prov")||"groq";
+ const prov=S("prov")||"auto";
  for(let i=0;i<18;i++){
   const m=await llm(prov,hist);
   hist.push({role:"assistant",content:m.content||"",...(m.tool_calls?{tool_calls:m.tool_calls}:{})});
@@ -293,25 +306,57 @@ async function run(text){
 // ---------- UI ----------
 const ownerMode=()=>location.hash==="#owner";function add(c,t){if(c==="t"&&!ownerMode())return;const d=document.createElement("div");d.className="m "+c;d.textContent=t;$("log").appendChild(d);$("log").scrollTop=1e9}
 function sub(){$("agentTitle").firstChild.textContent=agentName();$("sub").textContent=(S("prov")||"groq")+" · "+Object.keys(tools).length+" инструментов"}
-$("f").onsubmit=async e=>{
- e.preventDefault();const t=$("q").value.trim();if(!t)return;
- $("q").value="";resizeInput();add("u",t);$("sendBtn").disabled=true;
- const thinking=document.createElement("div");thinking.className="thinking";thinking.textContent="Модель думает";$("log").appendChild(thinking);$("log").scrollTop=1e9;
- try{await run(t)}catch(err){add("a","⚠️ "+err.message)}finally{thinking.remove();$("sendBtn").disabled=false;$("q").focus()}
- S("hist",JSON.stringify((h=>h.slice(Math.max(0,h.findIndex(x=>x.role==="user"))))(hist.slice(-40))));
+let pendingAttachments=[];
+function renderAttachments(){
+ const box=$("attachPreview");box.innerHTML="";
+ pendingAttachments.forEach((x,i)=>{const d=document.createElement("div");d.className="attach-chip";d.innerHTML="<span>"+x.name.replace(/[<>&]/g,"")+"</span>";const b=document.createElement("button");b.type="button";b.textContent="×";b.onclick=()=>{pendingAttachments.splice(i,1);renderAttachments()};d.appendChild(b);box.appendChild(d)});
+}
+$("attachBtn").onclick=()=>$("fileInput").click();
+$("fileInput").onchange=async e=>{
+ const files=[...e.target.files].slice(0,4);pendingAttachments=[];
+ for(const f of files){
+  const item={name:f.name,type:f.type,size:f.size};
+  if(f.type.startsWith("image/")&&f.size<=2*1024*1024)item.data=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(f)});
+  else if(/^text\\/i.test(f.type)||/json|javascript|typescript|csv|markdown/i.test(f.type)||/\\.(txt|md|csv|json|js|ts|html|css)$/i.test(f.name))item.text=(await f.text()).slice(0,12000);
+  pendingAttachments.push(item);
+ }
+ renderAttachments();e.target.value="";
 };
-function resizeInput(){const q=$("q");q.style.height="44px";q.style.height=Math.min(q.scrollHeight,180)+"px"}
+$("f").onsubmit=async e=>{
+ e.preventDefault();const t=$("q").value.trim();if(!t&&!pendingAttachments.length)return;
+ const files=pendingAttachments;pendingAttachments=[];renderAttachments();$("q").value="";resizeInput();
+ let userContent=t||"Посмотри прикреплённые материалы.";
+ if(files.length){
+  const parts=[{type:"text",text:userContent}];
+  for(const f of files){
+   if(f.data&&S("prov")==="gemini")parts.push({type:"image_url",image_url:{url:f.data}});
+   else if(f.text)parts.push({type:"text",text:"Файл "+f.name+":\\n"+f.text});
+   else parts.push({type:"text",text:"Прикреплён файл: "+f.name});
+  }
+  userContent=parts.length>1?parts:[{type:"text",text:userContent}];
+ }
+ add("u",t||files.map(x=>x.name).join(", "));$("sendBtn").disabled=true;
+ const thinking=document.createElement("div");thinking.className="thinking";thinking.textContent="Готовлю ответ";$("log").appendChild(thinking);$("log").scrollTop=1e9;
+ try{await run(userContent)}catch(err){console.error(err);add("a","Не удалось получить ответ. Проверь подключение провайдера в Настройках.")}finally{thinking.remove();$("sendBtn").disabled=false;$("q").focus()}
+ S("hist",JSON.stringify((h=>h.slice(Math.max(0,h.findIndex(x=>x.role==="user"))))(hist.slice(-24))));
+};
+function resizeInput(){const q=$("q");q.style.height="38px";q.style.height=Math.min(q.scrollHeight,150)+"px"}
 $("q").oninput=resizeInput;
-$("q").onkeydown=e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){e.preventDefault();$("f").requestSubmit()}};
+$("q").onkeydown=e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing)e.stopPropagation()};
+document.querySelectorAll(".check-provider").forEach(b=>b.onclick=async()=>{
+ const p=b.dataset.provider,st=$("status-"+p);b.disabled=true;st.textContent="…";
+ const r=await checkProvider(p);b.disabled=false;
+ if(r.ok)st.textContent="✓ "+r.ms+" мс";else st.textContent=r.reason==="key"?"нет ключа":"недоступен";
+});
 $("gear").onclick=()=>{
- $("prov").value=S("prov")||"groq";
- for(const k of KEYS)$(k).value=S(k)||"";
+ $("prov").value=S("prov")||"auto";
+ for(const k of KEYS)if($(k))$(k).value=S(k)||"";
  $("agentName").value=agentName();$("theme").value=S("theme")||"light";
  const ss=selectedSkills();document.querySelectorAll("#skillsList input").forEach(x=>x.checked=ss.includes(x.value));
  $("sys").value=S("sys4")||DEF_SYS;$("auto").checked=S("auto")==="1";$("set").classList.add("on")};
 $("save").onclick=()=>{
  S("prov",$("prov").value);
- for(const k of KEYS)S(k,$(k).value.trim());
+ for(const k of KEYS)if($(k))S(k,$(k).value.trim());
  S("agentName",$("agentName").value.trim()||"Мой агент");S("theme",$("theme").value);
  S("skills",JSON.stringify([...document.querySelectorAll("#skillsList input:checked")].map(x=>x.value)));
  S("sys4",$("sys").value);S("auto",$("auto").checked?"1":"");applyTheme();$("set").classList.remove("on");sub()};
@@ -319,7 +364,7 @@ $("clr").onclick=()=>{hist=[];S("hist","");$("log").innerHTML="";add("a","Кон
 $("pvx").onclick=()=>{$("pv").style.display="none";$("pvf").srcdoc=""};
 $("setClose").onclick=()=>$("set").classList.remove("on");
 applyTheme();sub();
-add("a",(S("prov")==="opencode_deepseek"||S("k_"+(S("prov")||"groq")))?"Готов. Чем помочь?":"Привет! Нажми «Настройки» и вставь бесплатный API-ключ.");
+add("a",S("k_"+(S("prov")||"groq"))?"Готов. Чем помочь?":"Привет! Нажми «Настройки» и вставь бесплатный API-ключ.");
 </script>
 </body>
 </html>
