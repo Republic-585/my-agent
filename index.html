@@ -250,7 +250,7 @@ async function llmOnce(prov,msgs,useTools=true,keyOverride){
 }
 async function llm(prov,msgs,useTools=true){
  const selected=prov||"groq";
- const order=selected==="auto"?["opencode_deepseek","mistral","xkiro","gemini","groq","openrouter","kilo","pollinations","unorouter","huggingface","modelscope","ovh","aihorde"]:[selected,"opencode_deepseek","mistral","xkiro","gemini","groq","openrouter","kilo","pollinations","unorouter","huggingface","modelscope","ovh","aihorde"].filter((x,i,a)=>a.indexOf(x)===i);
+ const order=selected==="auto"?["mistral","xkiro","gemini","groq","openrouter","kilo","pollinations","unorouter","huggingface","modelscope","ovh","aihorde"]:[selected,"opencode_deepseek","mistral","xkiro","gemini","groq","openrouter","kilo","pollinations","unorouter","huggingface","modelscope","ovh","aihorde"].filter((x,i,a)=>a.indexOf(x)===i);
  const errors=[];
  const retryable=[429,500,502,503,504];
  for(const p of order){
