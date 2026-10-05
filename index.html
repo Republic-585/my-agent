@@ -7,75 +7,103 @@
 <meta name="apple-mobile-web-app-title" content="Агент">
 <title>Мой агент</title>
 <style>
-:root{--bg:#eceef2;--ink:#14213d;--mut:#6b7385;--card:#fff;--acc:#14213d;--hi:#fca311;--ok:#e3e8f2}
+:root{--bg:#f3f4f6;--ink:#20242a;--mut:#68707a;--card:#ffffff;--acc:#626b75;--hi:#7b858f;--ok:#e5e8ec;--line:rgba(45,52,60,.14);--glow:rgba(98,107,117,.18)}
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
-body{font:16px/1.45 -apple-system,system-ui,sans-serif;background:var(--bg);color:var(--ink);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top)}
-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;font-weight:700}
-header small{font-weight:400;color:var(--mut);display:block;font-size:12px}
-button{font:inherit;border:0;border-radius:10px;padding:9px 14px;background:var(--acc);color:#fff}
-button.g{background:var(--ok);color:var(--ink)}
+body{font:16px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",system-ui,sans-serif;background:var(--bg);color:var(--ink);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;overflow:hidden;position:relative}body::before{content:"";position:fixed;inset:-20%;pointer-events:none;background:radial-gradient(circle at 85% 5%,rgba(98,107,117,.08),transparent 30%),radial-gradient(circle at 8% 92%,rgba(123,133,143,.07),transparent 26%);z-index:-1}
+header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;font-weight:700;gap:10px;animation:riseIn .45s ease both}
+header>div:first-child{min-width:0} header small{font-weight:400;color:var(--mut);display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.head-actions{margin-left:auto;display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-shrink:0}
+button{font:inherit;border:0;border-radius:11px;padding:9px 14px;background:var(--acc);color:#fff;box-shadow:0 6px 18px rgba(45,52,60,.18);transition:transform .18s ease,box-shadow .18s ease,filter .18s ease}button:hover{filter:brightness(1.04);box-shadow:0 9px 24px rgba(45,52,60,.24)}button:active{transform:scale(.97)}
+#sendBtn{width:44px;height:44px;min-width:44px;padding:0;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;line-height:1;background:linear-gradient(145deg,#707983,#555e68);box-shadow:0 8px 24px rgba(45,52,60,.28)}
+#sendBtn:disabled{opacity:.55;box-shadow:none}#sendBtn:hover{transform:translateY(-1px) scale(1.02)}
+.head-icon{width:40px;height:40px;min-width:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;text-decoration:none;color:var(--ink);font-size:22px;background:rgba(255,255,255,.7);border:1px solid var(--line);box-shadow:0 4px 14px rgba(45,52,60,.08)}
+.head-icon:hover{background:var(--ok);transform:translateY(-1px)}
+#f{padding:8px 12px calc(10px + env(safe-area-inset-bottom));background:linear-gradient(180deg,transparent,var(--bg) 28%);display:flex}
+.input-island{width:100%;display:flex;align-items:flex-end;gap:7px;padding:6px;border:1px solid var(--line);border-radius:24px;background:rgba(255,255,255,.92);box-shadow:0 8px 28px rgba(35,40,45,.10);backdrop-filter:saturate(180%) blur(18px)}
+body.dark .input-island{background:rgba(23,26,30,.94)}
+.input-main{min-width:0;flex:1}.input-main textarea{border:0!important;background:transparent!important;box-shadow:none!important;padding:7px 3px;min-height:38px}
+.attach-btn{width:38px;height:38px;min-width:38px;border-radius:50%;padding:0;background:transparent;color:var(--ink);box-shadow:none;font-size:26px;font-weight:300;line-height:1}
+.attach-btn:hover{background:var(--ok);box-shadow:none}
+#sendBtn{width:38px;height:38px;min-width:38px}
+.attach-preview{display:flex;gap:6px;overflow-x:auto;padding:0 3px 3px}.attach-chip{display:flex;align-items:center;gap:5px;max-width:180px;padding:5px 8px;border-radius:12px;background:var(--ok);font-size:12px;white-space:nowrap}.attach-chip button{width:20px;height:20px;padding:0;background:none;color:var(--ink);box-shadow:none}
+.agent-key-box{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end}.agent-key-box input{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.02em}.access-status{margin-top:8px;min-height:20px;color:var(--mut);font-size:13px}.access-status.ok{color:#2f7a4d}.access-status.bad{color:#a23b3b}#gear{width:40px;height:40px;min-width:40px;padding:0;border-radius:50%;display:flex;align-items:center;justify-content:center;background:transparent;color:var(--ink);font-size:21px;line-height:1;border:1px solid transparent}
+#gear:hover,#gear:focus-visible{background:var(--ok);outline:none;box-shadow:0 0 0 5px var(--glow)}
+#set{backdrop-filter:saturate(180%) blur(18px)}
+.settings-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 18px}
+.settings-header h2{margin:0;font-size:28px;letter-spacing:-.03em}
+.settings-close{width:38px;height:38px;min-width:38px;border-radius:50%;padding:0;background:var(--ok);color:var(--ink);font-size:20px;line-height:1}
+.settings-group{background:linear-gradient(180deg,rgba(255,255,255,.97),rgba(247,248,250,.94));border:1px solid var(--line);border-radius:16px;margin:0 0 12px;overflow:hidden;box-shadow:0 10px 28px rgba(50,42,30,.06);animation:cardIn .38s ease both}.settings-group:nth-of-type(2){animation-delay:.03s}.settings-group:nth-of-type(3){animation-delay:.06s}.settings-group:nth-of-type(4){animation-delay:.09s}.settings-group:nth-of-type(5){animation-delay:.12s}
+.settings-group-title{padding:13px 15px 8px;font-size:13px;font-weight:650;color:#5d6670;letter-spacing:.02em}
+.settings-group-body{padding:0 15px 14px}
+.settings-group-body>label:not(.skill-option){margin:12px 0 5px}
+.settings-group-body>label:first-child{margin-top:4px}
+.settings-group-body input,.settings-group-body select,.settings-group-body textarea{border-color:var(--line);background:rgba(255,255,255,.72);border-radius:11px;transition:border-color .18s ease,box-shadow .18s ease,background .18s ease}.settings-group-body input:focus,.settings-group-body select:focus,.settings-group-body textarea:focus{outline:none;border-color:rgba(98,107,117,.62);box-shadow:0 0 0 4px var(--glow);background:#fff}
+.settings-group-body p{margin:5px 0 8px}
+.settings-save{position:sticky;bottom:12px;display:flex;justify-content:flex-end;margin-top:4px}
+.settings-save button{min-height:44px;padding:0 20px;border-radius:12px;background:linear-gradient(145deg,#707983,#555e68)}
+body.dark .settings-group{border-color:var(--line)}
+body.dark .settings-group-body input,body.dark .settings-group-body select,body.dark .settings-group-body textarea{background:#111417;border-color:#30353b}
+.thinking{align-self:flex-start;font-size:13px;color:var(--mut);padding:3px 8px 5px;min-height:24px}
+.thinking::after{content:"";animation:dots 1.2s infinite}
+@keyframes dots{0%,20%{content:""}40%{content:"."}60%{content:".."}80%,100%{content:"..."}}@keyframes riseIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:none}}@keyframes cardIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}@keyframes messageIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}}
+button.g{background:var(--ok);color:var(--ink);white-space:nowrap;box-shadow:none}
 #log{flex:1;overflow-y:auto;padding:6px 14px 14px;display:flex;flex-direction:column;gap:8px}
 .m{max-width:88%;padding:9px 12px;border-radius:14px;white-space:pre-wrap;word-wrap:break-word}
-.u{align-self:flex-end;background:var(--acc);color:#fff;border-bottom-right-radius:4px}
-.a{align-self:flex-start;background:var(--card);border-bottom-left-radius:4px}
-.t{align-self:flex-start;font-size:12.5px;color:var(--mut);background:none;padding:0 4px;border-left:3px solid var(--hi);border-radius:0;padding-left:8px}
-form{display:flex;gap:8px;padding:8px 14px calc(8px + env(safe-area-inset-bottom));background:var(--bg)}
-textarea,input,select{font:inherit;width:100%;border:1px solid #cfd4de;border-radius:10px;padding:9px 11px;background:#fff;color:var(--ink)}
+.u{align-self:flex-end;background:linear-gradient(145deg,#707983,#555e68);color:#fff;border-bottom-right-radius:4px;box-shadow:0 6px 18px rgba(45,52,60,.16);animation:messageIn .22s ease both}
+.a{align-self:flex-start;background:#e1e4e7;color:#20242a;border:1px solid var(--line);border-bottom-left-radius:4px;box-shadow:0 5px 18px rgba(40,45,50,.045);animation:messageIn .22s ease both}
+.t{align-self:flex-start;font-size:12.5px;color:var(--mut);background:none;padding:0 4px;border-left:3px solid var(--hi);border-radius:0;padding-left:8px;animation:messageIn .2s ease both}
+form{display:flex;align-items:flex-end;gap:8px;padding:8px 14px calc(8px + env(safe-area-inset-bottom));background:var(--bg)}
+form textarea{flex:1;min-height:44px;max-height:180px;overflow-y:auto}
+textarea,input,select{font:inherit;width:100%;border:1px solid var(--line);border-radius:10px;padding:9px 11px;background:rgba(255,255,255,.86);color:var(--ink);transition:border-color .18s ease,box-shadow .18s ease}
 textarea{resize:none;height:44px}
+.skills{display:grid;gap:7px;margin:6px 0 12px}
+.skill-option{display:flex;align-items:center;gap:9px;margin:0!important;font-weight:400!important}
+.skill-option input{width:auto;margin:0}
+body.dark{--bg:#0f1113;--ink:#f1f3f5;--mut:#a7adb5;--card:#171a1e;--acc:#727b86;--hi:#aeb6bf;--ok:#22262b;--line:rgba(210,216,223,.13);--glow:rgba(114,123,134,.20)}
+body.dark textarea,body.dark input,body.dark select{background:#111417;color:var(--ink);border-color:#30353b}body.dark .settings-group{background:linear-gradient(180deg,rgba(20,23,26,.98),rgba(17,20,23,.96));border-color:var(--line);box-shadow:0 12px 32px rgba(0,0,0,.22)}body.dark .settings-group-title{color:#c3c9cf};body.dark .a{background:#e1e4e7;color:#20242a;border-color:#3a3f45}body.dark .settings-group-body input:focus,body.dark .settings-group-body select:focus,body.dark .settings-group-body textarea:focus{background:#15191d}
+body.dark #set{background:var(--bg)}
+body.dark form{background:var(--bg)}
 #set{position:fixed;inset:0;background:var(--bg);overflow:auto;padding:calc(14px + env(safe-area-inset-top)) 14px 30px;display:none}
 #set.on{display:block}
 #set label{display:block;margin:12px 0 4px;font-weight:600}
 #set p{color:var(--mut);font-size:13px;margin:4px 0}
-.kc{background:#fff;border-radius:12px;padding:10px 12px;margin:8px 0}.row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.row button{padding:6px 10px;font-size:13px}
 </style>
 </head>
 <body>
-<header><div>Мой агент<small id="sub"></small></div><div><button class="g" id="admbtn" style="display:none">Админ</button> <button class="g" id="clr">Очистить</button> <button id="gear">Настройки</button></div></header>
+<header><div id="agentTitle">Мой агент<small id="sub"></small></div><div class="head-actions"><button class="g" id="clr">Очистить</button><button id="gear" aria-label="Настройки" title="Настройки">⚙︎</button></div></header>
 <div id="log"></div>
-<form id="f"><textarea id="q" placeholder="Напиши задачу…" enterkeyhint="send"></textarea><button>Отправить</button></form>
+<form id="f"><div class="input-island"><button id="attachBtn" class="attach-btn" type="button" aria-label="Прикрепить файл или фото" title="Прикрепить">+</button><input id="fileInput" type="file" hidden multiple accept="image/*,.txt,.md,.csv,.json,.js,.ts,.html,.css,.pdf,.doc,.docx,.xlsx"><div class="input-main"><div id="attachPreview" class="attach-preview"></div><textarea id="q" placeholder="Напишите задачу…" enterkeyhint="enter" rows="1"></textarea></div><button id="sendBtn" type="submit" aria-label="Отправить" title="Отправить">↑</button></div></form>
 
 <div id="set">
-<h2 style="margin:0">Настройки</h2>
-<label>Главная модель</label>
-<select id="prov"><option value="gateway">Шлюз (по ключу доступа)</option><option value="groq">Groq (Llama 3.3)</option><option value="gemini">Google Gemini</option><option value="openrouter">OpenRouter (free-модели)</option></select>
-<label>Ключ Groq</label><input id="k_groq" type="password" autocomplete="off"><p>console.groq.com → API Keys</p>
-<label>Ключ Gemini</label><input id="k_gemini" type="password" autocomplete="off"><p>aistudio.google.com → Get API key</p>
-<label>Ключ OpenRouter</label><input id="k_openrouter" type="password" autocomplete="off"><p>openrouter.ai → Keys</p>
-<label>Модель Gemini (если старая отключат, впиши новую)</label><input id="m_gemini" placeholder="gemini-3.8-flash">
-<label>Модель Groq</label><input id="m_groq" placeholder="llama-3.3-70b-versatile">
-<label>Модель OpenRouter</label><input id="m_openrouter" placeholder="meta-llama/llama-3.3-70b-instruct:free">
-<label>GitHub token (classic, право repo)</label><input id="k_github" type="password" autocomplete="off"><p>github.com/settings/tokens</p>
-<label>Telegram Bot Token</label><input id="k_tg" type="password" autocomplete="off"><p>@BotFather → /newbot</p>
-<label>Supabase URL</label><input id="k_sburl" placeholder="https://xxxx.supabase.co">
-<label>Supabase ключ (secret / service_role)</label><input id="k_sbkey" type="password" autocomplete="off"><p>Project Settings → API Keys. Секретный ключ даёт полный доступ к базе: держи его только в этом приложении.</p>
-<label>Адрес шлюза (твой Worker, https://…workers.dev)</label><input id="k_gwurl" placeholder="https://tgbot.xxx.workers.dev">
-<label>Ключ доступа (если тебе его выдали)</label><input id="k_access" type="password" autocomplete="off">
-<label>Админ-токен (только для владельца)</label><input id="k_admin" type="password" autocomplete="off"><p>Откроет кнопку «Админ» для выдачи ключей.</p>
-<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="auto" style="width:auto"> Автопилот: не спрашивать подтверждений, кроме опасных действий</label>
-<label>Системная инструкция</label><textarea id="sys" style="height:110px"></textarea>
-<p>Ключи хранятся только в памяти браузера на этом телефоне.</p>
-<p><button id="save">Сохранить</button></p>
+<div class="settings-header"><h2>Настройки</h2><button class="settings-close" id="setClose" aria-label="Закрыть" title="Закрыть">×</button></div>
+<section class="settings-group"><div class="settings-group-title">Общие</div><div class="settings-group-body"><label>Имя Агента</label><input id="agentName" placeholder="Мой агент">
+<label>Тема</label><select id="theme"><option value="light">Светлая</option><option value="dark">Тёмная</option></select>
+</div></section>
+<section class="settings-group"><div class="settings-group-title">Навыки</div><div class="settings-group-body">
+<label>Навыки (инструменты) агента</label><div class="skills" id="skillsList">
+<label class="skill-option"><input type="checkbox" value="strategy">Стратегия и планирование</label><label class="skill-option"><input type="checkbox" value="telegram_pro">Telegram-боты</label><label class="skill-option"><input type="checkbox" value="miniapp_ui">Mini App и интерфейсы</label><label class="skill-option"><input type="checkbox" value="stars_money">Оплата и монетизация</label><label class="skill-option"><input type="checkbox" value="supabase_pro">Supabase и база данных</label><label class="skill-option"><input type="checkbox" value="growth_channel">Рост Telegram-канала</label><label class="skill-option"><input type="checkbox" value="funnel_copy">Воронки и тексты</label><label class="skill-option"><input type="checkbox" value="ai_features">AI и модели</label><label class="skill-option"><input type="checkbox" value="analytics">Аналитика</label><label class="skill-option"><input type="checkbox" value="security">Безопасность</label><label class="skill-option"><input type="checkbox" value="deploy_cf">Деплой Cloudflare</label><label class="skill-option"><input type="checkbox" value="code_quality">Качество кода</label><label class="skill-option"><input type="checkbox" value="debugging">Поиск и исправление ошибок</label>
+</div></div></section>
+<section class="settings-group"><div class="settings-group-title">Доступ к AI агенту</div><div class="settings-group-body">
+<label>Ключ доступа к агенту</label>
+<div class="agent-key-box"><input id="agentKey" type="password" autocomplete="off" placeholder="AGENT-••••-••••-••••"><button type="button" id="checkAccess">Проверить</button></div>
+<div id="accessStatus" class="access-status">Ключ нужен для работы AI.</div>
+</div></section>
+<section class="settings-group"><div class="settings-group-title">Интеграции и доступ</div><div class="settings-group-body">
+<label>GitHub token (classic, право repo)</label><input id="k_github" type="password" autocomplete="off"><p>github.com/settings/tokens</p><label>Telegram Bot Token</label><input id="k_tg" type="password" autocomplete="off"><p>@BotFather → /newbot</p><label>Supabase URL</label><input id="k_sburl" placeholder="https://xxxx.supabase.co"><label>Supabase ключ (secret / service_role)</label><input id="k_sbkey" type="password" autocomplete="off"><p>Project Settings → API Keys. Секретный ключ даёт полный доступ к базе: держи его только в этом приложении.</p>
+</div></section>
+<section class="settings-group"><div class="settings-group-title">Поведение агента</div><div class="settings-group-body">
+<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="auto" style="width:auto"> Автопилот: не спрашивать подтверждений, кроме опасных действий</label><label>Системная инструкция</label><textarea id="sys" style="height:110px"></textarea><p>Ключи хранятся только в памяти браузера на этом телефоне.</p><div class="settings-save"><button id="save">Сохранить</button></div>
+</div></section>
 </div>
 
-<div id="adm" style="display:none;position:fixed;inset:0;z-index:8;background:var(--bg);overflow:auto;padding:calc(14px + env(safe-area-inset-top)) 14px 30px">
-<div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0">Админ-панель</h2><button class="g" id="admx">Закрыть</button></div>
-<p style="color:var(--mut);font-size:13px">Выдача ключей доступа к агенту. Заполни поля и нажми «Создать»: ссылка для входа скопируется, отправь её человеку.</p>
-<input id="alabel" placeholder="Имя (кому выдаёшь)"><div class="row"><input id="adays" type="number" placeholder="Срок, дней (0 = без срока)"><input id="aquota" type="number" placeholder="Запросов в день (100)"></div>
-<p><button id="amk">Создать ключ</button> <button class="g" id="arf">Обновить список</button></p><div id="alist"></div></div>
 <div id="pv" style="display:none;position:fixed;inset:0;z-index:9;background:#fff;padding-top:env(safe-area-inset-top)"><div style="padding:6px 10px"><button id="pvx">Закрыть предпросмотр</button></div><iframe id="pvf" sandbox="allow-scripts allow-forms" style="width:100%;height:calc(100% - 52px);border:0"></iframe></div>
 <script>
 const $=id=>document.getElementById(id);
-const P={
- gateway:{url:"",model:"gateway"},
- groq:{url:"https://api.groq.com/openai/v1/chat/completions",model:"openai/gpt-oss-120b"},
- gemini:{url:"https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",model:"gemini-3.8-flash"},
- openrouter:{url:"https://openrouter.ai/api/v1/chat/completions",model:"meta-llama/llama-3.3-70b-instruct:free"}
-};
+const GATEWAY_URL="https://dfvztoazthliaobqnndv.supabase.co/functions/v1/agent-gateway";
 const DEF_SYS=`Ты — автономный AI-инженер и операционный директор Telegram-бизнеса. Пользователь ставит задачу и почти не участвует: ты сам планируешь, делаешь, публикуешь, проверяешь и докладываешь итог в 3-6 строк со ссылками. Только бесплатные сервисы, пользователь работает с iPhone. Отвечай по-русски.
 ПЛАТФОРМА (инструмент scaffold_platform): рантайм на Cloudflare Worker работает 24/7 и читает всю логику из Supabase, поэтому правки бота делаются записью в таблицы через supabase, без передеплоя. Таблицы: users(id,plan,plan_until,ref_by), settings(key,value jsonb: welcome, ai_prompt, ai_premium_only), commands(cmd,label,reply,buttons[{text,url|cb}],premium,in_menu), products(id,title,description,stars,days,sub,active), payments, posts(chat_id или 'all',text,photo,buttons,send_at,sent) — посты в канал и рассылки по расписанию. Секреты Worker: BOT_TOKEN, BOT_NAME, WEBHOOK_SECRET, SB_URL, SB_KEY, ADMIN_ID, опц. AI_KEY. Cron: * * * * *. Эндпоинты для Mini App: POST /api/me и /api/invoice с initData.
 ПЕРВЫЙ ЗАПУСК: scaffold_platform, scaffold_deploy, github_push (авто-деплой Worker через GitHub Actions), github_status для проверки, затем точные шаги для пользователя (SQL Editor, секреты репозитория GitHub), затем setWebhook (url воркера + /hook, secret_token = WEBHOOK_SECRET), setMyCommands, setChatMenuButton, наполнение таблиц.
-ШЛЮЗ ДОСТУПА: Worker /gw пускает людей к ИИ по ключам из таблицы access_keys (их выдаёт админ-панель в приложении, кнопка «Админ»). Модель и адрес ИИ для бота и шлюза меняются записью в settings (ключи ai_model, ai_url) без деплоя.
 КАНАЛ: бот должен быть админом; контент-план = строки posts с send_at; пиши готовые посты и ставь их в очередь.
 МОНЕТИЗАЦИЯ: Telegram Stars (XTR): free/premium, подписка sub=true на 30 дней, платные команды (premium=true), рефералы, апселл в welcome и после полезных ответов. Mini App: telegram-web-app.js, доступ через /api/me, покупка через /api/invoice и Telegram.WebApp.openInvoice.
 АВТОМАТИЗАЦИЯ: приветственная воронка, рассылки, расписание постов, AI-ответы (settings.ai_prompt), /stats для админа.
@@ -83,13 +111,17 @@ const DEF_SYS=`Ты — автономный AI-инженер и операци
 НАВЫКИ: перед задачей вызови load_skill для 1-3 подходящих: strategy (новый проект), telegram_pro, miniapp_ui, stars_money, supabase_pro, growth_channel, funnel_copy, ai_features, analytics, security, deploy_cf; code_quality перед каждым github_push; debugging при любой ошибке. Чужой проект: github_repos, github_pull, правки, github_push. Документацию читай через read_url.
 ПРАВИЛА: после изменений проверяй результат (getWebhookInfo, чтение таблиц, preview). Секреты не выводи и не клади в код или репозиторий. С деньгами проверяй логику дважды. Не выдумывай API, если не уверен, так и скажи. Правки существующего проекта: сначала list_files и read_file, меняй точечно.`;
 const S=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}};
+function applyTheme(){document.body.classList.toggle("dark",S("theme")==="dark")}
+function agentName(){return S("agentName")||"Мой агент"}
+function selectedSkills(){try{return JSON.parse(S("skills")||"[]")}catch(e){return []}}
+function skillsPrompt(){const a=selectedSkills();if(!a.length)return "";return "\n\nАКТИВНЫЕ НАВЫКИ:\n"+a.map(n=>SKILLS[n]?"["+n+"]\n"+SKILLS[n]:"").filter(Boolean).join("\n\n")}
 let hist=[];try{hist=JSON.parse(localStorage.getItem("hist")||"[]")}catch(e){}
-const KEYS=["k_groq","k_gemini","k_openrouter","m_openrouter","m_gemini","m_groq","k_gwurl","k_access","k_admin","k_github","k_tg","k_sburl","k_sbkey"];
+const KEYS=["k_github","k_tg","k_sburl","k_sbkey"];
 
 // ---------- tools ----------
 const J=async u=>{const r=await fetch(u);if(!r.ok)throw new Error("HTTP "+r.status);return r.json()};
-const RT_WORKER="// Универсальный рантайм Telegram-бота для Cloudflare Workers (бесплатный план).\n// Секреты: BOT_TOKEN, BOT_NAME, WEBHOOK_SECRET, SB_URL, SB_KEY, ADMIN_ID, ADMIN_TOKEN, AI_KEY (ключ Gemini)\n// Модель и адрес ИИ меняются без деплоя: таблица settings, ключи ai_model и ai_url\n// Cron Trigger: * * * * *\nconst J={'content-type':'application/json'};\nconst CORS={'access-control-allow-origin':'*','access-control-allow-headers':'content-type,x-key,x-admin','access-control-allow-methods':'POST,OPTIONS'};\nconst arr=x=>Array.isArray(x)?x:[];\nconst GEM='https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',MODEL='gemini-3.8-flash';\nconst out=(o,s=200)=>new Response(JSON.stringify(o),{status:s,headers:{...J,...CORS}});\nconst tg=(e,m,b)=>fetch(`https://api.telegram.org/bot${e.BOT_TOKEN}/${m}`,{method:'POST',headers:J,body:JSON.stringify(b)}).then(r=>r.json());\nconst db=(e,m,t,q,b)=>fetch(`${e.SB_URL}/rest/v1/${t}${q?'?'+q:''}`,{method:m,headers:{apikey:e.SB_KEY,Authorization:'Bearer '+e.SB_KEY,'content-type':'application/json',Prefer:'return=representation,resolution=merge-duplicates'},body:b?JSON.stringify(b):undefined}).then(r=>r.json()).catch(()=>[]);\nconst active=u=>!!(u&&u.plan_until&&new Date(u.plan_until)>new Date());\nconst kb=b=>b&&b.length?{inline_keyboard:b.map(x=>[x.url?{text:x.text,url:x.url}:{text:x.text,callback_data:x.cb}])}:undefined;\nconst say=(e,id,text,b)=>tg(e,'sendMessage',{chat_id:id,text,parse_mode:'HTML',reply_markup:kb(b)});\nconst send=(e,chat,p)=>p.photo?tg(e,'sendPhoto',{chat_id:chat,photo:p.photo,caption:p.text,parse_mode:'HTML',reply_markup:kb(p.buttons)}):say(e,chat,p.text,p.buttons);\nconst cfg=async e=>Object.fromEntries(arr(await db(e,'GET','settings')).map(r=>[r.key,r.value]));\n\nasync function extend(e,id,days){const [u]=arr(await db(e,'GET','users','id=eq.'+id));if(!u)return;\n const d=active(u)?new Date(u.plan_until):new Date();d.setDate(d.getDate()+days);\n await db(e,'PATCH','users','id=eq.'+id,{plan:'premium',plan_until:d.toISOString()})}\nasync function link(e,p){const r=await tg(e,'createInvoiceLink',{title:p.title,description:p.description||p.title,payload:p.id,currency:'XTR',prices:[{label:p.title,amount:p.stars}],...(p.sub?{subscription_period:2592000}:{})});return r.result}\nasync function shop(e,id){const ps=arr(await db(e,'GET','products','active=eq.true&order=stars'));\n if(!ps.length)return say(e,id,'Тарифы скоро появятся.');\n return say(e,id,'💎 <b>Премиум<\/b>\\nВыберите тариф:',ps.map(p=>({text:`${p.title} — ${p.stars} ⭐`,cb:'buy:'+p.id})))}\nasync function runCmd(e,id,c,usr){const [r]=arr(await db(e,'GET','commands','cmd=eq.'+encodeURIComponent(c)));if(!r)return false;\n if(r.premium&&!active(usr)){await say(e,id,'🔒 Доступно в Премиум.',[{text:'💎 Оформить',cb:'shop'}]);return true}\n await say(e,id,r.reply,r.buttons);return true}\nasync function paid(e,id,sp,usr){const [p]=arr(await db(e,'GET','products','id=eq.'+sp.invoice_payload));\n const first=!arr(await db(e,'GET','payments',`user_id=eq.${id}&limit=1`)).length;\n await db(e,'POST','payments','',{user_id:id,product_id:p?.id,stars:sp.total_amount,charge_id:sp.telegram_payment_charge_id});\n await extend(e,id,p?.days||30);\n if(first&&usr.ref_by)await extend(e,usr.ref_by,3);\n if(e.ADMIN_ID)await say(e,e.ADMIN_ID,`💰 +${sp.total_amount} ⭐ от ${id}`);\n return say(e,id,'🎉 Оплата прошла! Премиум активен.')}\n\nasync function onUpdate(e,u){\n if(u.pre_checkout_query)return tg(e,'answerPreCheckoutQuery',{pre_checkout_query_id:u.pre_checkout_query.id,ok:true});\n const cb=u.callback_query,from=(cb||u.message||{}).from;if(!from)return;const id=from.id;\n const t=(u.message?.text||'').trim();\n let [usr]=arr(await db(e,'GET','users','id=eq.'+id));\n if(!usr){const ref=+(t.split(' ')[1]||0);usr={id,username:from.username,first_name:from.first_name,ref_by:ref&&ref!==id?ref:null};await db(e,'POST','users','',usr)}\n if(u.message?.successful_payment)return paid(e,id,u.message.successful_payment,usr);\n if(cb){await tg(e,'answerCallbackQuery',{callback_query_id:cb.id});const i=cb.data.indexOf(':'),k=cb.data.slice(0,i),v=cb.data.slice(i+1);\n  if(k==='shop')return shop(e,id);\n  if(k==='cmd')return runCmd(e,id,v,usr);\n  if(k==='buy'){const [p]=arr(await db(e,'GET','products','id=eq.'+v));if(!p)return;\n   if(p.sub)return say(e,id,`${p.title}: ${p.stars} ⭐ / 30 дней`,[{text:'Оплатить',url:await link(e,p)}]);\n   return tg(e,'sendInvoice',{chat_id:id,title:p.title,description:p.description||p.title,payload:p.id,currency:'XTR',prices:[{label:p.title,amount:p.stars}]})}\n  return}\n if(!t)return;\n const c=t.split(/\\s+/)[0].toLowerCase().replace(/@.*/,'');\n if(c==='/start'){const s=await cfg(e),ms=arr(await db(e,'GET','commands','in_menu=eq.true'));\n  return say(e,id,s.welcome||'Привет! 👋',[...ms.map(x=>({text:x.label||x.cmd,cb:'cmd:'+x.cmd})),{text:'💎 Премиум',cb:'shop'}])}\n if(c==='/paysupport'||c==='/terms'){const s=await cfg(e);return say(e,id,s[c.slice(1)]||'Вопросы по оплате и условиям: @'+(e.SUPPORT||e.BOT_NAME))}\n if(c==='/buy'||c==='/premium')return shop(e,id);\n if(c==='/me')return say(e,id,(active(usr)?`✅ Премиум до ${usr.plan_until.slice(0,10)}`:'Тариф: free')+`\\nРеф-ссылка (+3 дня за каждую оплату друга): https://t.me/${e.BOT_NAME}?start=${id}`);\n if(String(id)===String(e.ADMIN_ID)){\n  if(c==='/stats'){const us=arr(await db(e,'GET','users','select=id,plan_until')),ps=arr(await db(e,'GET','payments','select=stars'));\n   return say(e,id,`👥 ${us.length} · 💎 ${us.filter(x=>active(x)).length} · ⭐ ${ps.reduce((a,p)=>a+p.stars,0)}`)}\n  if(c==='/broadcast'){await db(e,'POST','posts','',{chat_id:'all',text:t.slice(10).trim()});return say(e,id,'Рассылка в очереди')}}\n if(c.startsWith('/')){if(await runCmd(e,id,c,usr))return;return}\n if(!e.AI_KEY)return;\n const s=await cfg(e);\n if(s.ai_premium_only&&!active(usr))return say(e,id,'🔒 AI-ответы в Премиум.',[{text:'💎 Оформить',cb:'shop'}]);\n const r=await fetch(s.ai_url||e.AI_URL||GEM,{method:'POST',headers:{...J,Authorization:'Bearer '+e.AI_KEY},body:JSON.stringify({model:s.ai_model||e.AI_MODEL||MODEL,messages:[{role:'system',content:s.ai_prompt||'Ты полезный помощник. Отвечай кратко.'},{role:'user',content:t}]})}).then(r=>r.json()).catch(()=>({}));\n return say(e,id,(r.choices?.[0]?.message?.content||'Не получилось ответить').replace(/[<>&]/g,''))}\n\nasync function cron(e){\n const [p]=arr(await db(e,'GET','posts','sent=eq.false&send_at=lte.'+new Date().toISOString()+'&order=id&limit=1'));if(!p)return;\n if(p.chat_id!=='all'){await send(e,p.chat_id,p);return db(e,'PATCH','posts','id=eq.'+p.id,{sent:true})}\n const us=arr(await db(e,'GET','users',`bc=lt.${p.id}&select=id&limit=38`));\n await Promise.all(us.map(x=>send(e,x.id,p)));\n if(us.length)await db(e,'PATCH','users',`id=in.(${us.map(x=>x.id).join(',')})`,{bc:p.id});\n if(us.length<38)await db(e,'PATCH','posts','id=eq.'+p.id,{sent:true})}\n\nasync function verify(init,token){const p=new URLSearchParams(init),h=p.get('hash');p.delete('hash');\n if(Date.now()/1000-(+p.get('auth_date')||0)>86400)return null;\n const s=[...p.entries()].sort(([a],[b])=>a<b?-1:1).map(([k,v])=>k+'='+v).join('\\n'),enc=new TextEncoder();\n const hm=(k,d)=>crypto.subtle.importKey('raw',k,{name:'HMAC',hash:'SHA-256'},false,['sign']).then(K=>crypto.subtle.sign('HMAC',K,d));\n const key=await hm(enc.encode('WebAppData'),enc.encode(token));\n const hex=[...new Uint8Array(await hm(key,enc.encode(s)))].map(b=>b.toString(16).padStart(2,'0')).join('');\n return hex===h?JSON.parse(p.get('user')):null}\n\n// Шлюз доступа: приложение-агент ходит в ИИ через /gw по ключу доступа (x-key)\nasync function gw(r,e,ctx){\n const k=r.headers.get('x-key')||'';\n const [a]=k?arr(await db(e,'GET','access_keys','key=eq.'+encodeURIComponent(k))):[];\n if(!a||!a.active||(a.expires_at&&new Date(a.expires_at)<new Date()))return out({error:'Ключ доступа недействителен или истёк'},401);\n const day=new Date().toISOString().slice(0,10),used=a.day===day?a.used:0;\n if(used>=a.quota)return out({error:'Дневной лимит запросов исчерпан, попробуйте завтра'},429);\n const t=await r.text();if(t.length>300000)return out({error:'Слишком большой запрос'},413);\n let b;try{b=JSON.parse(t)}catch(x){}\n if(!b||!Array.isArray(b.messages))return out({error:'bad request'},400);\n const s=await cfg(e);\n const res=await fetch(s.ai_url||e.AI_URL||GEM,{method:'POST',headers:{...J,Authorization:'Bearer '+e.AI_KEY},body:JSON.stringify({messages:b.messages,tools:b.tools,tool_choice:b.tool_choice,model:s.ai_model||e.AI_MODEL||MODEL})});\n ctx.waitUntil(db(e,'PATCH','access_keys','key=eq.'+encodeURIComponent(k),{day,used:used+1,total:(a.total||0)+1}));\n return new Response(res.body,{status:res.status,headers:{...J,...CORS}})}\n// Админ-API: x-admin = ADMIN_TOKEN. Операции: list, create, set, delete\nasync function adm(r,e){\n if(!e.ADMIN_TOKEN||r.headers.get('x-admin')!==e.ADMIN_TOKEN)return out({error:'Нет доступа'},403);\n const b=await r.json().catch(()=>({}));\n if(b.op==='list')return out({keys:arr(await db(e,'GET','access_keys','order=created_at.desc&limit=100'))});\n if(b.op==='create'){const k='ag_'+[...crypto.getRandomValues(new Uint8Array(18))].map(x=>x.toString(36).padStart(2,'0')).join('').slice(0,28);\n  await db(e,'POST','access_keys','',{key:k,label:String(b.label||'').slice(0,60),quota:Math.min(+b.quota||100,5000),expires_at:b.days>0?new Date(Date.now()+b.days*864e5).toISOString():null});\n  return out({key:k})}\n if(b.op==='set'){await db(e,'PATCH','access_keys','key=eq.'+encodeURIComponent(b.key),{active:!!b.active});return out({ok:1})}\n if(b.op==='delete'){await db(e,'DELETE','access_keys','key=eq.'+encodeURIComponent(b.key));return out({ok:1})}\n return out({error:'unknown op'},400)}\n\nexport default{\n async fetch(r,e,ctx){const u=new URL(r.url);\n  if(r.method==='OPTIONS')return new Response(null,{headers:CORS});\n  if(u.pathname==='/hook'){if(r.headers.get('x-telegram-bot-api-secret-token')!==e.WEBHOOK_SECRET)return new Response('no',{status:403});\n   const up=await r.json();ctx.waitUntil(onUpdate(e,up).catch(console.error));return new Response('ok')}\n  if(u.pathname==='/gw'&&r.method==='POST')return gw(r,e,ctx);\n  if(u.pathname==='/admin'&&r.method==='POST')return adm(r,e);\n  if(u.pathname.startsWith('/api/')){const b=await r.json().catch(()=>({})),tu=b.initData&&await verify(b.initData,e.BOT_TOKEN);\n   const out=(o,s=200)=>new Response(JSON.stringify(o),{status:s,headers:{...J,...CORS}});\n   if(!tu)return out({error:'auth'},401);\n   if(u.pathname==='/api/me'){const [x]=arr(await db(e,'GET','users','id=eq.'+tu.id));return out({id:tu.id,plan:x?.plan||'free',active:active(x),until:x?.plan_until||null})}\n   if(u.pathname==='/api/invoice'){const [p]=arr(await db(e,'GET','products','id=eq.'+b.product));return p?out({link:await link(e,p)}):out({error:'no product'},404)}}\n  return new Response('bot runtime ok',{headers:CORS})},\n async scheduled(ev,e,ctx){ctx.waitUntil(cron(e))}\n};\n";
-const RT_SQL="create table if not exists users(id bigint primary key,username text,first_name text,plan text default 'free',plan_until timestamptz,ref_by bigint,bc bigint default 0,created_at timestamptz default now());\ncreate table if not exists settings(key text primary key,value jsonb);\ncreate table if not exists commands(cmd text primary key,label text,reply text not null,buttons jsonb,premium boolean default false,in_menu boolean default false);\ncreate table if not exists products(id text primary key,title text not null,description text,stars int not null,days int default 30,sub boolean default false,active boolean default true);\ncreate table if not exists payments(id bigserial primary key,user_id bigint,product_id text,stars int,charge_id text,created_at timestamptz default now());\ncreate table if not exists posts(id bigserial primary key,chat_id text not null,text text not null,photo text,buttons jsonb,send_at timestamptz default now(),sent boolean default false);\nalter table users enable row level security;alter table settings enable row level security;alter table commands enable row level security;\nalter table products enable row level security;alter table payments enable row level security;alter table posts enable row level security;\ncreate table if not exists access_keys(key text primary key,label text,active boolean default true,quota int default 100,used int default 0,day date,total int default 0,expires_at timestamptz,created_at timestamptz default now());\nalter table access_keys enable row level security;\n-- Доступ только через secret/service_role ключ (рантайм и агент). Публичный anon-доступ закрыт.\n";
+const RT_WORKER="// Универсальный рантайм Telegram-бота для Cloudflare Workers (бесплатный план).\n// Секреты: BOT_TOKEN, BOT_NAME, WEBHOOK_SECRET, SB_URL, SB_KEY, ADMIN_ID, (опц.) AI_KEY, AI_URL, AI_MODEL\n// Cron Trigger: * * * * *\nconst J={'content-type':'application/json'};\nconst CORS={'access-control-allow-origin':'*','access-control-allow-headers':'content-type','access-control-allow-methods':'POST,OPTIONS'};\nconst arr=x=>Array.isArray(x)?x:[];\nconst tg=(e,m,b)=>fetch(`https://api.telegram.org/bot${e.BOT_TOKEN}/${m}`,{method:'POST',headers:J,body:JSON.stringify(b)}).then(r=>r.json());\nconst db=(e,m,t,q,b)=>fetch(`${e.SB_URL}/rest/v1/${t}${q?'?'+q:''}`,{method:m,headers:{apikey:e.SB_KEY,Authorization:'Bearer '+e.SB_KEY,'content-type':'application/json',Prefer:'return=representation,resolution=merge-duplicates'},body:b?JSON.stringify(b):undefined}).then(r=>r.json()).catch(()=>[]);\nconst active=u=>!!(u&&u.plan_until&&new Date(u.plan_until)>new Date());\nconst kb=b=>b&&b.length?{inline_keyboard:b.map(x=>[x.url?{text:x.text,url:x.url}:{text:x.text,callback_data:x.cb}])}:undefined;\nconst say=(e,id,text,b)=>tg(e,'sendMessage',{chat_id:id,text,parse_mode:'HTML',reply_markup:kb(b)});\nconst send=(e,chat,p)=>p.photo?tg(e,'sendPhoto',{chat_id:chat,photo:p.photo,caption:p.text,parse_mode:'HTML',reply_markup:kb(p.buttons)}):say(e,chat,p.text,p.buttons);\nconst cfg=async e=>Object.fromEntries(arr(await db(e,'GET','settings')).map(r=>[r.key,r.value]));\n\nasync function extend(e,id,days){const [u]=arr(await db(e,'GET','users','id=eq.'+id));if(!u)return;\n const d=active(u)?new Date(u.plan_until):new Date();d.setDate(d.getDate()+days);\n await db(e,'PATCH','users','id=eq.'+id,{plan:'premium',plan_until:d.toISOString()})}\nasync function link(e,p){const r=await tg(e,'createInvoiceLink',{title:p.title,description:p.description||p.title,payload:p.id,currency:'XTR',prices:[{label:p.title,amount:p.stars}],...(p.sub?{subscription_period:2592000}:{})});return r.result}\nasync function shop(e,id){const ps=arr(await db(e,'GET','products','active=eq.true&order=stars'));\n if(!ps.length)return say(e,id,'Тарифы скоро появятся.');\n return say(e,id,'💎 <b>Премиум<\/b>\\nВыберите тариф:',ps.map(p=>({text:`${p.title} — ${p.stars} ⭐`,cb:'buy:'+p.id})))}\nasync function runCmd(e,id,c,usr){const [r]=arr(await db(e,'GET','commands','cmd=eq.'+encodeURIComponent(c)));if(!r)return false;\n if(r.premium&&!active(usr)){await say(e,id,'🔒 Доступно в Премиум.',[{text:'💎 Оформить',cb:'shop'}]);return true}\n await say(e,id,r.reply,r.buttons);return true}\nasync function paid(e,id,sp,usr){const [p]=arr(await db(e,'GET','products','id=eq.'+sp.invoice_payload));\n const first=!arr(await db(e,'GET','payments',`user_id=eq.${id}&limit=1`)).length;\n await db(e,'POST','payments','',{user_id:id,product_id:p?.id,stars:sp.total_amount,charge_id:sp.telegram_payment_charge_id});\n await extend(e,id,p?.days||30);\n if(first&&usr.ref_by)await extend(e,usr.ref_by,3);\n if(e.ADMIN_ID)await say(e,e.ADMIN_ID,`💰 +${sp.total_amount} ⭐ от ${id}`);\n return say(e,id,'🎉 Оплата прошла! Премиум активен.')}\n\nasync function onUpdate(e,u){\n if(u.pre_checkout_query)return tg(e,'answerPreCheckoutQuery',{pre_checkout_query_id:u.pre_checkout_query.id,ok:true});\n const cb=u.callback_query,from=(cb||u.message||{}).from;if(!from)return;const id=from.id;\n const t=(u.message?.text||'').trim();\n let [usr]=arr(await db(e,'GET','users','id=eq.'+id));\n if(!usr){const ref=+(t.split(' ')[1]||0);usr={id,username:from.username,first_name:from.first_name,ref_by:ref&&ref!==id?ref:null};await db(e,'POST','users','',usr)}\n if(u.message?.successful_payment)return paid(e,id,u.message.successful_payment,usr);\n if(cb){await tg(e,'answerCallbackQuery',{callback_query_id:cb.id});const i=cb.data.indexOf(':'),k=cb.data.slice(0,i),v=cb.data.slice(i+1);\n  if(k==='shop')return shop(e,id);\n  if(k==='cmd')return runCmd(e,id,v,usr);\n  if(k==='buy'){const [p]=arr(await db(e,'GET','products','id=eq.'+v));if(!p)return;\n   if(p.sub)return say(e,id,`${p.title}: ${p.stars} ⭐ / 30 дней`,[{text:'Оплатить',url:await link(e,p)}]);\n   return tg(e,'sendInvoice',{chat_id:id,title:p.title,description:p.description||p.title,payload:p.id,currency:'XTR',prices:[{label:p.title,amount:p.stars}]})}\n  return}\n if(!t)return;\n const c=t.split(/\\s+/)[0].toLowerCase().replace(/@.*/,'');\n if(c==='/start'){const s=await cfg(e),ms=arr(await db(e,'GET','commands','in_menu=eq.true'));\n  return say(e,id,s.welcome||'Привет! 👋',[...ms.map(x=>({text:x.label||x.cmd,cb:'cmd:'+x.cmd})),{text:'💎 Премиум',cb:'shop'}])}\n if(c==='/paysupport'||c==='/terms'){const s=await cfg(e);return say(e,id,s[c.slice(1)]||'Вопросы по оплате и условиям: @'+(e.SUPPORT||e.BOT_NAME))}\n if(c==='/buy'||c==='/premium')return shop(e,id);\n if(c==='/me')return say(e,id,(active(usr)?`✅ Премиум до ${usr.plan_until.slice(0,10)}`:'Тариф: free')+`\\nРеф-ссылка (+3 дня за каждую оплату друга): https://t.me/${e.BOT_NAME}?start=${id}`);\n if(String(id)===String(e.ADMIN_ID)){\n  if(c==='/stats'){const us=arr(await db(e,'GET','users','select=id,plan_until')),ps=arr(await db(e,'GET','payments','select=stars'));\n   return say(e,id,`👥 ${us.length} · 💎 ${us.filter(x=>active(x)).length} · ⭐ ${ps.reduce((a,p)=>a+p.stars,0)}`)}\n  if(c==='/broadcast'){await db(e,'POST','posts','',{chat_id:'all',text:t.slice(10).trim()});return say(e,id,'Рассылка в очереди')}}\n if(c.startsWith('/')){if(await runCmd(e,id,c,usr))return;return}\n if(!e.AI_KEY)return;\n const s=await cfg(e);\n if(s.ai_premium_only&&!active(usr))return say(e,id,'🔒 AI-ответы в Премиум.',[{text:'💎 Оформить',cb:'shop'}]);\n const r=await fetch(e.AI_URL||'https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{...J,Authorization:'Bearer '+e.AI_KEY},body:JSON.stringify({model:e.AI_MODEL||'llama-3.3-70b-versatile',messages:[{role:'system',content:s.ai_prompt||'Ты полезный помощник. Отвечай кратко.'},{role:'user',content:t}]})}).then(r=>r.json()).catch(()=>({}));\n return say(e,id,(r.choices?.[0]?.message?.content||'Не получилось ответить').replace(/[<>&]/g,''))}\n\nasync function cron(e){\n const [p]=arr(await db(e,'GET','posts','sent=eq.false&send_at=lte.'+new Date().toISOString()+'&order=id&limit=1'));if(!p)return;\n if(p.chat_id!=='all'){await send(e,p.chat_id,p);return db(e,'PATCH','posts','id=eq.'+p.id,{sent:true})}\n const us=arr(await db(e,'GET','users',`bc=lt.${p.id}&select=id&limit=38`));\n await Promise.all(us.map(x=>send(e,x.id,p)));\n if(us.length)await db(e,'PATCH','users',`id=in.(${us.map(x=>x.id).join(',')})`,{bc:p.id});\n if(us.length<38)await db(e,'PATCH','posts','id=eq.'+p.id,{sent:true})}\n\nasync function verify(init,token){const p=new URLSearchParams(init),h=p.get('hash');p.delete('hash');\n if(Date.now()/1000-(+p.get('auth_date')||0)>86400)return null;\n const s=[...p.entries()].sort(([a],[b])=>a<b?-1:1).map(([k,v])=>k+'='+v).join('\\n'),enc=new TextEncoder();\n const hm=(k,d)=>crypto.subtle.importKey('raw',k,{name:'HMAC',hash:'SHA-256'},false,['sign']).then(K=>crypto.subtle.sign('HMAC',K,d));\n const key=await hm(enc.encode('WebAppData'),enc.encode(token));\n const hex=[...new Uint8Array(await hm(key,enc.encode(s)))].map(b=>b.toString(16).padStart(2,'0')).join('');\n return hex===h?JSON.parse(p.get('user')):null}\n\nexport default{\n async fetch(r,e,ctx){const u=new URL(r.url);\n  if(r.method==='OPTIONS')return new Response(null,{headers:CORS});\n  if(u.pathname==='/hook'){if(r.headers.get('x-telegram-bot-api-secret-token')!==e.WEBHOOK_SECRET)return new Response('no',{status:403});\n   const up=await r.json();ctx.waitUntil(onUpdate(e,up).catch(console.error));return new Response('ok')}\n  if(u.pathname.startsWith('/api/')){const b=await r.json().catch(()=>({})),tu=b.initData&&await verify(b.initData,e.BOT_TOKEN);\n   const out=(o,s=200)=>new Response(JSON.stringify(o),{status:s,headers:{...J,...CORS}});\n   if(!tu)return out({error:'auth'},401);\n   if(u.pathname==='/api/me'){const [x]=arr(await db(e,'GET','users','id=eq.'+tu.id));return out({id:tu.id,plan:x?.plan||'free',active:active(x),until:x?.plan_until||null})}\n   if(u.pathname==='/api/invoice'){const [p]=arr(await db(e,'GET','products','id=eq.'+b.product));return p?out({link:await link(e,p)}):out({error:'no product'},404)}}\n  return new Response('bot runtime ok',{headers:CORS})},\n async scheduled(ev,e,ctx){ctx.waitUntil(cron(e))}\n};\n";
+const RT_SQL="create table if not exists users(id bigint primary key,username text,first_name text,plan text default 'free',plan_until timestamptz,ref_by bigint,bc bigint default 0,created_at timestamptz default now());\ncreate table if not exists settings(key text primary key,value jsonb);\ncreate table if not exists commands(cmd text primary key,label text,reply text not null,buttons jsonb,premium boolean default false,in_menu boolean default false);\ncreate table if not exists products(id text primary key,title text not null,description text,stars int not null,days int default 30,sub boolean default false,active boolean default true);\ncreate table if not exists payments(id bigserial primary key,user_id bigint,product_id text,stars int,charge_id text,created_at timestamptz default now());\ncreate table if not exists posts(id bigserial primary key,chat_id text not null,text text not null,photo text,buttons jsonb,send_at timestamptz default now(),sent boolean default false);\nalter table users enable row level security;alter table settings enable row level security;alter table commands enable row level security;\nalter table products enable row level security;alter table payments enable row level security;alter table posts enable row level security;\n-- Доступ только через secret/service_role ключ (рантайм и агент). Публичный anon-доступ закрыт.\n";
 const SKILLS={
 telegram_pro:"Bot API: отвечай на вебхук быстро (200), тяжёлое через ctx.waitUntil; идемпотентность по update_id; callback_data до 64 байт; лимиты: ~30 сообщений/сек всего, 1/сек в чат, 20/мин в группу; в HTML-режиме экранируй < > &; гейт подписки через getChatMember (member/administrator/creator); deep links t.me/бот?start=src_метка для аналитики источников; setMyCommands; ошибка 403 = бота заблокировали, помечай в БД. Отладка: getWebhookInfo (last_error_message, pending_update_count).",
 miniapp_ui:"Mini App: подключи telegram-web-app.js, вызови Telegram.WebApp.ready() и expand(); цвета только из themeParams через CSS-переменные, тёмная тема; безопасные зоны; MainButton для главного действия, BackButton для навигации; HapticFeedback на нажатиях; зоны нажатия от 44px; скелетоны вместо спиннеров; пустые и ошибочные состояния с действием; один акцентный цвет, два веса шрифта; важные данные в БД, не в localStorage; доступ проверяй на сервере по initData (/api/me); оплата через Telegram.WebApp.openInvoice(link, cb).",
@@ -100,12 +132,12 @@ funnel_copy:"Воронка: /start за 3 строки обещает резу�
 strategy:"Перед новым проектом ответь в 5 строках: кто ЦА, какая боль, главный сценарий, как деньги, как найти первые 100 пользователей. MVP за один день: один сценарий, один тариф, один канал привлечения. Каждая функция должна влиять на деньги или удержание, остальное не строй. После запуска меняй по данным, не по ощущениям.",
 code_quality:"Перед github_push: прогони test_html для веба и run_js для логики; обработка ошибок и таймаут у каждого fetch; нет секретов в коде; ввод пользователя валидируй; повторы с задержкой для внешних API; малые понятные коммиты; критичный код (оплата, доступ) отдай на ревью другой модели через ask_other_llm и учти замечания.",
 debugging:"Отладка: 1) воспроизведи и назови симптом; 2) бот: getWebhookInfo, деплой: github_status, веб: test_html; 3) одна гипотеза и её проверка; 4) минимальная правка; 5) повторная проверка тем же способом. Не меняй несколько вещей сразу, не угадывай.",
-deploy_cf:"Деплой: scaffold_deploy создаёт wrangler.toml и workflow GitHub Actions; пользователь один раз добавляет секреты репозитория (CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, BOT_TOKEN, BOT_NAME, WEBHOOK_SECRET, SB_URL, SB_KEY, ADMIN_ID, ADMIN_TOKEN, AI_KEY); дальше каждый github_push в main выкатывает Worker сам. Лимиты Cloudflare free: 100k запросов в сутки, 50 подзапросов на вызов, ~10 мс CPU, без eval. При failure в github_status смотри упавший шаг.",
+deploy_cf:"Деплой: scaffold_deploy создаёт wrangler.toml и workflow GitHub Actions; пользователь один раз добавляет секреты репозитория (CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, BOT_TOKEN, BOT_NAME, WEBHOOK_SECRET, SB_URL, SB_KEY, ADMIN_ID); дальше каждый github_push в main выкатывает Worker сам. Лимиты Cloudflare free: 100k запросов в сутки, 50 подзапросов на вызов, ~10 мс CPU, без eval. При failure в github_status смотри упавший шаг.",
 security:"Секреты только в Secrets (GitHub, Cloudflare), не в коде и не в чате; вебхук проверяй по secret_token; Mini App по HMAC initData; не доверяй callback_data и тексту; RLS; антиспам и лимит запросов к AI на пользователя; в логах без персональных данных; админ-команды только по ADMIN_ID; ключам давай минимально нужные права; нужны /terms и политика конфиденциальности (не юридическая консультация).",
 ai_features:"AI в боте: системный промпт задаёт роль, границы, формат, язык; счётчик бесплатных запросов в БД, сверх лимита апселл Premium; короткий контекст (последние 6 сообщений); кэш частых вопросов; запасная модель при ошибке; не обещай то, чего модель не знает; проверь 10 типичными и 5 злонамеренными запросами.",
 analytics:"Аналитика: таблица events(user_id,name,meta,created_at); считай DAU, конверсию free→paid, ARPU, удержание D1/D7, источники по start=; еженедельный отчёт админу ставь в posts на его chat_id; меняй по одной метрике за раз."
 };
-const SEC=["BOT_TOKEN","BOT_NAME","WEBHOOK_SECRET","SB_URL","SB_KEY","ADMIN_ID","ADMIN_TOKEN","AI_KEY"];
+const SEC=["BOT_TOKEN","BOT_NAME","WEBHOOK_SECRET","SB_URL","SB_KEY","ADMIN_ID"];
 const sandbox=(html,ms=4000)=>new Promise(res=>{const f=document.createElement("iframe");f.sandbox="allow-scripts";f.style.display="none";const logs=[];
  const on=e=>{if(e.source===f.contentWindow&&e.data&&e.data.__t)logs.push(e.data.m)};addEventListener("message",on);
  const inj='<script>(()=>{const s=m=>parent.postMessage({__t:1,m:String(m).slice(0,500)},"*");for(const k of["log","warn","error"])console[k]=(...a)=>s(k+": "+a.map(x=>{try{return typeof x==="object"?JSON.stringify(x):x}catch(e){return x}}).join(" "));onerror=(m,u,l)=>s("ОШИБКА: "+m+" (строка "+l+")");onunhandledrejection=e=>s("ОШИБКА promise: "+(e.reason&&e.reason.message||e.reason));addEventListener("load",()=>setTimeout(()=>s("DOM: title="+document.title+", кнопок/ссылок="+document.querySelectorAll("button,a").length+", текста "+document.body.innerText.length+" симв."),300))})()<\/script>';
@@ -152,7 +184,7 @@ const tools={
    const bad=jb.flatMap(x=>(x.steps||[]).filter(s=>s.conclusion==="failure").map(s=>s.name));
    return (r.map(x=>`${x.name}: ${x.status}/${x.conclusion||"..."} ${x.created_at}`).join("\n")||"запусков нет")+(bad.length?"\nУпавшие шаги: "+bad.join(", "):"")}},
  scaffold_deploy:{d:"Создать wrangler.toml и workflow GitHub Actions для авто-деплоя Worker в Cloudflare при каждом push",p:{name:"string (необязательно: имя воркера)",ai:"string (необязательно: yes — добавить AI_KEY)"},f:async a=>{
-   const w=ws(),sec=SEC;
+   const w=ws(),sec=a.ai==="yes"?[...SEC,"AI_KEY"]:SEC;
    w["wrangler.toml"]=`name = "${a.name||"tgbot-runtime"}"\nmain = "runtime/worker.js"\ncompatibility_date = "2025-01-01"\n\n[triggers]\ncrons = ["* * * * *"]\n`;
    w[".github/workflows/deploy.yml"]=["name: deploy","on:","  push:","    branches: [main]","  workflow_dispatch:","jobs:","  deploy:","    runs-on: ubuntu-latest","    steps:","      - uses: actions/checkout@v4","      - uses: cloudflare/wrangler-action@v3","        with:","          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}","          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}","          secrets: |",...sec.map(x=>"            "+x),"        env:",...sec.map(x=>`          ${x}: \${{ secrets.${x} }}`)].join("\n")+"\n";
    wsSave(w);return "Записаны wrangler.toml и .github/workflows/deploy.yml. Секреты репозитория: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, "+sec.join(", ")}},
@@ -181,85 +213,125 @@ const tools={
  http_request:{ask:a=>(a.method||"GET").toUpperCase()!=="GET",hard:()=>1,d:"Произвольный HTTP-запрос (только к API с разрешённым CORS)",p:{method:"string",url:"string",headers_json:"string (необязательно)",body:"string (необязательно)"},f:async a=>{
    const m=(a.method||"GET").toUpperCase();const r=await fetch(a.url,{method:m,headers:a.headers_json?JSON.parse(a.headers_json):{},body:m==="GET"?undefined:a.body});
    return r.status+" "+(await r.text()).slice(0,6000)}},
- ask_other_llm:{d:"Задать вопрос другой LLM (groq, gemini или openrouter) и получить её ответ. Полезно для второго мнения.",p:{provider:"string (groq|gemini|openrouter)",question:"string"},f:async a=>{
+ ask_other_llm:{d:"Задать вопрос другой подключённой LLM и получить второе мнение. Полезно для проверки результата.",p:{provider:"string (mistral|xkiro|gemini|groq|openrouter|kilo|pollinations|unorouter|huggingface|modelscope|ovh|aihorde)",question:"string"},f:async a=>{
    const m=await llm(a.provider,[{role:"user",content:a.question}],false);return m.content}}
 };
 const schema=Object.entries(tools).map(([n,t])=>({type:"function",function:{name:n,description:t.d,parameters:{type:"object",properties:Object.fromEntries(Object.entries(t.p).map(([k,v])=>[k,{type:"string",description:v}])),required:Object.keys(t.p).filter(k=>!t.p[k].includes("необяз"))}}}));
 
 // ---------- LLM ----------
-async function llm(prov,msgs,useTools=true){
- const cfg=P[prov];if(!cfg)throw new Error("Неизвестный провайдер: "+prov);
- const key=prov==="gateway"?S("k_access"):S("k_"+prov);if(!key)throw new Error("Нет ключа для "+prov+". Добавь в настройках.");
- const model=S("m_"+prov)||cfg.model;
- const body={model,messages:[{role:"system",content:S("sys5")||DEF_SYS},...msgs]};
- if(useTools){body.tools=schema;body.tool_choice="auto"}
- const r=await fetch(prov==="gateway"?(S("k_gwurl")||"").replace(/\/$/,"")+"/gw":cfg.url,{method:"POST",headers:prov==="gateway"?{"Content-Type":"application/json","x-key":key}:{"Content-Type":"application/json",Authorization:"Bearer "+key},body:JSON.stringify(body)});
- const j=await r.json().catch(()=>({}));
- if(!r.ok)throw new Error(prov+" "+r.status+": "+(j.error?.message||(typeof j.error==="string"?j.error:JSON.stringify(j).slice(0,200))));
- return j.choices[0].message;
+function compactMessages(h){
+ const max=10;
+ let start=Math.max(0,h.length-max);
+ while(start>0&&h[start]?.role==="tool")start--;
+ if(start>0&&h[start]?.role==="assistant"&&h[start]?.tool_calls)start--;
+ return h.slice(start).map(x=>{
+  const y={...x};
+  if(typeof y.content==="string")y.content=y.content.slice(0,y.role==="tool"?1600:3000);
+  return y;
+ });
 }
-
+async function llmOnce(prov,msgs,useTools=true){
+ const key=S("agent_key");if(!key)throw new Error("key");
+ const body={action:"chat",provider:prov||"auto",messages:compactMessages(msgs),useTools:!!useTools,tools:useTools?schema:[],system:(S("sys4")||DEF_SYS)+skillsPrompt()};
+ const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),30000);
+ try{
+  const r=await fetch(GATEWAY_URL,{method:"POST",headers:{"Content-Type":"application/json","x-agent-key":key},body:JSON.stringify(body),signal:controller.signal});
+  const j=await r.json().catch(()=>({}));if(!r.ok||!j.message)throw new Error(j.error||"gateway");return j.message;
+ }finally{clearTimeout(timer)}
+}
+async function llm(prov,msgs,useTools=true){return llmOnce(prov||"auto",msgs,useTools)}
+async function checkAccess(){
+ const key=$("agentKey").value.trim(),st=$("accessStatus");if(!key){st.textContent="Введите ключ доступа.";st.className="access-status bad";return}
+ st.textContent="Проверяю доступ…";st.className="access-status";
+ try{
+  const r=await fetch(GATEWAY_URL,{method:"POST",headers:{"Content-Type":"application/json","x-agent-key":key},body:JSON.stringify({action:"health"}),signal:AbortSignal.timeout(30000)});
+  const j=await r.json().catch(()=>({}));if(!r.ok||!j.ok)throw new Error("access");
+  S("agent_key",key);st.textContent="✓ Доступ активен · AI готов";st.className="access-status ok";sub();
+ }catch(e){st.textContent="Ключ не принят или доступ недоступен.";st.className="access-status bad"}
+}
 // ---------- agent loop ----------
 async function run(text){
- hist.push({role:"user",content:text});
- const prov=S("prov")||"groq";
- for(let i=0;i<30;i++){
-  const m=await llm(prov,hist);
+ const rich=Array.isArray(text);
+ const stored=rich?text.filter(x=>x&&x.type==="text").map(x=>x.text||"").join("\n").slice(0,3000):String(text||"");
+ hist.push({role:"user",content:stored||"Прикреплён материал."});
+ const prov=rich?"gemini":"auto";
+ const msgs=[...hist.slice(0,-1),{role:"user",content:text}];
+ for(let i=0;i<8;i++){
+  const m=await llm(prov,msgs);
+  msgs.push({role:"assistant",content:m.content||"",...(m.tool_calls?{tool_calls:m.tool_calls}:{})});
   hist.push({role:"assistant",content:m.content||"",...(m.tool_calls?{tool_calls:m.tool_calls}:{})});
   if(!m.tool_calls?.length){add("a",m.content||"(пустой ответ)");return}
   for(const c of m.tool_calls){
    let out,args={};
-   try{args=JSON.parse(c.function.arguments||"{}");add("t","🔧 "+c.function.name+" "+JSON.stringify(args));
-    const T=tools[c.function.name];out=!T?"нет такого инструмента":(T.ask&&T.ask(args)&&(S("auto")!=="1"||(T.hard&&T.hard(args)))&&!confirm("Разрешить: "+c.function.name+"\n"+JSON.stringify(args).slice(0,300)))?"Пользователь отклонил действие":String(await T.f(args))}
-   catch(e){out="Ошибка: "+e.message}
-   hist.push({role:"tool",tool_call_id:c.id,name:c.function.name,content:out.slice(0,8000)});
+   try{
+    args=JSON.parse(c.function.arguments||"{}");
+    const T=tools[c.function.name];
+    out=!T?"Действие недоступно":(T.ask&&T.ask(args)&&(S("auto")!=="1"||(T.hard&&T.hard(args)))&&!confirm("Разрешить действие?"))?"Действие отклонено":String(await T.f(args));
+   }catch(e){console.error(e);out="Не удалось выполнить действие."}
+   const toolMsg={role:"tool",tool_call_id:c.id,name:c.function.name,content:out.slice(0,1600)};
+   msgs.push(toolMsg);hist.push(toolMsg);
   }
  }
- add("a","Остановился: слишком много шагов.");
+ add("a","Не удалось завершить задачу за один сеанс.");
 }
-
 // ---------- UI ----------
-function add(c,t){const d=document.createElement("div");d.className="m "+c;d.textContent=t;$("log").appendChild(d);$("log").scrollTop=1e9}
-function sub(){$("admbtn").style.display=S("k_admin")?"":"none";$("sub").textContent=(S("prov")||"groq")+" · "+Object.keys(tools).length+" инструментов"}
-$("f").onsubmit=async e=>{
- e.preventDefault();const t=$("q").value.trim();if(!t)return;
- $("q").value="";add("u",t);
- try{await run(t)}catch(err){add("a","⚠️ "+err.message)}
- S("hist",JSON.stringify((h=>h.slice(Math.max(0,h.findIndex(x=>x.role==="user"))))(hist.slice(-40))));
+const ownerMode=()=>location.hash==="#owner";function add(c,t){if(c==="t"&&!ownerMode())return;const d=document.createElement("div");d.className="m "+c;d.textContent=t;$("log").appendChild(d);$("log").scrollTop=1e9}
+function sub(){$("agentTitle").firstChild.textContent=agentName();$("sub").textContent=(S("agent_key")?"AI подключён":"AI не подключён")+" · "+Object.keys(tools).length+" инструментов"}
+let pendingAttachments=[];
+function renderAttachments(){
+ const box=$("attachPreview");box.innerHTML="";
+ pendingAttachments.forEach((x,i)=>{const d=document.createElement("div");d.className="attach-chip";d.innerHTML="<span>"+x.name.replace(/[<>&]/g,"")+"</span>";const b=document.createElement("button");b.type="button";b.textContent="×";b.onclick=()=>{pendingAttachments.splice(i,1);renderAttachments()};d.appendChild(b);box.appendChild(d)});
+}
+$("attachBtn").onclick=()=>$("fileInput").click();
+$("fileInput").onchange=async e=>{
+ const files=[...e.target.files].slice(0,4);pendingAttachments=[];
+ for(const f of files){
+  const item={name:f.name,type:f.type,size:f.size};
+  if(f.type.startsWith("image/")&&f.size<=2*1024*1024)item.data=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(f)});
+  else if(/^text\\/i.test(f.type)||/json|javascript|typescript|csv|markdown/i.test(f.type)||/\\.(txt|md|csv|json|js|ts|html|css)$/i.test(f.name))item.text=(await f.text()).slice(0,12000);
+  pendingAttachments.push(item);
+ }
+ renderAttachments();e.target.value="";
 };
-$("q").onkeydown=e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){e.preventDefault();$("f").requestSubmit()}};
+$("f").onsubmit=async e=>{
+ e.preventDefault();const t=$("q").value.trim();if(!t&&!pendingAttachments.length)return;
+ const files=pendingAttachments;pendingAttachments=[];renderAttachments();$("q").value="";resizeInput();
+ let userContent=t||"Посмотри прикреплённые материалы.";
+ if(files.length){
+  const parts=[{type:"text",text:userContent}];
+  for(const f of files){
+   if(f.data)parts.push({type:"image_url",image_url:{url:f.data}});
+   else if(f.text)parts.push({type:"text",text:"Файл "+f.name+":\\n"+f.text});
+   else parts.push({type:"text",text:"Прикреплён файл: "+f.name});
+  }
+  userContent=parts.length>1?parts:[{type:"text",text:userContent}];
+ }
+ add("u",t||files.map(x=>x.name).join(", "));$("sendBtn").disabled=true;
+ const thinking=document.createElement("div");thinking.className="thinking";thinking.textContent="Готовлю ответ";$("log").appendChild(thinking);$("log").scrollTop=1e9;
+ try{await run(userContent)}catch(err){console.error(err);add("a","Не удалось получить ответ. Проверь подключение провайдера в Настройках.")}finally{thinking.remove();$("sendBtn").disabled=false;$("q").focus()}
+ S("hist",JSON.stringify((h=>h.slice(Math.max(0,h.findIndex(x=>x.role==="user"))))(hist.slice(-24))));
+};
+function resizeInput(){const q=$("q");q.style.height="38px";q.style.height=Math.min(q.scrollHeight,150)+"px"}
+$("q").oninput=resizeInput;
+$("q").onkeydown=e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing)e.stopPropagation()};
+$("checkAccess").onclick=checkAccess;
 $("gear").onclick=()=>{
- $("prov").value=S("prov")||"groq";
- for(const k of KEYS)$(k).value=S(k)||"";
- $("sys").value=S("sys5")||DEF_SYS;$("auto").checked=S("auto")==="1";$("set").classList.add("on")};
+ for(const k of KEYS)if($(k))$(k).value=S(k)||"";
+ $("agentKey").value=S("agent_key")||"";
+ $("agentName").value=agentName();$("theme").value=S("theme")||"light";
+ const ss=selectedSkills();document.querySelectorAll("#skillsList input").forEach(x=>x.checked=ss.includes(x.value));
+ $("sys").value=S("sys4")||DEF_SYS;$("auto").checked=S("auto")==="1";$("set").classList.add("on")};
 $("save").onclick=()=>{
- S("prov",$("prov").value);
- for(const k of KEYS)S(k,$(k).value.trim());
- S("sys5",$("sys").value);S("auto",$("auto").checked?"1":"");$("set").classList.remove("on");sub()};
+ S("agent_key",$("agentKey").value.trim());
+ for(const k of KEYS)if($(k))S(k,$(k).value.trim());
+ S("agentName",$("agentName").value.trim()||"Мой агент");S("theme",$("theme").value);
+ S("skills",JSON.stringify([...document.querySelectorAll("#skillsList input:checked")].map(x=>x.value)));
+ S("sys4",$("sys").value);S("auto",$("auto").checked?"1":"");applyTheme();$("set").classList.remove("on");sub()};
 $("clr").onclick=()=>{hist=[];S("hist","");$("log").innerHTML="";add("a","Контекст очищен.")};
-const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const copy=async t=>{try{await navigator.clipboard.writeText(t)}catch(e){prompt("Скопируйте ссылку:",t)}};
-const btn=(p,t,f)=>{const b=document.createElement("button");b.textContent=t;b.className="g";b.onclick=async()=>{try{await f()}catch(e){alert(e.message)}};p.appendChild(b)};
-const AD=async(op,x={})=>{const u=(S("k_gwurl")||"").replace(/\/$/,"");const r=await fetch(u+"/admin",{method:"POST",headers:{"Content-Type":"application/json","x-admin":S("k_admin")||""},body:JSON.stringify({op,...x})});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||("HTTP "+r.status));return j};
-const inv=k=>location.origin+location.pathname+"#gw="+encodeURIComponent(S("k_gwurl"))+"&key="+encodeURIComponent(k);
-async function admRender(){const L=$("alist");L.textContent="Загрузка…";
- try{const {keys}=await AD("list"),day=new Date().toISOString().slice(0,10);L.innerHTML="";
-  for(const a of keys){const d=document.createElement("div");d.className="kc";
-   d.innerHTML="<b>"+esc(a.label||"без имени")+"</b> "+(a.active?"✅":"⛔")+"<br><small>"+esc(a.key.slice(0,10))+"… · сегодня "+(a.day===day?a.used:0)+"/"+a.quota+" · всего "+a.total+" · до "+(a.expires_at?a.expires_at.slice(0,10):"без срока")+"</small><div class='row'></div>";
-   const row=d.querySelector(".row");
-   btn(row,"Копировать ссылку",()=>copy(inv(a.key)));
-   btn(row,a.active?"Отозвать":"Включить",async()=>{await AD("set",{key:a.key,active:!a.active});admRender()});
-   btn(row,"Удалить",async()=>{if(confirm("Удалить ключ?")){await AD("delete",{key:a.key});admRender()}});
-   L.appendChild(d)}
-  if(!keys.length)L.textContent="Ключей пока нет"}catch(e){L.textContent="⚠️ "+e.message}}
-$("admbtn").onclick=()=>{$("adm").style.display="block";admRender()};
-$("admx").onclick=()=>{$("adm").style.display="none"};
-$("arf").onclick=admRender;
-$("amk").onclick=async()=>{try{const j=await AD("create",{label:$("alabel").value,days:+$("adays").value||0,quota:+$("aquota").value||100});await copy(inv(j.key));alert("Ключ создан. Ссылка для входа скопирована: отправьте её человеку.");$("alabel").value="";admRender()}catch(e){alert(e.message)}};
-(()=>{const h=new URLSearchParams(location.hash.slice(1));if(h.get("gw")&&h.get("key")){S("k_gwurl",h.get("gw"));S("k_access",h.get("key"));S("prov","gateway");history.replaceState(null,"",location.pathname)}})();
 $("pvx").onclick=()=>{$("pv").style.display="none";$("pvf").srcdoc=""};
-sub();
-add("a",S("k_"+(S("prov")||"groq"))?"Готов. Чем помочь?":"Привет! Нажми «Настройки» и вставь бесплатный API-ключ.");
+$("setClose").onclick=()=>$("set").classList.remove("on");
+applyTheme();sub();
+add("a",S("agent_key")?"Готов. Чем помочь?":"Привет! Открой «Настройки», вставь ключ доступа к агенту и нажми «Проверить».");
 </script>
 </body>
 </html>
