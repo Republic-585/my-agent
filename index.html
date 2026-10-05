@@ -344,13 +344,14 @@ function compactMessages(h){
   return y;
  });
 }
+let serverConversationId=S("server_conversation_id")||null;
 async function llmOnce(prov,msgs,useTools=true){
  const key=S("agent_key");if(!key)throw new Error("key");
- const body={action:"chat",provider:prov||"auto",messages:compactMessages(msgs),useTools:!!useTools,tools:useTools?schema:[],system:(S("sys4")||DEF_SYS)+skillsPrompt()};
+ const body={action:"chat",provider:prov||"auto",messages:compactMessages(msgs),conversation_id:serverConversationId,useTools:!!useTools,tools:useTools?schema:[],system:(S("sys4")||DEF_SYS)+skillsPrompt()};
  const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),30000);
  try{
   const r=await fetch(GATEWAY_URL,{method:"POST",headers:{"Content-Type":"application/json","x-agent-key":key},body:JSON.stringify(body),signal:controller.signal});
-  const j=await r.json().catch(()=>({}));if(!r.ok||!j.message)throw new Error(j.error||"gateway");return j.message;
+  const j=await r.json().catch(()=>({}));if(!r.ok||!j.message)throw new Error(j.error||"gateway");if(j.conversation_id){serverConversationId=j.conversation_id;S("server_conversation_id",serverConversationId)}return j.message;
  }finally{clearTimeout(timer)}
 }
 async function llm(prov,msgs,useTools=true){return llmOnce(prov||"auto",msgs,useTools)}
