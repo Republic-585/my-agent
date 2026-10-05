@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Личный кабинет · Мой агент</title>
+<style>
+:root{--bg:#f5f6f7;--card:rgba(255,255,255,.88);--ink:#17191c;--mut:#747b84;--line:#dfe2e6;--acc:#68717b;--ok:#eef0f2}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font:16px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",system-ui,sans-serif;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}
+body{padding:env(safe-area-inset-top) 16px env(safe-area-inset-bottom);display:flex;justify-content:center}
+main{width:min(520px,100%);padding:22px 0 34px}.top{display:flex;align-items:center;gap:12px;margin-bottom:24px}.back{width:42px;height:42px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;text-decoration:none;color:var(--ink);background:var(--card);font-size:20px}.brand{font-weight:700;font-size:20px}.brand small{display:block;color:var(--mut);font-size:12px;font-weight:400}
+.card{background:var(--card);border:1px solid rgba(220,224,228,.9);border-radius:24px;padding:22px;box-shadow:0 18px 55px rgba(30,35,40,.08);backdrop-filter:blur(22px);margin-bottom:14px}
+h1{font-size:28px;letter-spacing:-.04em;margin:0 0 6px}h2{font-size:20px;margin:0 0 16px}.mut{color:var(--mut);font-size:14px;margin:0 0 18px}
+.social{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}.social button{background:#fff;color:var(--ink);border:1px solid var(--line);box-shadow:none}
+button{width:100%;min-height:46px;border:0;border-radius:14px;padding:10px 14px;font:inherit;font-weight:650;background:var(--ink);color:#fff;cursor:pointer;transition:.18s ease}button:hover{transform:translateY(-1px)}button:disabled{opacity:.5;transform:none}
+.field{margin:12px 0}.field label{display:block;font-size:13px;font-weight:650;margin:0 0 6px}.field input{width:100%;min-height:46px;border:1px solid var(--line);border-radius:13px;padding:10px 12px;font:inherit;background:#fff;color:var(--ink)}.field input:focus{outline:none;border-color:#8b939c;box-shadow:0 0 0 4px rgba(104,113,123,.12)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.linkbtn{background:transparent;color:var(--ink);box-shadow:none;padding:6px;font-weight:600}
+.notice{min-height:22px;color:var(--mut);font-size:13px;margin-top:12px}.notice.error{color:#a23b3b}.profile{display:grid;gap:12px}.profile-line{display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid var(--line)}.profile-line:last-child{border-bottom:0}.profile-line span:first-child{color:var(--mut)}.profile-line span:last-child{text-align:right;font-weight:600;word-break:break-word}.hidden{display:none!important}.secure{font-size:12px;color:var(--mut);text-align:center;margin-top:12px}
+@media(prefers-color-scheme:dark){:root{--bg:#0f1113;--card:rgba(23,26,30,.92);--ink:#f1f3f5;--mut:#a7adb5;--line:#30353b;--ok:#22262b}.social button,.field input{background:#15181b;color:var(--ink)}}
+</style>
+</head>
+<body>
+<main>
+  <div class="top"><a class="back" href="index.html" aria-label="Назад">‹</a><div class="brand">Мой агент<small>Личный кабинет</small></div></div>
+
+  <section id="authCard" class="card">
+    <h1>Вход</h1>
+    <p class="mut">Ваши личные данные доступны только после авторизации.</p>
+    <div class="social"><button id="google">Google</button><button id="apple">Apple</button></div>
+    <div class="field"><label for="name">Имя</label><input id="name" autocomplete="name" placeholder="Как к вам обращаться"></div>
+    <div class="field"><label for="email">E-mail</label><input id="email" type="email" autocomplete="email" placeholder="you@example.com"></div>
+    <div class="field"><label for="password">Пароль</label><input id="password" type="password" autocomplete="current-password" placeholder="Минимум 6 символов"></div>
+    <div class="row"><button id="login">Войти</button><button id="signup" class="linkbtn">Создать аккаунт</button></div>
+    <button id="reset" class="linkbtn">Восстановить пароль</button>
+    <div id="notice" class="notice"></div>
+    <div class="secure">Защита аккаунта: Supabase Auth + Row Level Security.</div>
+  </section>
+
+  <section id="cabinet" class="hidden">
+    <div class="card">
+      <h1>Ваш кабинет</h1>
+      <p class="mut">Данные этого раздела привязаны к вашей учётной записи.</p>
+      <div class="profile">
+        <div class="profile-line"><span>Имя</span><span id="pName">—</span></div>
+        <div class="profile-line"><span>E-mail</span><span id="pEmail">—</span></div>
+        <div class="profile-line"><span>Способ входа</span><span id="pProvider">—</span></div>
+        <div class="profile-line"><span>Аккаунт создан</span><span id="pCreated">—</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Профиль</h2>
+      <div class="field"><label for="profileName">Имя</label><input id="profileName" autocomplete="name"></div>
+      <button id="saveProfile">Сохранить</button>
+      <div id="profileNotice" class="notice"></div>
+    </div>
+    <div class="card"><button id="logout">Выйти</button></div>
+  </section>
+</main>
+
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/+esm";
+
+const SUPABASE_URL="https://dfvztoazthliaobqnndv.supabase.co";
+const SUPABASE_KEY="sb_publishable_rklL_02gyQi9Va_Ow6BS-w_d1QeN947";
+const supabase=createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+const $=id=>document.getElementById(id);
+const redirect=()=>window.location.origin+window.location.pathname;
+function msg(text,error=false){$("notice").textContent=text;$("notice").className="notice"+(error?" error":"")}
+function pmsg(text,error=false){$("profileNotice").textContent=text;$("profileNotice").className="notice"+(error?" error":"")}
+
+async function social(provider){
+ msg("Открываю вход…");
+ const {error}=await supabase.auth.signInWithOAuth({provider,options:{redirectTo:redirect()}});
+ if(error)msg("Этот способ входа пока не настроен.",true);
+}
+$("google").onclick=()=>social("google");
+$("apple").onclick=()=>social("apple");
+
+$("login").onclick=async()=>{
+ msg("Проверяю данные…");
+ const {error}=await supabase.auth.signInWithPassword({email:$("email").value.trim(),password:$("password").value});
+ if(error)msg("Не удалось войти. Проверьте e-mail и пароль.",true);
+};
+$("signup").onclick=async()=>{
+ msg("Создаю аккаунт…");
+ const {data,error}=await supabase.auth.signUp({
+  email:$("email").value.trim(),password:$("password").value,
+  options:{data:{full_name:$("name").value.trim()},emailRedirectTo:redirect()}
+ });
+ if(error){msg("Не удалось создать аккаунт. Проверьте данные.",true);return}
+ if(data.session)msg("Аккаунт создан.");
+ else msg("Аккаунт создан. Проверьте почту для подтверждения.");
+};
+$("reset").onclick=async()=>{
+ const email=$("email").value.trim();if(!email){msg("Введите e-mail для восстановления.");return}
+ const {error}=await supabase.auth.resetPasswordForEmail(email,{redirectTo:redirect()});
+ msg(error?"Не удалось отправить письмо восстановления.":"Письмо для восстановления отправлено.");
+};
+$("logout").onclick=async()=>{await supabase.auth.signOut();show(null)};
+
+async function loadProfile(user){
+ const {data,error}=await supabase.from("agent_profiles").select("display_name,avatar_url,created_at").eq("user_id",user.id).maybeSingle();
+ const name=data?.display_name||user.user_metadata?.full_name||user.user_metadata?.name||"—";
+ $("pName").textContent=name;$("pEmail").textContent=user.email||"—";
+ $("pProvider").textContent=(user.app_metadata?.provider||"email").replace("google","Google").replace("apple","Apple");
+ $("pCreated").textContent=new Date(user.created_at).toLocaleDateString("ru-RU");
+ $("profileName").value=name==="—"?"":name;
+ if(error)pmsg("Профиль загружен без дополнительных данных.",true);
+}
+async function show(session){
+ const on=!!session;$("authCard").classList.toggle("hidden",on);$("cabinet").classList.toggle("hidden",!on);
+ if(session)await loadProfile(session.user);
+}
+$("saveProfile").onclick=async()=>{
+ const user=(await supabase.auth.getUser()).data.user;if(!user)return;
+ const name=$("profileName").value.trim().slice(0,100);
+ const {error}=await supabase.from("agent_profiles").upsert({user_id:user.id,display_name:name,updated_at:new Date().toISOString()});
+ if(error)pmsg("Не удалось сохранить профиль.",true);else{pmsg("Сохранено.");$("pName").textContent=name||"—";}
+};
+supabase.auth.onAuthStateChange((_event,session)=>{setTimeout(()=>show(session),0)});
+const {data:{session}}=await supabase.auth.getSession();show(session);
+</script>
+</body>
+</html>
