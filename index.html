@@ -27,7 +27,7 @@ body.dark .input-island{background:rgba(23,26,30,.94)}
 .attach-btn:hover{background:var(--ok);box-shadow:none}
 #sendBtn{width:38px;height:38px;min-width:38px}
 .attach-preview{display:flex;gap:6px;overflow-x:auto;padding:0 3px 3px}.attach-chip{display:flex;align-items:center;gap:5px;max-width:180px;padding:5px 8px;border-radius:12px;background:var(--ok);font-size:12px;white-space:nowrap}.attach-chip button{width:20px;height:20px;padding:0;background:none;color:var(--ink);box-shadow:none}
-.provider-checks{display:grid;gap:6px;margin-top:8px}.provider-row{display:grid;grid-template-columns:1fr auto 56px;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px}.check-provider{min-height:34px;padding:6px 11px;border-radius:17px;font-size:12px}.provider-status{text-align:right;color:var(--mut);font-variant-numeric:tabular-nums}.cabinet-link{display:block!important;margin:4px 0 10px!important;padding:12px 14px;border:1px solid var(--line);border-radius:13px;text-decoration:none;color:var(--ink);background:var(--ok);font-weight:600}
+.provider-checks{display:grid;gap:6px;margin-top:8px}.provider-row{display:grid;grid-template-columns:1fr auto 56px;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px}.check-provider{min-height:34px;padding:6px 11px;border-radius:17px;font-size:12px}.provider-status{text-align:right;color:var(--mut);font-variant-numeric:tabular-nums}.agent-key-box{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end}.agent-key-box input{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.02em}.access-status{margin-top:8px;min-height:20px;color:var(--mut);font-size:13px}.access-status.ok{color:#2f7a4d}.access-status.bad{color:#a23b3b}.cabinet-link{display:block!important;margin:4px 0 10px!important;padding:12px 14px;border:1px solid var(--line);border-radius:13px;text-decoration:none;color:var(--ink);background:var(--ok);font-weight:600}
 #gear{width:40px;height:40px;min-width:40px;padding:0;border-radius:50%;display:flex;align-items:center;justify-content:center;background:transparent;color:var(--ink);font-size:21px;line-height:1;border:1px solid transparent}
 #gear:hover,#gear:focus-visible{background:var(--ok);outline:none;box-shadow:0 0 0 5px var(--glow)}
 #set{backdrop-filter:saturate(180%) blur(18px)}
@@ -86,16 +86,22 @@ body.dark form{background:var(--bg)}
 <label>Навыки (инструменты) агента</label><div class="skills" id="skillsList">
 <label class="skill-option"><input type="checkbox" value="strategy">Стратегия и планирование</label><label class="skill-option"><input type="checkbox" value="telegram_pro">Telegram-боты</label><label class="skill-option"><input type="checkbox" value="miniapp_ui">Mini App и интерфейсы</label><label class="skill-option"><input type="checkbox" value="stars_money">Оплата и монетизация</label><label class="skill-option"><input type="checkbox" value="supabase_pro">Supabase и база данных</label><label class="skill-option"><input type="checkbox" value="growth_channel">Рост Telegram-канала</label><label class="skill-option"><input type="checkbox" value="funnel_copy">Воронки и тексты</label><label class="skill-option"><input type="checkbox" value="ai_features">AI и модели</label><label class="skill-option"><input type="checkbox" value="analytics">Аналитика</label><label class="skill-option"><input type="checkbox" value="security">Безопасность</label><label class="skill-option"><input type="checkbox" value="deploy_cf">Деплой Cloudflare</label><label class="skill-option"><input type="checkbox" value="code_quality">Качество кода</label><label class="skill-option"><input type="checkbox" value="debugging">Поиск и исправление ошибок</label>
 </div></div></section>
-<section class="settings-group"><div class="settings-group-title">Провайдеры и API</div><div class="settings-group-body">
-<label>Провайдер</label><select id="prov"><option value="auto">Авто</option><option value="mistral">Mistral</option><option value="xkiro">xKiro</option><option value="gemini">Google Gemini</option><option value="groq">Groq</option><option value="openrouter">OpenRouter</option><option value="kilo">Kilo</option><option value="pollinations">Pollinations</option><option value="ovh">OVHcloud AI Endpoints</option><option value="aihorde">AI Horde</option><option value="unorouter">UnoRouter</option><option value="huggingface">Hugging Face</option><option value="modelscope">ModelScope</option></select>
-<label>Ключ Mistral</label><input id="k_mistral" type="password" autocomplete="off"><p>Основной ключ Mistral</p><label>Резервный ключ Mistral</label><input id="k_mistral2" type="password" autocomplete="off"><p>Второй ключ используется при временной ошибке основного.</p><label>Ключ xKiro</label><input id="k_xkiro" type="password" autocomplete="off"><p>OpenAI-compatible gateway</p><label>Ключ Groq</label><input id="k_groq" type="password" autocomplete="off"><p>console.groq.com → API Keys</p><label>Ключ Gemini</label><input id="k_gemini" type="password" autocomplete="off"><p>aistudio.google.com → Get API key</p><label>Ключ OpenRouter</label><input id="k_openrouter" type="password" autocomplete="off"><p>openrouter.ai → Keys</p>
-<label>Ключ Kilo</label><input id="k_kilo" type="password" autocomplete="off"><p>Можно использовать без ключа, если провайдер разрешает.</p><label>Ключ Pollinations</label><input id="k_pollinations" type="password" autocomplete="off"><p>Создаётся на enter.pollinations.ai</p><label>Ключ OVHcloud AI Endpoints</label><input id="k_ovh" type="password" autocomplete="off"><p>Public Cloud → AI Endpoints → API key</p><label>Ключ AI Horde</label><input id="k_aihorde" type="password" autocomplete="off"><p>Зарегистрированный ключ AI Horde. Провайдер использует доступную конфигурацию автоматически.</p><label>Ключ UnoRouter</label><input id="k_unorouter" type="password" autocomplete="off"><p>Settings → API access</p><label>Ключ Hugging Face</label><input id="k_hf" type="password" autocomplete="off"><p>HF token с правом inference</p><label>Ключ ModelScope</label><input id="k_modelscope" type="password" autocomplete="off"><p>ModelScope SDK Token</p>
+<section class="settings-group"><div class="settings-group-title">Доступ к AI</div><div class="settings-group-body">
+<label>Ключ доступа к агенту</label>
+<div class="agent-key-box"><input id="agentKey" type="password" autocomplete="off" placeholder="AGENT-••••-••••-••••"><button type="button" class="check-provider" id="checkAccess">Проверить</button></div>
+<div id="accessStatus" class="access-status">Ключ нужен для работы AI.</div>
+<p>Один ключ открывает доступ к единому AI-шлюзу. Ключи отдельных моделей сюда не вставляются.</p>
+<label>Провайдер</label><select id="prov"><option value="auto">Авто</option></select>
 </div></section>
-<section class="settings-group"><div class="settings-group-title">Проверка провайдеров</div><div class="settings-group-body">
-<p>Проверка отправляет короткий запрос. Результат остаётся здесь и не появляется в чате.</p>
+<section class="settings-group"><div class="settings-group-title">Проверка AI</div><div class="settings-group-body">
+<p>Проверка делает короткий тест через защищённый шлюз. Секреты моделей и технические ответы не показываются в чате.</p>
 <div id="providerChecks" class="provider-checks">
-<div class="provider-row"><span>Groq · GPT-OSS 20B</span><button type="button" class="check-provider" data-provider="groq">Проверить</button><span class="provider-status" id="status-groq">—</span></div><div class="provider-row"><span>Google · Gemini 3.7 Flash</span><button type="button" class="check-provider" data-provider="gemini">Проверить</button><span class="provider-status" id="status-gemini">—</span></div><div class="provider-row"><span>Mistral · Small</span><button type="button" class="check-provider" data-provider="mistral">Проверить</button><span class="provider-status" id="status-mistral">—</span></div><div class="provider-row"><span>xKiro</span><button type="button" class="check-provider" data-provider="xkiro">Проверить</button><span class="provider-status" id="status-xkiro">—</span></div><div class="provider-row"><span>OpenRouter · Free Router</span><button type="button" class="check-provider" data-provider="openrouter">Проверить</button><span class="provider-status" id="status-openrouter">—</span></div><div class="provider-row"><span>Kilo</span><button type="button" class="check-provider" data-provider="kilo">Проверить</button><span class="provider-status" id="status-kilo">—</span></div><div class="provider-row"><span>Pollinations</span><button type="button" class="check-provider" data-provider="pollinations">Проверить</button><span class="provider-status" id="status-pollinations">—</span></div><div class="provider-row"><span>OVHcloud AI</span><button type="button" class="check-provider" data-provider="ovh">Проверить</button><span class="provider-status" id="status-ovh">—</span></div><div class="provider-row"><span>AI Horde</span><button type="button" class="check-provider" data-provider="aihorde">Проверить</button><span class="provider-status" id="status-aihorde">—</span></div><div class="provider-row"><span>UnoRouter</span><button type="button" class="check-provider" data-provider="unorouter">Проверить</button><span class="provider-status" id="status-unorouter">—</span></div><div class="provider-row"><span>Hugging Face</span><button type="button" class="check-provider" data-provider="huggingface">Проверить</button><span class="provider-status" id="status-huggingface">—</span></div><div class="provider-row"><span>ModelScope</span><button type="button" class="check-provider" data-provider="modelscope">Проверить</button><span class="provider-status" id="status-modelscope">—</span></div>
-</div></div></section><section class="settings-group"><div class="settings-group-title">Интеграции и доступ</div><div class="settings-group-body">
+<div class="provider-row"><span>Основной AI</span><button type="button" class="check-provider" data-provider="groq">Проверить</button><span class="provider-status" id="status-groq">—</span></div>
+<div class="provider-row"><span>AI для изображений</span><button type="button" class="check-provider" data-provider="gemini">Проверить</button><span class="provider-status" id="status-gemini">—</span></div>
+<div class="provider-row"><span>Дополнительный AI</span><button type="button" class="check-provider" data-provider="mistral">Проверить</button><span class="provider-status" id="status-mistral">—</span></div>
+<div class="provider-row"><span>Резервный маршрут</span><button type="button" class="check-provider" data-provider="openrouter">Проверить</button><span class="provider-status" id="status-openrouter">—</span></div>
+</div></div></section>
+<section class="settings-group"><div class="settings-group-title">Интеграции и доступ</div><div class="settings-group-body">
 <label>GitHub token (classic, право repo)</label><input id="k_github" type="password" autocomplete="off"><p>github.com/settings/tokens</p><label>Telegram Bot Token</label><input id="k_tg" type="password" autocomplete="off"><p>@BotFather → /newbot</p><label>Supabase URL</label><input id="k_sburl" placeholder="https://xxxx.supabase.co"><label>Supabase ключ (secret / service_role)</label><input id="k_sbkey" type="password" autocomplete="off"><p>Project Settings → API Keys. Секретный ключ даёт полный доступ к базе: держи его только в этом приложении.</p>
 </div></section>
 <section class="settings-group"><div class="settings-group-title">Поведение агента</div><div class="settings-group-body">
@@ -106,20 +112,7 @@ body.dark form{background:var(--bg)}
 <div id="pv" style="display:none;position:fixed;inset:0;z-index:9;background:#fff;padding-top:env(safe-area-inset-top)"><div style="padding:6px 10px"><button id="pvx">Закрыть предпросмотр</button></div><iframe id="pvf" sandbox="allow-scripts allow-forms" style="width:100%;height:calc(100% - 52px);border:0"></iframe></div>
 <script>
 const $=id=>document.getElementById(id);
-const P={
- groq:{url:"https://api.groq.com/openai/v1/chat/completions",model:"openai/gpt-oss-20b",label:"Groq · GPT-OSS 20B"},
- gemini:{url:"https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",model:"gemini-3.7-flash",label:"Google · Gemini 3.7 Flash"},
- mistral:{url:"https://api.mistral.ai/v1/chat/completions",model:"mistral-small-latest",label:"Mistral · Small"},
- xkiro:{url:"https://api.xkiro.com/v1/chat/completions",model:"openai/gpt-5.6-sol"},
- openrouter:{url:"https://openrouter.ai/api/v1/chat/completions",model:"openrouter/free",label:"OpenRouter · Free Router"},
- kilo:{url:"https://api.kilo.ai/api/gateway/chat/completions",model:"kilo-auto/free",noKey:true},
- pollinations:{url:"https://gen.pollinations.ai/v1/chat/completions",model:"openai/gpt-5.4-nano",key:"k_pollinations"},
- ovh:{url:"https://oai.endpoints.kepler.ai.cloud.ovh.net/v1/chat/completions",model:"mistral@latest",key:"k_ovh"},
- aihorde:{url:"https://oai.aihorde.net/v1/chat/completions",model:"",key:"k_aihorde"},
- unorouter:{url:"https://api.unorouter.com/v1/chat/completions",model:"glm-5.3:free",key:"k_unorouter"},
- huggingface:{url:"https://router.huggingface.co/v1/chat/completions",model:"zai-org/GLM-5.2",key:"k_hf"},
- modelscope:{url:"https://api-inference.modelscope.cn/v1/chat/completions",model:"ZhipuAI/GLM-5.2",key:"k_modelscope"},
-};
+const GATEWAY_URL="https://dfvztoazthliaobqnndv.supabase.co/functions/v1/agent-gateway";
 const DEF_SYS=`Ты — автономный AI-инженер и операционный директор Telegram-бизнеса. Пользователь ставит задачу и почти не участвует: ты сам планируешь, делаешь, публикуешь, проверяешь и докладываешь итог в 3-6 строк со ссылками. Только бесплатные сервисы, пользователь работает с iPhone. Отвечай по-русски.
 ПЛАТФОРМА (инструмент scaffold_platform): рантайм на Cloudflare Worker работает 24/7 и читает всю логику из Supabase, поэтому правки бота делаются записью в таблицы через supabase, без передеплоя. Таблицы: users(id,plan,plan_until,ref_by), settings(key,value jsonb: welcome, ai_prompt, ai_premium_only), commands(cmd,label,reply,buttons[{text,url|cb}],premium,in_menu), products(id,title,description,stars,days,sub,active), payments, posts(chat_id или 'all',text,photo,buttons,send_at,sent) — посты в канал и рассылки по расписанию. Секреты Worker: BOT_TOKEN, BOT_NAME, WEBHOOK_SECRET, SB_URL, SB_KEY, ADMIN_ID, опц. AI_KEY. Cron: * * * * *. Эндпоинты для Mini App: POST /api/me и /api/invoice с initData.
 ПЕРВЫЙ ЗАПУСК: scaffold_platform, scaffold_deploy, github_push (авто-деплой Worker через GitHub Actions), github_status для проверки, затем точные шаги для пользователя (SQL Editor, секреты репозитория GitHub), затем setWebhook (url воркера + /hook, secret_token = WEBHOOK_SECRET), setMyCommands, setChatMenuButton, наполнение таблиц.
@@ -135,7 +128,7 @@ function agentName(){return S("agentName")||"Мой агент"}
 function selectedSkills(){try{return JSON.parse(S("skills")||"[]")}catch(e){return []}}
 function skillsPrompt(){const a=selectedSkills();if(!a.length)return "";return "\n\nАКТИВНЫЕ НАВЫКИ:\n"+a.map(n=>SKILLS[n]?"["+n+"]\n"+SKILLS[n]:"").filter(Boolean).join("\n\n")}
 let hist=[];try{hist=JSON.parse(localStorage.getItem("hist")||"[]")}catch(e){}
-const KEYS=["k_mistral","k_mistral2","k_xkiro","k_groq","k_gemini","k_openrouter","k_kilo","k_pollinations","k_ovh","k_aihorde","k_unorouter","k_hf","k_modelscope","k_github","k_tg","k_sburl","k_sbkey"];
+const KEYS=["k_github","k_tg","k_sburl","k_sbkey"];
 
 // ---------- tools ----------
 const J=async u=>{const r=await fetch(u);if(!r.ok)throw new Error("HTTP "+r.status);return r.json()};
@@ -249,40 +242,32 @@ function compactMessages(h){
   return y;
  });
 }
-async function llmOnce(prov,msgs,useTools=true,keyOverride){
- let cfg=P[prov];if(!cfg)throw new Error("provider");
- const key=keyOverride||S(cfg.key||("k_"+prov));
- if(!key&&!cfg.noKey)throw new Error("key");
- const model=S("m_"+prov)||cfg.model;if(!model)throw new Error("model");
- const style="\\n\\nСТИЛЬ: отвечай кратко, профессионально и по делу. Не показывай внутренние рассуждения, названия инструментов, технические ошибки, служебные данные или сведения о провайдере. Не повторяй условие.";
- const body={model,messages:[{role:"system",content:(S("sys4")||DEF_SYS)+skillsPrompt()+style},...compactMessages(msgs)],max_tokens:700};
- if(prov==="groq")body.reasoning_effort="low";
- if(prov==="mistral")body.reasoning_effort="none";
- if(prov==="gemini")body.reasoning_effort="low";
- if(useTools){body.tools=schema;body.tool_choice="auto"}
- const headers={"Content-Type":"application/json"};if(key)headers.Authorization="Bearer "+key;
+async function llmOnce(prov,msgs,useTools=true){
+ const key=S("agent_key");if(!key)throw new Error("key");
+ const body={action:"chat",provider:prov||"auto",messages:compactMessages(msgs),useTools:!!useTools,tools:useTools?schema:[],system:(S("sys4")||DEF_SYS)+skillsPrompt()};
  const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),30000);
  try{
-  const r=await fetch(cfg.url,{method:"POST",headers,body:JSON.stringify(body),signal:controller.signal});
-  const j=await r.json().catch(()=>({}));
-  if(!r.ok){const e=new Error("provider");e.status=r.status;e.retryAfter=r.headers.get("retry-after")||"";throw e}
-  if(!j.choices?.[0]?.message)throw new Error("provider");
-  return j.choices[0].message;
+  const r=await fetch(GATEWAY_URL,{method:"POST",headers:{"Content-Type":"application/json","x-agent-key":key},body:JSON.stringify(body),signal:controller.signal});
+  const j=await r.json().catch(()=>({}));if(!r.ok||!j.message)throw new Error(j.error||"gateway");return j.message;
  }finally{clearTimeout(timer)}
 }
-async function llm(prov,msgs,useTools=true){
- const selected=prov||"auto";
- const actual=selected==="auto"?"groq":selected;
- return llmOnce(actual,msgs,useTools);
-}
+async function llm(prov,msgs,useTools=true){return llmOnce(prov||"auto",msgs,useTools)}
 async function checkProvider(prov){
- const cfg=P[prov];if(!cfg)return {ok:false};
- const key=S(cfg.key||("k_"+prov));if(!key&&!cfg.noKey)return {ok:false,reason:"key"};
+ const key=S("agent_key");if(!key)return {ok:false,reason:"key"};
  const started=performance.now();
  try{
-  const m=await llmOnce(prov,[{role:"user",content:"Ответь только: OK"}],false);
-  return {ok:String(m.content||"").trim().toUpperCase().includes("OK"),ms:Math.round(performance.now()-started)};
- }catch(e){return {ok:false,ms:Math.round(performance.now()-started),status:e.status||0}}
+  const r=await fetch(GATEWAY_URL,{method:"POST",headers:{"Content-Type":"application/json","x-agent-key":key},body:JSON.stringify({action:"check_provider",provider:prov}),signal:AbortSignal.timeout(30000)});
+  const j=await r.json().catch(()=>({}));return {ok:!!j.ok,ms:j.ms||Math.round(performance.now()-started)};
+ }catch(e){return {ok:false,ms:Math.round(performance.now()-started)}}
+}
+async function checkAccess(){
+ const key=$("agentKey").value.trim(),st=$("accessStatus");if(!key){st.textContent="Введите ключ доступа.";st.className="access-status bad";return}
+ st.textContent="Проверяю доступ…";st.className="access-status";
+ try{
+  const r=await fetch(GATEWAY_URL,{method:"POST",headers:{"Content-Type":"application/json","x-agent-key":key},body:JSON.stringify({action:"health"}),signal:AbortSignal.timeout(30000)});
+  const j=await r.json().catch(()=>({}));if(!r.ok||!j.ok)throw new Error("access");
+  S("agent_key",key);st.textContent="✓ Доступ активен · AI готов";st.className="access-status ok";sub();
+ }catch(e){st.textContent="Ключ не принят или доступ недоступен.";st.className="access-status bad"}
 }
 // ---------- agent loop ----------
 async function run(text){
@@ -313,7 +298,7 @@ async function run(text){
 }
 // ---------- UI ----------
 const ownerMode=()=>location.hash==="#owner";function add(c,t){if(c==="t"&&!ownerMode())return;const d=document.createElement("div");d.className="m "+c;d.textContent=t;$("log").appendChild(d);$("log").scrollTop=1e9}
-function sub(){$("agentTitle").firstChild.textContent=agentName();$("sub").textContent=(S("prov")||"groq")+" · "+Object.keys(tools).length+" инструментов"}
+function sub(){$("agentTitle").firstChild.textContent=agentName();$("sub").textContent=(S("agent_key")?"AI подключён":"AI не подключён")+" · "+Object.keys(tools).length+" инструментов"}
 let pendingAttachments=[];
 function renderAttachments(){
  const box=$("attachPreview");box.innerHTML="";
@@ -337,7 +322,7 @@ $("f").onsubmit=async e=>{
  if(files.length){
   const parts=[{type:"text",text:userContent}];
   for(const f of files){
-   if(f.data&&S("prov")==="gemini")parts.push({type:"image_url",image_url:{url:f.data}});
+   if(f.data&&(S("prov")==="gemini"||S("prov")==="auto"))parts.push({type:"image_url",image_url:{url:f.data}});
    else if(f.text)parts.push({type:"text",text:"Файл "+f.name+":\\n"+f.text});
    else parts.push({type:"text",text:"Прикреплён файл: "+f.name});
   }
@@ -351,19 +336,21 @@ $("f").onsubmit=async e=>{
 function resizeInput(){const q=$("q");q.style.height="38px";q.style.height=Math.min(q.scrollHeight,150)+"px"}
 $("q").oninput=resizeInput;
 $("q").onkeydown=e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing)e.stopPropagation()};
-document.querySelectorAll(".check-provider").forEach(b=>b.onclick=async()=>{
+document.querySelectorAll(".check-provider[data-provider]").forEach(b=>b.onclick=async()=>{
  const p=b.dataset.provider,st=$("status-"+p);b.disabled=true;st.textContent="…";
- const r=await checkProvider(p);b.disabled=false;
- if(r.ok)st.textContent="✓ "+r.ms+" мс";else st.textContent=r.reason==="key"?"нет ключа":"недоступен";
+ const r=await checkProvider(p);b.disabled=false;st.textContent=r.ok?"✓ "+r.ms+" мс":(r.reason==="key"?"нет ключа":"недоступен");
 });
+$("checkAccess").onclick=checkAccess;
 $("gear").onclick=()=>{
  $("prov").value=S("prov")||"auto";
  for(const k of KEYS)if($(k))$(k).value=S(k)||"";
+ $("agentKey").value=S("agent_key")||"";
  $("agentName").value=agentName();$("theme").value=S("theme")||"light";
  const ss=selectedSkills();document.querySelectorAll("#skillsList input").forEach(x=>x.checked=ss.includes(x.value));
  $("sys").value=S("sys4")||DEF_SYS;$("auto").checked=S("auto")==="1";$("set").classList.add("on")};
 $("save").onclick=()=>{
- S("prov",$("prov").value);
+ S("prov","auto");
+ S("agent_key",$("agentKey").value.trim());
  for(const k of KEYS)if($(k))S(k,$(k).value.trim());
  S("agentName",$("agentName").value.trim()||"Мой агент");S("theme",$("theme").value);
  S("skills",JSON.stringify([...document.querySelectorAll("#skillsList input:checked")].map(x=>x.value)));
@@ -372,7 +359,7 @@ $("clr").onclick=()=>{hist=[];S("hist","");$("log").innerHTML="";add("a","Кон
 $("pvx").onclick=()=>{$("pv").style.display="none";$("pvf").srcdoc=""};
 $("setClose").onclick=()=>$("set").classList.remove("on");
 applyTheme();sub();
-add("a",S("k_"+(S("prov")||"groq"))?"Готов. Чем помочь?":"Привет! Нажми «Настройки» и вставь бесплатный API-ключ.");
+add("a",S("agent_key")?"Готов. Чем помочь?":"Привет! Открой «Настройки», вставь ключ доступа к агенту и нажми «Проверить».");
 </script>
 </body>
 </html>
