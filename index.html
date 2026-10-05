@@ -135,7 +135,7 @@ function agentName(){return S("agentName")||"Мой агент"}
 function selectedSkills(){try{return JSON.parse(S("skills")||"[]")}catch(e){return []}}
 function skillsPrompt(){const a=selectedSkills();if(!a.length)return "";return "\n\nАКТИВНЫЕ НАВЫКИ:\n"+a.map(n=>SKILLS[n]?"["+n+"]\n"+SKILLS[n]:"").filter(Boolean).join("\n\n")}
 let hist=[];try{hist=JSON.parse(localStorage.getItem("hist")||"[]")}catch(e){}
-const KEYS=["k_mistral","k_mistral2","k_xkiro","k_groq","k_gemini","k_openrouter","k_kilo","k_pollinations","k_ovh","k_aihorde","k_unorouter","k_hf","k_modelscope","k_dsbridge","k_github","k_tg","k_sburl","k_sbkey"];
+const KEYS=["k_mistral","k_mistral2","k_xkiro","k_groq","k_gemini","k_openrouter","k_kilo","k_pollinations","k_ovh","k_aihorde","k_unorouter","k_hf","k_modelscope","k_github","k_tg","k_sburl","k_sbkey"];
 
 // ---------- tools ----------
 const J=async u=>{const r=await fetch(u);if(!r.ok)throw new Error("HTTP "+r.status);return r.json()};
