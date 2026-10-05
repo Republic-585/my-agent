@@ -9,9 +9,19 @@ function generateKey(){const b=new Uint8Array(32);crypto.getRandomValues(b);cons
 async function requireAdmin(req:Request){const a=req.headers.get("authorization")||"";if(!a.startsWith("Bearer "))return null;const t=a.slice(7).trim();if(!t)return null;const u=await sb("/auth/v1/user",{headers:{Authorization:`Bearer ${t}`}});if(!u.ok)return null;const user=await u.json();const r=await sb(`/rest/v1/admin_users?user_id=eq.${encodeURIComponent(user.id)}&select=user_id&limit=1`);if(!r.ok)throw new Error("admin_lookup");return (await r.json())?.length?user:null}
 async function main(req:Request){
  if(req.method==="OPTIONS")return json({ok:true});
- if(!await requireAdmin(req))return json({error:"admin_required"},403);
+ const admin=await requireAdmin(req);if(!admin)return json({error:"admin_required"},403);
  const body=req.method==="POST"?await req.json().catch(()=>({})):{};const action=String(body.action||"list");
- if(action==="list"){const r=await sb("/rest/v1/agent_access_keys?select=id,key_prefix,user_id,plan,status,expires_at,daily_limit,monthly_limit,created_at,last_used_at&order=created_at.desc");if(!r.ok)throw new Error("keys_list");return json({ok:true,keys:await r.json()})}
+ if(action==="users"){
+  const [ur,pr]=await Promise.all([
+   sb("/auth/v1/admin/users?per_page=1000&page=1"),
+   sb("/rest/v1/agent_profiles?select=user_id,display_name&order=created_at.desc")
+  ]);
+  if(!ur.ok)throw new Error("users_list");
+  const uj=await ur.json(), profiles=pr.ok?await pr.json():[], pm=new Map(profiles.map((x:any)=>[x.user_id,x.display_name]));
+  const users=(uj.users||[]).map((u:any)=>({id:u.id,email:u.email||"",name:pm.get(u.id)||u.user_metadata?.full_name||u.user_metadata?.name||""}));
+  return json({ok:true,users});
+ }
+ if(action==="list"){const r=await sb("/rest/v1/agent_access_keys?select=id,key_prefix,user_id,plan,status,expires_at,daily_limit,monthly_limit,created_at,last_used_at&order=created_at.desc");if(!r.ok)throw new Error("keys_list");return json({ok:true,keys:await r.json(),admin:{id:admin.id,email:admin.email||""}})}
  if(action==="create"){
   const plan=String(body.plan||"pro").slice(0,40),dailyLimit=Math.max(1,Math.min(1000000,Number(body.daily_limit||500))),monthlyLimit=Math.max(1,Math.min(10000000,Number(body.monthly_limit||10000))),userId=body.user_id?String(body.user_id):null,expiresAt=body.expires_at?String(body.expires_at):null;
   if(userId){const check=await sb(`/rest/v1/agent_profiles?user_id=eq.${encodeURIComponent(userId)}&select=user_id&limit=1`);if(!check.ok||!(await check.json())?.length)return json({error:"invalid_user"},400)}
