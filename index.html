@@ -289,7 +289,8 @@ async function run(text){
  const rich=Array.isArray(text);
  const stored=rich?text.filter(x=>x&&x.type==="text").map(x=>x.text||"").join("\n").slice(0,3000):String(text||"");
  hist.push({role:"user",content:stored||"Прикреплён материал."});
- const prov=S("prov")||"auto";
+ const requested=S("prov")||"auto";
+ const prov=requested==="auto"&&rich?"gemini":requested;
  const msgs=[...hist.slice(0,-1),{role:"user",content:text}];
  if(prov==="auto"&&rich)S("prov_auto_context","vision");
  for(let i=0;i<8;i++){
