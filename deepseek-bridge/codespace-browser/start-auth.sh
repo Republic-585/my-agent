@@ -12,16 +12,6 @@ log() {
   echo "[deepseek-codespace] $*"
 }
 
-wait_for_file() {
-  local file="$1"
-  local tries="${2:-30}"
-  for ((i=1; i<=tries; i++)); do
-    [ -f "$file" ] && return 0
-    sleep 1
-  done
-  return 1
-}
-
 if ! command -v Xvfb >/dev/null 2>&1 || ! command -v x11vnc >/dev/null 2>&1; then
   log "X11/VNC packages are missing; installing them."
   sudo apt-get update
@@ -31,7 +21,6 @@ fi
 if [ ! -x "$RUNTIME/venv/bin/python" ]; then
   log "Python virtual environment is missing; creating it."
   if ! python3 -m venv "$RUNTIME/venv"; then
-    log "python3-venv is missing; installing it."
     sudo apt-get update
     sudo DEBIAN_FRONTEND=noninteractive apt-get install -y python3-venv
     python3 -m venv "$RUNTIME/venv"
@@ -62,32 +51,57 @@ if ! "$RUNTIME/venv/bin/python" -m playwright install --dry-run chromium >/dev/n
 fi
 
 if ! pgrep -f "Xvfb :99" >/dev/null 2>&1; then
-  Xvfb :99 -screen 0 1440x900x24 -ac >/tmp/deepseek-xvfb.log 2>&1 &
+  Xvfb :99 -screen 0 1440x900x24 -ac >"$LOG_DIR/xvfb.log" 2>&1 &
   sleep 2
 fi
 
 if ! pgrep -f "x11vnc.*5900" >/dev/null 2>&1; then
-  DISPLAY=:99 x11vnc -display :99 -forever -shared -nopw -rfbport 5900 >/tmp/deepseek-x11vnc.log 2>&1 &
+  DISPLAY=:99 x11vnc -display :99 -forever -shared -nopw -rfbport 5900 >"$LOG_DIR/x11vnc.log" 2>&1 &
   sleep 2
 fi
 
-if ! pgrep -f "novnc_proxy.*6080" >/dev/null 2>&1; then
-  "$NOVNC_DIR/utils/novnc_proxy" --vnc localhost:5900 --listen 0.0.0.0:6080 --web "$NOVNC_DIR" >"$LOG_DIR/novnc.log" 2>&1 &
-  sleep 3
+start_novnc() {
+  pkill -f "novnc_proxy.*6080" >/dev/null 2>&1 || true
+  log "Starting noVNC on port 6080."
+  "$NOVNC_DIR/utils/novnc_proxy" \
+    --vnc localhost:5900 \
+    --listen 0.0.0.0:6080 \
+    --web "$NOVNC_DIR" \
+    --heartbeat 30 \
+    >"$LOG_DIR/novnc.log" 2>&1 &
+}
+
+novnc_ready() {
+  curl -fsS --max-time 5 http://127.0.0.1:6080/vnc.html >/dev/null 2>&1
+}
+
+if ! novnc_ready; then
+  start_novnc
+  for i in {1..20}; do
+    if novnc_ready; then
+      break
+    fi
+    sleep 1
+  done
 fi
 
-if ! bash -c 'exec 7<>/dev/tcp/127.0.0.1/6080' >/dev/null 2>&1; then
-  log "ERROR: noVNC did not open port 6080."
-  tail -n 80 "$LOG_DIR/novnc.log" 2>/dev/null || true
+if ! novnc_ready; then
+  log "ERROR: noVNC HTTP service did not become ready."
+  log "---- noVNC log ----"
+  tail -n 100 "$LOG_DIR/novnc.log" 2>/dev/null || true
+  log "---- Xvfb log ----"
+  tail -n 50 "$LOG_DIR/xvfb.log" 2>/dev/null || true
+  log "---- x11vnc log ----"
+  tail -n 50 "$LOG_DIR/x11vnc.log" 2>/dev/null || true
   exit 1
 fi
 
-if [ ! -f "$BRIDGE_DIR/session/session.json" ]; then
-  if ! pgrep -f "python.*deepseek.auth" >/dev/null 2>&1; then
-    log "Starting interactive DeepSeek login browser."
-    cd "$BRIDGE_DIR"
-    DISPLAY=:99 "$RUNTIME/venv/bin/python" -m deepseek.auth >"$LOG_DIR/auth.log" 2>&1 &
-  fi
+log "noVNC HTTP service is ready."
+
+if [ ! -f "$BRIDGE_DIR/session/session.json" ] && ! pgrep -f "python.*deepseek.auth" >/dev/null 2>&1; then
+  log "Starting interactive DeepSeek login browser."
+  cd "$BRIDGE_DIR"
+  DISPLAY=:99 "$RUNTIME/venv/bin/python" -m deepseek.auth >"$LOG_DIR/auth.log" 2>&1 &
 fi
 
 if ! pgrep -f "python.*app.py" >/dev/null 2>&1; then
@@ -96,5 +110,5 @@ if ! pgrep -f "python.*app.py" >/dev/null 2>&1; then
   "$RUNTIME/venv/bin/python" app.py >"$LOG_DIR/bridge.log" 2>&1 &
 fi
 
-log "DeepSeek remote browser: /vnc.html"
+log "DeepSeek remote browser: /vnc.html?autoconnect=true"
 log "Bridge API: /v1"
