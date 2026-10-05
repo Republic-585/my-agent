@@ -286,23 +286,30 @@ async function checkProvider(prov){
 }
 // ---------- agent loop ----------
 async function run(text){
- hist.push({role:"user",content:text});
+ const rich=Array.isArray(text);
+ const stored=rich?text.filter(x=>x&&x.type==="text").map(x=>x.text||"").join("\n").slice(0,3000):String(text||"");
+ hist.push({role:"user",content:stored||"Прикреплён материал."});
  const prov=S("prov")||"auto";
- for(let i=0;i<18;i++){
-  const m=await llm(prov,hist);
+ const msgs=[...hist.slice(0,-1),{role:"user",content:text}];
+ if(prov==="auto"&&rich)S("prov_auto_context","vision");
+ for(let i=0;i<8;i++){
+  const m=await llm(prov,msgs);
+  msgs.push({role:"assistant",content:m.content||"",...(m.tool_calls?{tool_calls:m.tool_calls}:{})});
   hist.push({role:"assistant",content:m.content||"",...(m.tool_calls?{tool_calls:m.tool_calls}:{})});
   if(!m.tool_calls?.length){add("a",m.content||"(пустой ответ)");return}
   for(const c of m.tool_calls){
    let out,args={};
-   try{args=JSON.parse(c.function.arguments||"{}");add("t","🔧 "+c.function.name+" "+JSON.stringify(args));
-    const T=tools[c.function.name];out=!T?"нет такого инструмента":(T.ask&&T.ask(args)&&(S("auto")!=="1"||(T.hard&&T.hard(args)))&&!confirm("Разрешить: "+c.function.name+"\n"+JSON.stringify(args).slice(0,300)))?"Пользователь отклонил действие":String(await T.f(args))}
-   catch(e){out="Ошибка: "+e.message}
-   hist.push({role:"tool",tool_call_id:c.id,name:c.function.name,content:out.slice(0,2500)});
+   try{
+    args=JSON.parse(c.function.arguments||"{}");
+    const T=tools[c.function.name];
+    out=!T?"Действие недоступно":(T.ask&&T.ask(args)&&(S("auto")!=="1"||(T.hard&&T.hard(args)))&&!confirm("Разрешить действие?"))?"Действие отклонено":String(await T.f(args));
+   }catch(e){console.error(e);out="Не удалось выполнить действие."}
+   const toolMsg={role:"tool",tool_call_id:c.id,name:c.function.name,content:out.slice(0,1600)};
+   msgs.push(toolMsg);hist.push(toolMsg);
   }
  }
- add("a","Остановился: слишком много шагов.");
+ add("a","Не удалось завершить задачу за один сеанс.");
 }
-
 // ---------- UI ----------
 const ownerMode=()=>location.hash==="#owner";function add(c,t){if(c==="t"&&!ownerMode())return;const d=document.createElement("div");d.className="m "+c;d.textContent=t;$("log").appendChild(d);$("log").scrollTop=1e9}
 function sub(){$("agentTitle").firstChild.textContent=agentName();$("sub").textContent=(S("prov")||"groq")+" · "+Object.keys(tools).length+" инструментов"}
