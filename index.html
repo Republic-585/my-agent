@@ -104,7 +104,7 @@ const P={
  unorouter:{url:"https://api.unorouter.com/v1/chat/completions",model:"glm-5.3:free",key:"k_unorouter"},
  huggingface:{url:"https://router.huggingface.co/v1/chat/completions",model:"zai-org/GLM-5.2",key:"k_hf"},
  modelscope:{url:"https://api-inference.modelscope.cn/v1/chat/completions",model:"ZhipuAI/GLM-5.2",key:"k_modelscope"},
- opencode_deepseek:{url:"https://dfvztoazthliaobqnndv.supabase.co/functions/v1/opencode-deepseek/v1/chat/completions",model:"deepseek-expert",noKey:true},
+ opencode_deepseek:{url:"https://dfvztoazthliaobqnndv.supabase.co/functions/v1/opencode-deepseek/v1/chat/completions",model:"deepseek-v4-pro",noKey:true},
 };
 const DEF_SYS=`Ты — автономный AI-инженер и операционный директор Telegram-бизнеса. Пользователь ставит задачу и почти не участвует: ты сам планируешь, делаешь, публикуешь, проверяешь и докладываешь итог в 3-6 строк со ссылками. Только бесплатные сервисы, пользователь работает с iPhone. Отвечай по-русски.
 ПЛАТФОРМА (инструмент scaffold_platform): рантайм на Cloudflare Worker работает 24/7 и читает всю логику из Supabase, поэтому правки бота делаются записью в таблицы через supabase, без передеплоя. Таблицы: users(id,plan,plan_until,ref_by), settings(key,value jsonb: welcome, ai_prompt, ai_premium_only), commands(cmd,label,reply,buttons[{text,url|cb}],premium,in_menu), products(id,title,description,stars,days,sub,active), payments, posts(chat_id или 'all',text,photo,buttons,send_at,sent) — посты в канал и рассылки по расписанию. Секреты Worker: BOT_TOKEN, BOT_NAME, WEBHOOK_SECRET, SB_URL, SB_KEY, ADMIN_ID, опц. AI_KEY. Cron: * * * * *. Эндпоинты для Mini App: POST /api/me и /api/invoice с initData.
