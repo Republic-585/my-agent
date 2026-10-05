@@ -77,7 +77,7 @@ body.dark form{background:var(--bg)}
 
 <div id="set">
 <div class="settings-header"><h2>Настройки</h2><button class="settings-close" id="setClose" aria-label="Закрыть" title="Закрыть">×</button></div>
-<section class="settings-group"><div class="settings-group-title">Общие</div><div class="settings-group-body><label>Имя Агента</label><input id="agentName" placeholder="Мой агент">
+<section class="settings-group"><div class="settings-group-title">Общие</div><div class="settings-group-body"><label>Имя Агента</label><input id="agentName" placeholder="Мой агент">
 <label>Тема</label><select id="theme"><option value="light">Светлая</option><option value="dark">Тёмная</option></select>
 </div></section>
 <section class="settings-group"><div class="settings-group-title">Навыки</div><div class="settings-group-body">
@@ -300,7 +300,7 @@ $("f").onsubmit=async e=>{
  if(files.length){
   const parts=[{type:"text",text:userContent}];
   for(const f of files){
-   if(f.data&&(S("prov")==="gemini"||S("prov")==="auto"))parts.push({type:"image_url",image_url:{url:f.data}});
+   if(f.data)parts.push({type:"image_url",image_url:{url:f.data}});
    else if(f.text)parts.push({type:"text",text:"Файл "+f.name+":\\n"+f.text});
    else parts.push({type:"text",text:"Прикреплён файл: "+f.name});
   }
