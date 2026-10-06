@@ -1,0 +1,1 @@
+create index if not exists agent_ai_requests_conversation_idx on public.agent_ai_requests(conversation_id,created_at desc);create index if not exists agent_memories_source_conversation_idx on public.agent_memories(source_conversation_id);
