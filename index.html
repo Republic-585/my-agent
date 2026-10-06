@@ -350,7 +350,7 @@ async function llmOnce(prov,msgs,useTools=true){
  const body={action:"chat",provider:prov||"auto",messages:compactMessages(msgs),conversation_id:serverConversationId,useTools:!!useTools,tools:useTools?schema:[],system:(S("sys4")||DEF_SYS)+skillsPrompt()};
  const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),30000);
  try{
-  const r=await fetch(GATEWAY_URL,{method:"POST",headers:{"Content-Type":"application/json","x-agent-key":key},body:JSON.stringify(body),signal:controller.signal});
+  const r=await fetch(GATEWAY_URL,{method:"POST",headers:{"Content-Type":"application/json","x-agent-key":key,...(S("k_tg")?{"x-telegram-token":S("k_tg")}:{})},body:JSON.stringify(body),signal:controller.signal});
   const j=await r.json().catch(()=>({}));if(!r.ok||!j.message)throw new Error(j.error||"gateway");if(j.conversation_id){serverConversationId=j.conversation_id;S("server_conversation_id",serverConversationId)}return j.message;
  }finally{clearTimeout(timer)}
 }
