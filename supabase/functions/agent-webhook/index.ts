@@ -35,4 +35,4 @@ Deno.serve(async req=>{
 });
 // Deployment pipeline trigger: individual Edge Function deployment.
 
-// Trigger diagnostic Supabase deployment
+// Trigger isolated webhook deployment
