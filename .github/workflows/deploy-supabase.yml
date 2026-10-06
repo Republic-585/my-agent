@@ -47,4 +47,8 @@ jobs:
         run: echo "::warning::SUPABASE_DB_PASSWORD is not configured; database migrations are skipped. Edge Functions will still deploy."
 
       - name: Deploy Edge Functions
-        run: supabase functions deploy --project-ref "$SUPABASE_PROJECT_ID" --use-api
+        run: |
+          for fn in agent-admin agent-gateway agent-webhook billing-checkout billing-webhook; do
+            echo "=== Deploying $fn ==="
+            supabase functions deploy "$fn" --project-ref "$SUPABASE_PROJECT_ID" --use-api
+          done
