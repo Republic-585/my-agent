@@ -13,4 +13,4 @@ verify_jwt = true
 verify_jwt = false
 
 # GitHub Actions deploys this project on changes under supabase/.
-# Migration history synchronized 2026-10-06; baseline function signature fixed.
+# Migration history synchronized; unique migration timestamps.
