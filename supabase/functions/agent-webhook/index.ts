@@ -35,4 +35,4 @@ Deno.serve(async req=>{
 });
 // Deployment pipeline trigger: individual Edge Function deployment.
 
-// Trigger Supabase deployment after workflow fix
+// Trigger diagnostic Supabase deployment
