@@ -13,10 +13,10 @@ function providerOrder(requested:string,messages:ChatMessage[]){const first=choo
 function clientTools(bodyTools:any[]){return (Array.isArray(bodyTools)?bodyTools:[]).filter(t=>{const n=t?.function?.name;return n&& !serverToolNames.has(n) && !["github","telegram","supabase"].includes(n)}).slice(0,30)}
 async function main(req:Request){
  if(req.method==="OPTIONS")return json({ok:true});
- const agentKey=req.headers.get("x-agent-key")?.trim()||"";
- if(!agentKey||agentKey.length<20||agentKey.length>160)return json({error:"invalid_key"},401);
  const body=req.method==="POST"?await req.json().catch(()=>({})):{};const action=body.action||(req.method==="GET"?"health":"chat");
  if(action==="health"){const keys=envKeys();return json({ok:true,providers:Object.fromEntries(Object.entries(PROVIDERS).map(([k,v])=>[k,{label:v.label,configured:!!keys[k],model:v.model}])),server_tools:availableServerTools().map(x=>x.function.name)})}
+ const agentKey=req.headers.get("x-agent-key")?.trim()||"";
+ if(!agentKey||agentKey.length<20||agentKey.length>160)return json({error:"invalid_key"},401);
  if(action==="check_provider"){const p=String(body.provider||"groq");if(!(p in PROVIDERS))return json({error:"invalid_provider"},400);const started=performance.now();try{const r=await callProvider(p,[{role:"user",content:"Ответь только: OK"}],"Проверка соединения.",[]);return json({ok:String(r.message?.content||"").toUpperCase().includes("OK"),provider:p,ms:Math.round(performance.now()-started)})}catch{return json({ok:false,provider:p,ms:Math.round(performance.now()-started)},503)}}
  const access=await consumeAccess(agentKey);if(!access)return json({error:"access_denied"},403);
  const messages=Array.isArray(body.messages)?body.messages as ChatMessage[]:[];if(!messages.length)return json({error:"empty_request"},400);
