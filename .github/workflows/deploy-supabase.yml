@@ -36,7 +36,7 @@ jobs:
 
       - name: Check migration plan
         if: env.SUPABASE_DB_PASSWORD != ''
-        run: supabase db push --project-ref "$SUPABASE_PROJECT_ID" --password "$SUPABASE_DB_PASSWORD" --dry-run
+        run: supabase db push --project-ref "$SUPABASE_PROJECT_ID" --password "$SUPABASE_DB_PASSWORD" --dry-run --include-all
 
       - name: Deploy database migrations
         if: env.SUPABASE_DB_PASSWORD != ''
