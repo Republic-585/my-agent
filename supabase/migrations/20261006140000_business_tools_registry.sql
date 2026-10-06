@@ -1,0 +1,9 @@
+insert into public.agent_tools(name,description,input_schema,server_only,enabled,category,risk,requires_confirmation)
+values
+('find_records','Найти записи в разрешенной бизнес-таблице Supabase','{"type":"object","properties":{"table":{"type":"string"},"query":{"type":"string"},"limit":{"type":"integer"}},"required":["table"]}'::jsonb,true,true,'data','medium',false),
+('create_record','Создать запись в разрешенной бизнес-таблице Supabase','{"type":"object","properties":{"table":{"type":"string"},"body":{"type":"object"}},"required":["table","body"]}'::jsonb,true,true,'data','medium',false),
+('update_records','Обновить записи в разрешенной бизнес-таблице Supabase по фильтру','{"type":"object","properties":{"table":{"type":"string"},"query":{"type":"string"},"body":{"type":"object"}},"required":["table","query","body"]}'::jsonb,true,true,'data','high',true),
+('count_records','Посчитать записи в разрешенной бизнес-таблице Supabase','{"type":"object","properties":{"table":{"type":"string"},"query":{"type":"string"}},"required":["table"]}'::jsonb,true,true,'data','low',false),
+('telegram_send_message','Отправить сообщение в Telegram','{"type":"object","properties":{"chat_id":{"type":["string","number"]},"text":{"type":"string"},"parse_mode":{"type":"string"}},"required":["chat_id","text"]}'::jsonb,true,true,'communication','medium',false),
+('telegram_send_document','Отправить документ в Telegram по URL','{"type":"object","properties":{"chat_id":{"type":["string","number"]},"document":{"type":"string"},"caption":{"type":"string"}},"required":["chat_id","document"]}'::jsonb,true,true,'communication','medium',false)
+on conflict(name) do update set description=excluded.description,input_schema=excluded.input_schema,server_only=excluded.server_only,category=excluded.category,risk=excluded.risk,requires_confirmation=excluded.requires_confirmation,updated_at=now();
