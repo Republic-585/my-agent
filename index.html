@@ -269,7 +269,7 @@ function applyLanguage(){
  const en=S("language")==="en",L=en?LANG.en:LANG.ru;
  document.title=L.title;
  const set=(id,v)=>{const x=$(id);if(x)x.textContent=v};
- set("gear",L.settings);set("attachBtn",L.attach);set("sendBtn",L.send);set("adminBtn",L.cabinet);set("setClose", "×");
+ set("adminBtn",L.cabinet);set("setClose", "×");
  const groups=document.querySelectorAll("#set .settings-group-title");
  if(groups[0])groups[0].textContent=L.general;if(groups[1])groups[1].textContent=L.skills;if(groups[2])groups[2].textContent=L.access;if(groups[3])groups[3].textContent=L.integrations;if(groups[4])groups[4].textContent=L.behavior;
  const labels=[...document.querySelectorAll("#set .settings-group-body>label:not(.skill-option)")];
@@ -293,8 +293,16 @@ function applyLanguage(){
  const ph={agentKey:"AGENT-••••-••••-••••",k_github:"github token",k_tg:"123456:ABC…",k_sburl:"https://xxxx.supabase.co"};
  Object.entries(ph).forEach(([id,v])=>{const x=$(id);if(x)x.placeholder=v});
  const ps=[...document.querySelectorAll("#set p")];
- const hints=en?[ "github.com/settings/tokens","@BotFather → /newbot",L.sbhint,L.sysHint ]:["github.com/settings/tokens","@BotFather → /newbot",L.sbhint,L.sysHint];
+ const hints=en?[ "github.com/settings/tokens","@BotFather → /newbot",L.sbhint,L.sysHint ]:["github.com/settings/tokens","@BotFather → /newbot",L.sbhint,L.sysHint ];
  ps.forEach((x,i)=>{if(i<4)x.textContent=hints[i]});
+ const adminTabs=document.querySelectorAll("#adminPanel .admin-tab");
+ ["Overview","Users","AI access","Payments","Plans"].forEach((v,i)=>{if(adminTabs[i])adminTabs[i].textContent=en?v:["Обзор","Пользователи","AI-доступ","Платежи","Тарифы"][i]});
+ const adminLoginTitle=document.querySelector("#adminLogin h2");if(adminLoginTitle)adminLoginTitle.textContent=L.cabinet;
+ const adminLoginHint=document.querySelector("#adminLogin p");if(adminLoginHint)adminLoginHint.textContent=en?"Sign in with Supabase Auth. Only users in the administrator list get access.":"Вход выполняется через Supabase Auth. Только пользователи из списка администраторов получат доступ.";
+ const adminLoginLabels=document.querySelectorAll("#adminLogin .admin-form label");if(adminLoginLabels[0])adminLoginLabels[0].textContent=en?"Email":"Email";if(adminLoginLabels[1])adminLoginLabels[1].textContent=en?"Password":"Пароль";
+ const adminLoginBtn=$("adminLoginBtn");if(adminLoginBtn)adminLoginBtn.textContent=en?"Sign in":"Войти";
+ const adminRefresh=$("adminRefresh");if(adminRefresh)adminRefresh.textContent=en?"Refresh":"Обновить";
+ const adminLogout=$("adminLogout");if(adminLogout)adminLogout.textContent=en?"Sign out":"Выйти";
  const sels={theme:[L.auto,L.light,L.dark],notifications:[L.on,L.off],sound:[L.on,L.off]};
  Object.entries(sels).forEach(([id,arr])=>{const x=$(id);if(x)[...x.options].forEach((o,i)=>{if(arr[i]!=null)o.textContent=arr[i]})});
  const lang=$("language");if(lang)[...lang.options].forEach((o,i)=>o.textContent=i===0?"Русский":"English");
