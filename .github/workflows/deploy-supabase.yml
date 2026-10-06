@@ -17,6 +17,7 @@ jobs:
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
       SUPABASE_PROJECT_ID: dfvztoazthliaobqnndv
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -34,10 +35,16 @@ jobs:
           version: latest
 
       - name: Check migration plan
-        run: supabase db push --project-ref "$SUPABASE_PROJECT_ID" --dry-run
+        if: env.SUPABASE_DB_PASSWORD != ''
+        run: supabase db push --project-ref "$SUPABASE_PROJECT_ID" --password "$SUPABASE_DB_PASSWORD" --dry-run
 
       - name: Deploy database migrations
-        run: supabase db push --project-ref "$SUPABASE_PROJECT_ID" --include-all
+        if: env.SUPABASE_DB_PASSWORD != ''
+        run: supabase db push --project-ref "$SUPABASE_PROJECT_ID" --password "$SUPABASE_DB_PASSWORD" --include-all
+
+      - name: Note database deployment skipped
+        if: env.SUPABASE_DB_PASSWORD == ''
+        run: echo "::warning::SUPABASE_DB_PASSWORD is not configured; database migrations are skipped. Edge Functions will still deploy."
 
       - name: Deploy Edge Functions
         run: supabase functions deploy --project-ref "$SUPABASE_PROJECT_ID" --use-api
