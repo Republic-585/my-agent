@@ -5,6 +5,7 @@ import {PROVIDERS,chooseProvider,callProvider} from "./providers.ts";
 import {prepareConversation,loadContext,saveMessages,maybeRemember} from "./context.ts";
 import {serverTools,serverToolNames,executeTool} from "./tools.ts";
 import {logAiRequest} from "./usage.ts";
+import {encryptCredential,telegramGetMe} from "./connections.ts";
 const cors={"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"authorization, apikey, content-type, x-agent-key, x-agent-provider, x-telegram-token","Access-Control-Allow-Methods":"GET, POST, OPTIONS","Content-Type":"application/json"};
 const json=(b:unknown,s=200)=>new Response(JSON.stringify(b),{status:s,headers:cors});
 function envKeys(){let j:any={};try{j=JSON.parse(Deno.env.get("AI_PROVIDER_KEYS")||"{}")}catch{};return{groq:j.groq||Deno.env.get("GROQ_API_KEY")||"",gemini:j.gemini||Deno.env.get("GEMINI_API_KEY")||"",mistral:j.mistral||Deno.env.get("MISTRAL_API_KEY")||"",openrouter:j.openrouter||Deno.env.get("OPENROUTER_API_KEY")||""}}
@@ -18,9 +19,35 @@ async function main(req:Request){
  const agentKey=req.headers.get("x-agent-key")?.trim()||"";
  const telegramToken=req.headers.get("x-telegram-token")?.trim()||"";
  if(!agentKey||agentKey.length<20||agentKey.length>160)return json({error:"invalid_key"},401);
+ let access:any;
+ try{access=await consumeAccess(agentKey)}catch(e){console.error("access_consume_failed",e instanceof Error?e.message:"unknown");return json({error:"gateway_db"},503)}
+ if(!access)return json({error:"access_denied"},403);
  if(action==="check_access"){try{const a=await validateAccess(agentKey);if(!a)return json({ok:false,error:"access_denied"},403);let provider_ok=false;try{const p=await callProvider("groq",[{role:"user",content:"Ответь только: OK"}],"Проверка соединения.",[]);provider_ok=String(p.message?.content||"").toUpperCase().includes("OK")}catch(e){console.error("provider_check_failed",e instanceof Error?e.message:"unknown")}return json({ok:true,plan:a.plan,expires_at:a.expires_at,provider:"groq",provider_ok},200)}catch(e){console.error("access_check_failed",e instanceof Error?e.message:"unknown");return json({ok:false,error:"gateway_db"},503)}}
+ if(action==="connect_telegram"){
+  try{
+   const token=telegramToken||String(body.telegram_token||"").trim();
+   if(!token||token.length<20)return json({ok:false,error:"telegram_token_missing"},400);
+   const bot=await telegramGetMe(token);
+   const url=Deno.env.get("SUPABASE_URL"),key=(await import("./access.ts")).secretKey();
+   if(!url||!key)return json({ok:false,error:"gateway_db"},503);
+   const cred=await encryptCredential(token,agentKey);
+   const existing=await fetch(url+"/rest/v1/agent_connections?user_id=is.null&provider=eq.telegram&metadata->>bot_id=eq."+encodeURIComponent(String(bot.id))+"&select=id",{headers:{apikey:key,Authorization:"Bearer "+key}});
+   const ex=await existing.json().catch(()=>[]);
+   const bodyConn={user_id:access?.user_id||null,provider:"telegram",name:bot.username?("@"+bot.username):String(bot.first_name||"Telegram"),status:"active",credential_ciphertext:cred.ciphertext,credential_iv:cred.iv,metadata:{bot_id:String(bot.id),username:bot.username||null,first_name:bot.first_name||null,is_bot:!!bot.is_bot}};
+   let rr:Response;
+   if(Array.isArray(ex)&&ex[0]?.id){
+    rr=await fetch(url+"/rest/v1/agent_connections?id=eq."+encodeURIComponent(ex[0].id),{method:"PATCH",headers:{apikey:key,Authorization:"Bearer "+key,"Content-Type":"application/json",Prefer:"return=representation"},body:JSON.stringify(bodyConn)});
+   }else{
+    rr=await fetch(url+"/rest/v1/agent_connections",{method:"POST",headers:{apikey:key,Authorization:"Bearer "+key,"Content-Type":"application/json",Prefer:"return=representation"},body:JSON.stringify(bodyConn)});
+   }
+   if(!rr.ok)throw new Error("connection_save_failed");
+   const saved=(await rr.json())?.[0];
+   const rid=await fetch(url+"/rest/v1/agent_resources",{method:"POST",headers:{apikey:key,Authorization:"Bearer "+key,"Content-Type":"application/json",Prefer:"resolution=merge-duplicates,return=representation"},body:JSON.stringify({connection_id:saved.id,user_id:access?.user_id||null,resource_type:"telegram_bot",external_id:String(bot.id),name:bot.first_name||bot.username||"Telegram Bot",username:bot.username||null,status:"active",metadata:bot})});
+   if(!rid.ok)console.error("telegram_resource_save_failed",await rid.text());
+   return json({ok:true,connection:{id:saved.id,provider:"telegram",name:bodyConn.name,status:"active",bot:{id:bot.id,username:bot.username||null,first_name:bot.first_name||null}}});
+  }catch(e){console.error("connect_telegram_failed",e instanceof Error?e.message:"unknown");return json({ok:false,error:e instanceof Error?e.message:"telegram_connect_failed"},400)}
+ }
  if(action==="check_provider"){const p=String(body.provider||"groq");if(!(p in PROVIDERS))return json({error:"invalid_provider"},400);const started=performance.now();try{const r=await callProvider(p,[{role:"user",content:"Ответь только: OK"}],"Проверка соединения.",[]);return json({ok:String(r.message?.content||"").toUpperCase().includes("OK"),provider:p,ms:Math.round(performance.now()-started)})}catch{return json({ok:false,provider:p,ms:Math.round(performance.now()-started)},503)}}
- let access;try{access=await consumeAccess(agentKey)}catch(e){console.error("access_consume_failed",e instanceof Error?e.message:"unknown");return json({error:"gateway_db"},503)}if(!access)return json({error:"access_denied"},403);
  const messages=Array.isArray(body.messages)?body.messages as ChatMessage[]:[];if(!messages.length)return json({error:"empty_request"},400);
  const conversationId=await prepareConversation(access.user_id,body.conversation_id||null,String(messages.find(m=>m.role==="user")?.content||""));
  const ctx=await loadContext(access.user_id,conversationId,messages);
