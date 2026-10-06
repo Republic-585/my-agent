@@ -31,7 +31,7 @@ async function main(req:Request){
    const url=Deno.env.get("SUPABASE_URL"),key=(await import("./access.ts")).secretKey();
    if(!url||!key)return json({ok:false,error:"gateway_db"},503);
    const cred=await encryptCredential(token,agentKey);
-   const existing=await fetch(url+"/rest/v1/agent_connections?user_id=is.null&provider=eq.telegram&metadata->>bot_id=eq."+encodeURIComponent(String(bot.id))+"&select=id",{headers:{apikey:key,Authorization:"Bearer "+key}});
+   const existing=await fetch(url+"/rest/v1/agent_connections?user_id=eq.${access.user_id}&provider=eq.telegram&metadata->>bot_id=eq."+encodeURIComponent(String(bot.id))+"&select=id",{headers:{apikey:key,Authorization:"Bearer "+key}});
    const ex=await existing.json().catch(()=>[]);
    const bodyConn={user_id:access?.user_id||null,provider:"telegram",name:bot.username?("@"+bot.username):String(bot.first_name||"Telegram"),status:"active",credential_ciphertext:cred.ciphertext,credential_iv:cred.iv,metadata:{bot_id:String(bot.id),username:bot.username||null,first_name:bot.first_name||null,is_bot:!!bot.is_bot}};
    let rr:Response;
