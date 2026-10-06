@@ -318,17 +318,32 @@ function playUiSound(type="tap"){
  try{
   const a=getAudioContext();if(!a)return;
   const now=a.currentTime;
-  const notes={tap:[520,.045,0.06],send:[620,.055,0.09],receive:[660,.04,0.08],success:[523,.045,0.10],error:[220,.035,0.12]};
-  const n=notes[type]||notes.tap;
+  const cfg={
+   tap:{f:420,d:.045,v:.018},
+   send:{f:540,d:.075,v:.026},
+   receive:{f:620,d:.18,v:.032},
+   success:{f:560,d:.20,v:.028},
+   error:{f:180,d:.12,v:.022}
+  }[type]||{f:420,d:.045,v:.018};
   const o=a.createOscillator(),g=a.createGain();
-  o.type=type==="error"?"sine":"sine";o.frequency.setValueAtTime(n[0],now);
-  g.gain.setValueAtTime(.0001,now);g.gain.exponentialRampToValueAtTime(n[1],now+.012);g.gain.exponentialRampToValueAtTime(.0001,now+n[2]);
-  o.connect(g);g.connect(a.destination);o.start(now);o.stop(now+n[2]+.01);
+  o.type="sine";
+  o.frequency.setValueAtTime(cfg.f,now);
+  o.frequency.exponentialRampToValueAtTime(cfg.f*1.08,now+cfg.d*.7);
+  g.gain.setValueAtTime(.0001,now);
+  g.gain.exponentialRampToValueAtTime(cfg.v,now+.018);
+  g.gain.exponentialRampToValueAtTime(.0001,now+cfg.d);
+  o.connect(g);g.connect(a.destination);o.start(now);o.stop(now+cfg.d+.015);
+  if(type==="send"){
+   const o2=a.createOscillator(),g2=a.createGain();
+   o2.type="sine";o2.frequency.setValueAtTime(760,now+.035);
+   g2.gain.setValueAtTime(.0001,now+.035);g2.gain.exponentialRampToValueAtTime(.014,now+.05);g2.gain.exponentialRampToValueAtTime(.0001,now+.105);
+   o2.connect(g2);g2.connect(a.destination);o2.start(now+.035);o2.stop(now+.12);
+  }
   if(type==="receive"||type==="success"){
    const o2=a.createOscillator(),g2=a.createGain();
-   o2.type="sine";o2.frequency.setValueAtTime(type==="success"?784:880,now+.06);
-   g2.gain.setValueAtTime(.0001,now+.06);g2.gain.exponentialRampToValueAtTime(.026,now+.075);g2.gain.exponentialRampToValueAtTime(.0001,now+.17);
-   o2.connect(g2);g2.connect(a.destination);o2.start(now+.06);o2.stop(now+.18);
+   o2.type="sine";o2.frequency.setValueAtTime(type==="success"?820:900,now+.055);
+   g2.gain.setValueAtTime(.0001,now+.055);g2.gain.exponentialRampToValueAtTime(.018,now+.075);g2.gain.exponentialRampToValueAtTime(.0001,now+.22);
+   o2.connect(g2);g2.connect(a.destination);o2.start(now+.055);o2.stop(now+.23);
   }
  }catch(e){}
 }
