@@ -5,7 +5,7 @@ import {PROVIDERS,chooseProvider,callProvider} from "./providers.ts";
 import {prepareConversation,loadContext,saveMessages,maybeRemember} from "./context.ts";
 import {serverTools,serverToolNames,executeTool} from "./tools.ts";
 import {logAiRequest} from "./usage.ts";
-import {encryptCredential,telegramGetMe} from "./connections.ts";
+import {encryptCredential,telegramGetMe,telegramGetWebhookInfo,decryptCredential} from "./connections.ts";
 const cors={"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"authorization, apikey, content-type, x-agent-key, x-agent-provider, x-telegram-token","Access-Control-Allow-Methods":"GET, POST, OPTIONS","Content-Type":"application/json"};
 const json=(b:unknown,s=200)=>new Response(JSON.stringify(b),{status:s,headers:cors});
 function envKeys(){let j:any={};try{j=JSON.parse(Deno.env.get("AI_PROVIDER_KEYS")||"{}")}catch{};return{groq:j.groq||Deno.env.get("GROQ_API_KEY")||"",gemini:j.gemini||Deno.env.get("GEMINI_API_KEY")||"",mistral:j.mistral||Deno.env.get("MISTRAL_API_KEY")||"",openrouter:j.openrouter||Deno.env.get("OPENROUTER_API_KEY")||""}}
@@ -46,6 +46,21 @@ async function main(req:Request){
    if(!rid.ok)console.error("telegram_resource_save_failed",await rid.text());
    return json({ok:true,connection:{id:saved.id,provider:"telegram",name:bodyConn.name,status:"active",bot:{id:bot.id,username:bot.username||null,first_name:bot.first_name||null}}});
   }catch(e){console.error("connect_telegram_failed",e instanceof Error?e.message:"unknown");return json({ok:false,error:e instanceof Error?e.message:"telegram_connect_failed"},400)}
+ }
+ if(action==="sync_telegram"){
+  try{
+   const url=Deno.env.get("SUPABASE_URL"),key=(await import("./access.ts")).secretKey();
+   if(!url||!key)return json({ok:false,error:"gateway_db"},503);
+   const q=await fetch(url+"/rest/v1/agent_connections?provider=eq.telegram&status=eq.active&select=id,name,user_id,credential_ciphertext,credential_iv,metadata&order=created_at.desc&limit=1",{headers:{apikey:key,Authorization:"Bearer "+key}});
+   if(!q.ok)throw new Error("connection_lookup_failed");
+   const rows=await q.json(); const conn=rows?.[0]; if(!conn)return json({ok:false,error:"telegram_not_connected"},404);
+   const token=await decryptCredential(String(conn.credential_ciphertext),String(conn.credential_iv),agentKey);
+   const bot=await telegramGetMe(token); const webhook=await telegramGetWebhookInfo(token); const now=new Date().toISOString();
+   const meta={...(conn.metadata||{}),webhook:{url:webhook.url||null,has_custom_certificate:!!webhook.has_custom_certificate,pending_update_count:Number(webhook.pending_update_count||0),last_error_date:webhook.last_error_date||null,last_error_message:webhook.last_error_message||null},synced_at:now};
+   await fetch(url+"/rest/v1/agent_connections?id=eq."+encodeURIComponent(conn.id),{method:"PATCH",headers:{apikey:key,Authorization:"Bearer "+key,"Content-Type":"application/json"},body:JSON.stringify({last_synced_at:now,last_error:null,metadata:meta})});
+   await fetch(url+"/rest/v1/agent_resources?connection_id=eq."+encodeURIComponent(conn.id)+"&resource_type=eq.telegram_bot&external_id=eq."+encodeURIComponent(String(bot.id)),{method:"PATCH",headers:{apikey:key,Authorization:"Bearer "+key,"Content-Type":"application/json"},body:JSON.stringify({last_seen_at:now,metadata:bot,status:"active"})});
+   return json({ok:true,bot:{id:bot.id,username:bot.username||null,first_name:bot.first_name||null},webhook:{url:webhook.url||null,pending_update_count:Number(webhook.pending_update_count||0),last_error_message:webhook.last_error_message||null}});
+  }catch(e){console.error("sync_telegram_failed",e instanceof Error?e.message:"unknown");return json({ok:false,error:e instanceof Error?e.message:"telegram_sync_failed"},400)}
  }
  if(action==="check_provider"){const p=String(body.provider||"groq");if(!(p in PROVIDERS))return json({error:"invalid_provider"},400);const started=performance.now();try{const r=await callProvider(p,[{role:"user",content:"Ответь только: OK"}],"Проверка соединения.",[]);return json({ok:String(r.message?.content||"").toUpperCase().includes("OK"),provider:p,ms:Math.round(performance.now()-started)})}catch{return json({ok:false,provider:p,ms:Math.round(performance.now()-started)},503)}}
  const messages=Array.isArray(body.messages)?body.messages as ChatMessage[]:[];if(!messages.length)return json({error:"empty_request"},400);
