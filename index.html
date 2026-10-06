@@ -494,7 +494,7 @@ $("save").onclick=()=>{
 if($("clr"))$("clr").onclick=()=>{hist=[];S("hist","");$("log").innerHTML="";add("a","Контекст очищен.")};
 $("pvx").onclick=()=>{$("pv").style.display="none";$("pvf").srcdoc=""};
 $("setClose").onclick=()=>$("set").classList.remove("on");
-applyTheme();applyPreferences();if("serviceWorker" in navigator)navigator.serviceWorker.register("./sw.js").catch(()=>{});
+applyTheme();applyPreferences();if("serviceWorker" in navigator)navigator.serviceWorker.register("./sw.js").then(r=>r.update()).catch(()=>{});
 if(window.matchMedia){const mq=window.matchMedia("(prefers-color-scheme: dark)");const sync=()=>{if((S("theme")||"auto")==="auto")applyTheme()};if(mq.addEventListener)mq.addEventListener("change",sync);else if(mq.addListener)mq.addListener(sync)}sub();
 add("a",S("agent_key")?"Готов. Чем помочь?":"Привет! Открой «Настройки», вставь ключ доступа к агенту и нажми «Проверить».");
 
