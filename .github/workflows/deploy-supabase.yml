@@ -48,8 +48,8 @@ jobs:
 
       - name: Deploy agent-admin
         run: supabase functions deploy agent-admin --project-ref "$SUPABASE_PROJECT_ID"
-      - name: Deploy agent-gateway
-        run: supabase functions deploy agent-gateway --project-ref "$SUPABASE_PROJECT_ID"
+      - name: Note agent-gateway deployment
+        run: echo "::warning::agent-gateway deployment is temporarily skipped; current production version remains active while its CLI deployment issue is isolated."
       - name: Deploy agent-webhook
         run: supabase functions deploy agent-webhook --project-ref "$SUPABASE_PROJECT_ID"
       - name: Deploy billing-checkout
