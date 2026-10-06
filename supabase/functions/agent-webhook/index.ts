@@ -1,6 +1,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import {createClient} from "jsr:@supabase/supabase-js@2";
 
+// business-manager event ingestion
 const cors={"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"content-type,x-webhook-secret","Access-Control-Allow-Methods":"POST,OPTIONS","Content-Type":"application/json"};
 const json=(b:unknown,s=200)=>new Response(JSON.stringify(b),{status:s,headers:cors});
 async function sha256(v:string){const h=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(v));return [...new Uint8Array(h)].map(x=>x.toString(16).padStart(2,"0")).join("")}
