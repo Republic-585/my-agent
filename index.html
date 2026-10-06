@@ -229,7 +229,80 @@ const DEF_SYS=`Ты — автономный AI-инженер и операци
 ПРАВИЛА: после изменений проверяй результат (getWebhookInfo, чтение таблиц, preview). Секреты не выводи и не клади в код или репозиторий. С деньгами проверяй логику дважды. Не выдумывай API, если не уверен, так и скажи. Правки существующего проекта: сначала list_files и read_file, меняй точечно.`;
 const S=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}};
 function applyTheme(){const t=S("theme")||"auto";document.body.classList.toggle("dark",t==="dark"||(t==="auto"&&matchMedia("(prefers-color-scheme: dark)").matches))}
-function applyPreferences(){document.documentElement.lang=S("language")==="en"?"en":"ru";document.documentElement.dataset.notifications=S("notifications")==="0"?"off":"on";document.documentElement.dataset.sound=S("sound")==="0"?"off":"on"}
+function applyPreferences(){document.documentElement.lang=S("language")==="en"?"en":"ru";document.documentElement.dataset.notifications=S("notifications")==="0"?"off":"on";document.documentElement.dataset.sound=S("sound")==="0"?"off":"on";applyLanguage()}
+const LANG={
+ ru:{
+  title:"Мой агент",placeholder:"Напишите задачу…",settings:"Настройки",attach:"Прикрепить",send:"Отправить",
+  cabinet:"Кабинет",close:"Закрыть",general:"Общие",theme:"Тема",auto:"Авто",light:"Светлая",dark:"Тёмная",language:"Язык",
+  notifications:"Уведомления",on:"Вкл",off:"Выкл",sound:"Звук",skills:"Навыки",skillsLabel:"Навыки (инструменты) агента",
+  access:"Доступ к AI агенту",accessKey:"Ключ доступа к агенту",check:"Проверить",keyHint:"Ключ нужен для работы AI.",
+  integrations:"Интеграции и доступ",github:"GitHub token (classic, право repo)",githubHint:"github.com/settings/tokens",
+  tg:"Telegram Bot Token",tgHint:"@BotFather → /newbot",connect:"Подключить Telegram",notConnected:"Не подключён",
+  sburl:"Supabase URL",sbkey:"Supabase ключ (secret / service_role)",
+  sbhint:"Project Settings → API Keys. Секретный ключ даёт полный доступ к базе: держи его только в этом приложении.",
+  behavior:"Поведение агента",autopilot:"Автопилот: не спрашивать подтверждений, кроме опасных действий",system:"Системная инструкция",
+  sysHint:"Ключи хранятся только в памяти браузера на этом телефоне.",save:"Сохранить",
+  ready:"Готов. Чем помочь?",hello:"Привет! Открой «Настройки», вставь ключ доступа к агенту и нажми «Проверить».",
+  attached:"Прикреплённый материал.",thinking:"Готовлю ответ",noAnswer:"Не удалось получить ответ. Проверь подключение провайдера в Настройках.",
+  context:"Контекст очищен."
+ },
+ en:{
+  title:"My Agent",placeholder:"Describe a task…",settings:"Settings",attach:"Attach",send:"Send",
+  cabinet:"Cabinet",close:"Close",general:"General",theme:"Theme",auto:"Auto",light:"Light",dark:"Dark",language:"Language",
+  notifications:"Notifications",on:"On",off:"Off",sound:"Sound",skills:"Skills",skillsLabel:"Agent skills (tools)",
+  access:"AI agent access",accessKey:"Agent access key",check:"Check",keyHint:"An access key is required to use AI.",
+  integrations:"Integrations & access",github:"GitHub token (classic, repo permission)",githubHint:"github.com/settings/tokens",
+  tg:"Telegram Bot Token",tgHint:"@BotFather → /newbot",connect:"Connect Telegram",notConnected:"Not connected",
+  sburl:"Supabase URL",sbkey:"Supabase key (secret / service_role)",
+  sbhint:"Project Settings → API Keys. This secret key has full database access: keep it only in this app.",
+  behavior:"Agent behavior",autopilot:"Autopilot: don't ask for confirmation except for dangerous actions",system:"System instruction",
+  sysHint:"Keys are stored only in this browser on this phone.",save:"Save",
+  ready:"Ready. What can I help with?",hello:"Hi! Open Settings, enter your agent access key, and tap Check.",
+  attached:"Attached material.",thinking:"Preparing a response",noAnswer:"Could not get a response. Check the provider connection in Settings.",
+  context:"Context cleared."
+ },
+ skillsMap:{
+  strategy:["Стратегия и планирование","Strategy & planning"],telegram_pro:["Telegram-боты","Telegram bots"],miniapp_ui:["Mini App и интерфейсы","Mini Apps & interfaces"],stars_money:["Оплата и монетизация","Payments & monetization"],supabase_pro:["Supabase и база данных","Supabase & database"],growth_channel:["Рост Telegram-канала","Telegram channel growth"],funnel_copy:["Воронки и тексты","Funnels & copy"],ai_features:["AI и модели","AI & models"],analytics:["Аналитика","Analytics"],security:["Безопасность","Security"],deploy_cf:["Деплой Cloudflare","Cloudflare deployment"],code_quality:["Качество кода","Code quality"],debugging:["Поиск и исправление ошибок","Debugging"]
+ }
+};
+function applyLanguage(){
+ const en=S("language")==="en",L=en?LANG.en:LANG.ru;
+ document.title=L.title;
+ const set=(id,v)=>{const x=$(id);if(x)x.textContent=v};
+ set("gear",L.settings);set("attachBtn",L.attach);set("sendBtn",L.send);set("adminBtn",L.cabinet);set("setClose", "×");
+ const groups=document.querySelectorAll("#set .settings-group-title");
+ if(groups[0])groups[0].textContent=L.general;if(groups[1])groups[1].textContent=L.skills;if(groups[2])groups[2].textContent=L.access;if(groups[3])groups[3].textContent=L.integrations;if(groups[4])groups[4].textContent=L.behavior;
+ const labels=[...document.querySelectorAll("#set .settings-group-body>label:not(.skill-option)")];
+ const labelTexts=en?["Theme","Language","Notifications","Sound","Agent skills (tools)","Access key","GitHub token (classic, repo permission)","Telegram Bot Token","Supabase URL","Supabase key (secret / service_role)","Autopilot: don't ask for confirmation except for dangerous actions","System instruction"]:["Тема","Язык","Уведомления","Звук","Ключ доступа к агенту","GitHub token (classic, право repo)","Telegram Bot Token","Supabase URL","Supabase ключ (secret / service_role)","Автопилот: не спрашивать подтверждений, кроме опасных действий","Системная инструкция"];
+ // The skills heading is already handled by the group; keep structural labels stable.
+ const mainLabels=[...document.querySelectorAll("#set .settings-group")].flatMap(g=>[...g.querySelectorAll(".settings-group-body>label:not(.skill-option)")]);
+ const vals=en?["Theme","Language","Notifications","Sound","Agent access key","GitHub token (classic, repo permission)","Telegram Bot Token","Supabase URL","Supabase key (secret / service_role)","Autopilot: don't ask for confirmation except for dangerous actions","System instruction"]:["Тема","Язык","Уведомления","Звук","Ключ доступа к агенту","GitHub token (classic, право repo)","Telegram Bot Token","Supabase URL","Supabase ключ (secret / service_role)","Автопилот: не спрашивать подтверждений, кроме опасных действий","Системная инструкция"];
+ mainLabels.forEach((x,i)=>{if(vals[i]!=null)x.textContent=vals[i]});
+ const skillNames=document.querySelectorAll("#skillsList .skill-option");
+ skillNames.forEach(x=>{const inp=x.querySelector("input"),m=LANG.skillsMap[inp?.value];if(m)x.lastChild.textContent=en?m[1]:m[0]});
+ const q=$("q");if(q)q.placeholder=L.placeholder;
+ const f=$("fileInput");if(f)f.setAttribute("aria-label",L.attach);
+ const ab=$("attachBtn");if(ab){ab.title=L.attach;ab.setAttribute("aria-label",L.attach)}
+ const sb=$("sendBtn");if(sb){sb.title=L.send;sb.setAttribute("aria-label",L.send)}
+ const gb=$("gear");if(gb){gb.title=L.settings;gb.setAttribute("aria-label",L.settings)}
+ const save=$("save");if(save)save.textContent=L.save;
+ const check=$("checkAccess");if(check)check.textContent=L.check;
+ const con=$("connectTelegram");if(con)con.textContent=L.connect;
+ const st=$("telegramConnectionStatus");if(st&&(!st.textContent||st.textContent==="Не подключён"||st.textContent==="Not connected"))st.textContent=L.notConnected;
+ const access=$("accessStatus");if(access&&(access.textContent==="Ключ нужен для работы AI."||access.textContent==="An access key is required to use AI."))access.textContent=L.keyHint;
+ const ph={agentKey:"AGENT-••••-••••-••••",k_github:"github token",k_tg:"123456:ABC…",k_sburl:"https://xxxx.supabase.co"};
+ Object.entries(ph).forEach(([id,v])=>{const x=$(id);if(x)x.placeholder=v});
+ const ps=[...document.querySelectorAll("#set p")];
+ const hints=en?[ "github.com/settings/tokens","@BotFather → /newbot",L.sbhint,L.sysHint ]:["github.com/settings/tokens","@BotFather → /newbot",L.sbhint,L.sysHint];
+ ps.forEach((x,i)=>{if(i<4)x.textContent=hints[i]});
+ const sels={theme:[L.auto,L.light,L.dark],notifications:[L.on,L.off],sound:[L.on,L.off]};
+ Object.entries(sels).forEach(([id,arr])=>{const x=$(id);if(x)[...x.options].forEach((o,i)=>{if(arr[i]!=null)o.textContent=arr[i]})});
+ const lang=$("language");if(lang)[...lang.options].forEach((o,i)=>o.textContent=i===0?"Русский":"English");
+ const auto=document.querySelector("#auto")?.parentElement;if(auto)auto.lastChild.textContent=L.autopilot;
+ const sys=document.querySelector('label[for="sys"]');if(sys)sys.textContent=L.system;
+ const title=document.querySelector('meta[name="apple-mobile-web-app-title"]');if(title)title.content=L.title;
+}
+function responseLanguagePrompt(){return S("language")==="en"?"\n\nLANGUAGE REQUIREMENT: Reply only in English. Keep code, URLs, commands, tool names, and literal technical identifiers unchanged.":"\n\nТРЕБОВАНИЕ К ЯЗЫКУ: Отвечай только на русском языке. Код, URL, команды, названия инструментов и технические идентификаторы не переводи."}
 let audioContext=null;
 function getAudioContext(){const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return null;if(!audioContext)audioContext=new AC();if(audioContext.state==="suspended")audioContext.resume().catch(()=>{});return audioContext}
 function playUiSound(type="tap"){
@@ -375,7 +448,7 @@ function compactMessages(h){
 let serverConversationId=S("server_conversation_id")||null;
 async function llmOnce(prov,msgs,useTools=true){
  const key=S("agent_key");if(!key)throw new Error("key");
- const body={action:"chat",provider:prov||"auto",messages:compactMessages(msgs),conversation_id:serverConversationId,useTools:!!useTools,tools:useTools?schema:[],system:(S("sys4")||DEF_SYS)+skillsPrompt()};
+ const body={action:"chat",provider:prov||"auto",messages:compactMessages(msgs),conversation_id:serverConversationId,useTools:!!useTools,tools:useTools?schema:[],system:(S("sys4")||DEF_SYS)+skillsPrompt()+responseLanguagePrompt()};
  const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),30000);
  try{
   const r=await fetch(GATEWAY_URL,{method:"POST",headers:{"Content-Type":"application/json","x-agent-key":key,...(S("k_tg")?{"x-telegram-token":S("k_tg")}:{})},body:JSON.stringify(body),signal:controller.signal});
@@ -449,9 +522,9 @@ $("f").onsubmit=async e=>{
   }
   userContent=parts.length>1?parts:[{type:"text",text:userContent}];
  }
- add("u",t||files.map(x=>x.name).join(", "));playUiSound("send");$("sendBtn").disabled=true;
- const thinking=document.createElement("div");thinking.className="thinking";thinking.textContent="Готовлю ответ";$("log").appendChild(thinking);$("log").scrollTop=1e9;
- try{await run(userContent);aiConnected=true;sub()}catch(err){console.error(err);aiConnected=false;sub();playUiSound("error");add("a","Не удалось получить ответ. Проверь подключение провайдера в Настройках.")}finally{thinking.remove();$("sendBtn").disabled=false;$("q").focus()}
+ add("u",t||files.map(x=>x.name).join(", "));setTimeout(()=>playUiSound("send"),180);$("sendBtn").disabled=true;
+ const thinking=document.createElement("div");thinking.className="thinking";thinking.textContent=S("language")==="en"?"Preparing a response":"Готовлю ответ";$("log").appendChild(thinking);$("log").scrollTop=1e9;
+ try{await run(userContent);aiConnected=true;sub()}catch(err){console.error(err);aiConnected=false;sub();playUiSound("error");add("a",S("language")==="en"?"Could not get a response. Check the provider connection in Settings.":"Не удалось получить ответ. Проверь подключение провайдера в Настройках.")}finally{thinking.remove();$("sendBtn").disabled=false;$("q").focus()}
  S("hist",JSON.stringify((h=>h.slice(Math.max(0,h.findIndex(x=>x.role==="user"))))(hist.slice(-24))));
 };
 function resizeInput(){const q=$("q");q.style.height="38px";q.style.height=Math.min(q.scrollHeight,150)+"px"}
@@ -491,12 +564,12 @@ $("save").onclick=()=>{
  S("sys4",$("sys").value);S("auto",$("auto").checked?"1":"");applyTheme();applyPreferences();
  if(S("notifications")==="1")requestNotificationPermission();
  $("set").classList.remove("on");sub()};
-if($("clr"))$("clr").onclick=()=>{hist=[];S("hist","");$("log").innerHTML="";add("a","Контекст очищен.")};
+if($("clr"))$("clr").onclick=()=>{hist=[];S("hist","");$("log").innerHTML="";add("a",S("language")==="en"?"Context cleared.":"Контекст очищен.")};
 $("pvx").onclick=()=>{$("pv").style.display="none";$("pvf").srcdoc=""};
 $("setClose").onclick=()=>$("set").classList.remove("on");
 applyTheme();applyPreferences();if("serviceWorker" in navigator)navigator.serviceWorker.register("./sw.js").then(r=>r.update()).catch(()=>{});
 if(window.matchMedia){const mq=window.matchMedia("(prefers-color-scheme: dark)");const sync=()=>{if((S("theme")||"auto")==="auto")applyTheme()};if(mq.addEventListener)mq.addEventListener("change",sync);else if(mq.addListener)mq.addListener(sync)}sub();
-add("a",S("agent_key")?"Готов. Чем помочь?":"Привет! Открой «Настройки», вставь ключ доступа к агенту и нажми «Проверить».");
+add("a",S("agent_key")?(S("language")==="en"?"Ready. What can I help with?":"Готов. Чем помочь?"):(S("language")==="en"?"Hi! Open Settings, enter your agent access key, and tap Check.":"Привет! Открой «Настройки», вставь ключ доступа к агенту и нажми «Проверить»."));
 
 const ADMIN_SUPABASE_URL="https://dfvztoazthliaobqnndv.supabase.co";
 const ADMIN_SUPABASE_KEY="sb_publishable_rklL_02gyQi9Va_Ow6BS-w_d1QeN947";
