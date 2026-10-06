@@ -71,10 +71,10 @@ body.dark form{background:var(--bg)}
 #set.on{display:block}
 #set label{display:block;margin:12px 0 4px;font-weight:600}
 #set p{color:var(--mut);font-size:13px;margin:4px 0}
-</style>
+.menu-lines{display:flex;flex-direction:column;gap:5px;justify-content:center;align-items:center;width:24px;height:24px;filter:blur(.05px)}.menu-lines i{display:block;width:17px;height:3px;border-radius:999px;background:currentColor;box-shadow:0 0 .2px currentColor}.head-actions #gear{border:0!important;outline:0;background:transparent;box-shadow:none;border-radius:0;width:36px;height:36px;padding:0;display:flex;align-items:center;justify-content:center;appearance:none;-webkit-appearance:none}</style>
 </head>
 <body>
-<header><div id="agentTitle"></div><div class="head-actions"><button id="gear" aria-label="Настройки" title="Настройки">⚙︎</button></div></header>
+<header><div class="head-actions"><button id="gear" aria-label="Настройки" title="Настройки"><span class="menu-lines" aria-hidden="true"><i></i><i></i></span></button></div></header>
 <div id="log"></div>
 <form id="f"><div class="input-island"><button id="attachBtn" class="attach-btn" type="button" aria-label="Прикрепить файл или фото" title="Прикрепить">+</button><input id="fileInput" type="file" hidden multiple accept="image/*,.txt,.md,.csv,.json,.js,.ts,.html,.css,.pdf,.doc,.docx,.xlsx"><div class="input-main"><div id="attachPreview" class="attach-preview"></div><textarea id="q" placeholder="Напишите задачу…" enterkeyhint="enter" rows="1"></textarea></div><button id="sendBtn" type="submit" aria-label="Отправить" title="Отправить"><span class="send-arrow">↑</span></button></div></form>
 
