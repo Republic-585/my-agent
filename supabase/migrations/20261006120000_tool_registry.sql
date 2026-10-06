@@ -36,3 +36,8 @@ on conflict(name) do update set
 create index if not exists agent_tools_enabled_category_idx
   on public.agent_tools(enabled,category);
 -- Registry metadata is deployed through CI.
+
+
+insert into public.agent_tools(name,description,input_schema,server_only,enabled,category,risk,requires_confirmation)
+values ('http_request','Безопасный HTTPS-запрос к внешнему бизнес-API','{"type":"object","properties":{"method":{"type":"string"},"url":{"type":"string"},"headers":{"type":"object"},"query":{"type":"object"},"body":{},"timeout_ms":{"type":"integer"}},"required":["method","url"]}'::jsonb,true,true,'integration','medium',false)
+on conflict(name) do update set description=excluded.description,input_schema=excluded.input_schema,category=excluded.category,risk=excluded.risk,requires_confirmation=excluded.requires_confirmation,updated_at=now();
