@@ -33,3 +33,4 @@ Deno.serve(async req=>{
   }
   return json({ok:true,event_id:event.id,telegram_chat_id:chat?.id!==undefined?String(chat.id):null},202);
 });
+// Deployment pipeline trigger: individual Edge Function deployment.
