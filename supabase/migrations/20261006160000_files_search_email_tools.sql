@@ -1,0 +1,7 @@
+insert into public.agent_tools(name,description,input_schema,server_only,enabled,category,risk,requires_confirmation)
+values
+('file_read_text','Прочитать текстовый файл по HTTPS URL','{"type":"object","properties":{"url":{"type":"string"},"max_chars":{"type":"integer"}},"required":["url"]}'::jsonb,true,true,'data','low',false),
+('csv_parse','Разобрать CSV и вернуть структурированные строки','{"type":"object","properties":{"csv":{"type":"string"},"delimiter":{"type":"string"}},"required":["csv"]}'::jsonb,true,true,'data','low',false),
+('web_search','Поиск актуальной информации в открытом интернете','{"type":"object","properties":{"query":{"type":"string"},"limit":{"type":"integer"}},"required":["query"]}'::jsonb,true,true,'integration','low',false),
+('send_email','Отправить деловое письмо через Resend','{"type":"object","properties":{"to":{"type":"string"},"subject":{"type":"string"},"text":{"type":"string"},"from":{"type":"string"}},"required":["to","subject","text"]}'::jsonb,true,true,'communication','medium',false)
+on conflict(name) do update set description=excluded.description,input_schema=excluded.input_schema,server_only=excluded.server_only,category=excluded.category,risk=excluded.risk,requires_confirmation=excluded.requires_confirmation,updated_at=now();
