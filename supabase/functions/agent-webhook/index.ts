@@ -22,5 +22,14 @@ Deno.serve(async req=>{
   const headers:any={};for(const [k,v] of req.headers){if(/^authorization$|^cookie$|^x-webhook-secret$/i.test(k))continue;headers[k]=v.slice(0,1000)}
   const {data:event,error:insertError}=await db.from("agent_webhook_events").insert({webhook_id:hook.id,method:req.method,headers,payload}).select("id").single();
   if(insertError)return json({error:"webhook_store_failed"},503);
-  return json({ok:true,event_id:event.id},202);
+  const chat=payload?.message?.chat||payload?.edited_message?.chat||payload?.channel_post?.chat||payload?.edited_channel_post?.chat||payload?.callback_query?.message?.chat||null;
+  if(chat?.id!==undefined){
+    const text=payload?.message?.text??payload?.edited_message?.text??payload?.channel_post?.text??payload?.edited_channel_post?.text??payload?.callback_query?.data??null;
+    await db.from("agent_telegram_chats").upsert({
+      webhook_id:hook.id,chat_id:String(chat.id),chat_type:chat.type??null,username:chat.username??null,
+      first_name:chat.first_name??null,last_name:chat.last_name??null,
+      last_message_text:text===null?null:String(text).slice(0,4000),last_seen_at:new Date().toISOString()
+    },{onConflict:"webhook_id,chat_id"});
+  }
+  return json({ok:true,event_id:event.id,telegram_chat_id:chat?.id!==undefined?String(chat.id):null},202);
 });
