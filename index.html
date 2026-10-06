@@ -93,7 +93,7 @@ body.dark form{background:var(--bg)}
 <div id="accessStatus" class="access-status">Ключ нужен для работы AI.</div>
 </div></section>
 <section class="settings-group"><div class="settings-group-title">Интеграции и доступ</div><div class="settings-group-body">
-<label>GitHub token (classic, право repo)</label><input id="k_github" type="password" autocomplete="off"><p>github.com/settings/tokens</p><label>Telegram Bot Token</label><input id="k_tg" type="password" autocomplete="off"><p>@BotFather → /newbot</p><label>Supabase URL</label><input id="k_sburl" placeholder="https://xxxx.supabase.co"><label>Supabase ключ (secret / service_role)</label><input id="k_sbkey" type="password" autocomplete="off"><p>Project Settings → API Keys. Секретный ключ даёт полный доступ к базе: держи его только в этом приложении.</p>
+<label>GitHub token (classic, право repo)</label><input id="k_github" type="password" autocomplete="off"><p>github.com/settings/tokens</p><label>Telegram Bot Token</label><input id="k_tg" type="password" autocomplete="off"><p>@BotFather → /newbot</p><div style="display:flex;gap:8px;align-items:center;margin-top:8px"><button type="button" id="connectTelegram" class="g">Подключить Telegram</button><span id="telegramConnectionStatus" class="access-status" style="margin:0">Не подключён</span></div><label>Supabase URL</label><input id="k_sburl" placeholder="https://xxxx.supabase.co"><label>Supabase ключ (secret / service_role)</label><input id="k_sbkey" type="password" autocomplete="off"><p>Project Settings → API Keys. Секретный ключ даёт полный доступ к базе: держи его только в этом приложении.</p>
 </div></section>
 <section class="settings-group"><div class="settings-group-title">Поведение агента</div><div class="settings-group-body">
 <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="auto" style="width:auto"> Автопилот: не спрашивать подтверждений, кроме опасных действий</label><label>Системная инструкция</label><textarea id="sys" style="height:110px"></textarea><p>Ключи хранятся только в памяти браузера на этом телефоне.</p><div class="settings-save"><button id="save">Сохранить</button></div>
@@ -431,7 +431,18 @@ function updateSendButton(){const q=$("q"),b=$("sendBtn");b.classList.toggle("ha
 $("q").oninput=()=>{resizeInput();updateSendButton()};
 updateSendButton();
 $("q").onkeydown=e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing)e.stopPropagation()};
-$("checkAccess").onclick=checkAccess;
+$("checkAccess").onclick=checkAccess;$("connectTelegram").onclick=async()=>{
+ const st=$("telegramConnectionStatus"),token=$("k_tg").value.trim(),key=$("agentKey").value.trim()||S("agent_key");
+ if(!token){st.textContent="Вставь Telegram Bot Token";st.className="access-status bad";return}
+ if(!key){st.textContent="Сначала подключи ключ AI";st.className="access-status bad";return}
+ st.textContent="Подключаю…";st.className="access-status";
+ try{
+  const r=await fetch(GATEWAY_URL,{method:"POST",headers:{"Content-Type":"application/json","x-agent-key":key,"x-telegram-token":token},body:JSON.stringify({action:"connect_telegram"}),signal:AbortSignal.timeout(30000)});
+  const j=await r.json().catch(()=>({}));if(!r.ok||!j.ok)throw new Error(j.error||"telegram_connect_failed");
+  S("k_tg",token);const b=j.connection?.bot||{};st.textContent="● Подключён "+(b.username?"@"+b.username:(b.first_name||"бот"));st.className="access-status ok";
+ }catch(e){st.textContent="Ошибка подключения: "+e.message;st.className="access-status bad"}
+};
+
 $("gear").onclick=()=>{
  for(const k of KEYS)if($(k))$(k).value=S(k)||"";
  $("agentKey").value=S("agent_key")||"";
