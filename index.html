@@ -353,6 +353,23 @@ async function notifyUser(title,body){if(S("notifications")==="0"||!("Notificati
 function agentName(){return "Мой агент"}
 function selectedSkills(){try{return JSON.parse(S("skills")||"[]")}catch(e){return []}}
 function skillsPrompt(){const a=selectedSkills();if(!a.length)return "";return "\n\nАКТИВНЫЕ НАВЫКИ:\n"+a.map(n=>SKILLS[n]?"["+n+"]\n"+SKILLS[n]:"").filter(Boolean).join("\n\n")}
+function strategyEngine(messages){
+ const active=selectedSkills().includes("strategy");if(!active)return "";
+ const arr=Array.isArray(messages)?messages:[];
+ const last=[...arr].reverse().find(x=>x?.role==="user");
+ const task=typeof last?.content==="string"?last.content.trim().slice(0,5000):"";
+ if(!task)return "";
+ return "\n\nSTRATEGY ENGINE — РЕЖИМ СТРАТЕГИИ:\n"+
+ "1) Сначала сформулируй конечный результат задачи одной фразой.\n"+
+ "2) Выдели исходные данные, ограничения, ресурсы и неизвестные. Не выдумывай неизвестное.\n"+
+ "3) Разбей решение на последовательные этапы. Для каждого этапа укажи конкретное действие и ожидаемый результат.\n"+
+ "4) Отдельно отметь 1-3 главных риска и способ их снизить.\n"+
+ "5) Определи приоритет: что даст максимальный результат при минимуме времени/ресурсов.\n"+
+ "6) Если задача требует выполнения через доступные инструменты, сначала выполни безопасные действия сам, а пользователю сообщи только то, что действительно требуется от него.\n"+
+ "7) В конце дай ближайший конкретный шаг. Не пиши абстрактный план без действий.\n"+
+ "ФОРМАТ: Цель → Анализ → План → Риски → Следующий шаг.\n"+
+ "ТЕКУЩАЯ ЗАДАЧА: "+task;
+}
 let hist=[];try{hist=JSON.parse(localStorage.getItem("hist")||"[]")}catch(e){}
 const KEYS=["k_github","k_tg","k_sburl","k_sbkey"];
 
@@ -367,7 +384,7 @@ stars_money:"Stars (XTR): provider_token не нужен; answerPreCheckoutQuery
 supabase_pro:"Supabase: RLS включена на всех таблицах; политики по auth.uid(); индексы на колонки фильтров; SQL с IF NOT EXISTS; secret-ключ только в Worker и у админ-агента, в клиентских приложениях только publishable; даты timestamptz; секреты в таблицах не хранить; free-проект засыпает после недели без запросов (cron рантайма раз в минуту этого не допускает); раз в неделю экспортируй таблицы в бэкап.",
 growth_channel:"Канал: 3-5 постов в неделю разных форматов (польза, кейс, опрос, анонс, оффер); первая строка — крючок; один CTA на бота через deep link с меткой источника; закреплённый пост с оффером; кросс-промо с каналами близкого размера; без накруток; раз в неделю смотри /stats и убирай слабые форматы. Контент ставь в posts с send_at, готовыми партиями на неделю.",
 funnel_copy:"Воронка: /start за 3 строки обещает результат; первая быстрая победа за минуту; lead-magnet в обмен на действие; на 3-й день рассылка-апселл (posts с chat_id 'all'), на 7-й реактивация, на 30-й возврат со скидкой; тексты: выгода и цифра, один CTA, соцдоказательство, без воды; кнопки вместо ввода текста; проверь на 5 тестовых сценариях.",
-strategy:"Перед новым проектом ответь в 5 строках: кто ЦА, какая боль, главный сценарий, как деньги, как найти первые 100 пользователей. MVP за один день: один сценарий, один тариф, один канал привлечения. Каждая функция должна влиять на деньги или удержание, остальное не строй. После запуска меняй по данным, не по ощущениям.",
+strategy:"Strategy Engine: анализируй цель, ограничения и ресурсы; выделяй результат, этапы, приоритеты, зависимости и риски; выбирай следующий конкретный шаг. Для новых проектов отдельно проверь ЦА, боль, сценарий, монетизацию и путь к первым 100 пользователям. MVP держи минимальным: один главный сценарий, один способ монетизации, один канал привлечения. Не усложняй план без необходимости.",
 code_quality:"Перед github_push: прогони test_html для веба и run_js для логики; обработка ошибок и таймаут у каждого fetch; нет секретов в коде; ввод пользователя валидируй; повторы с задержкой для внешних API; малые понятные коммиты; критичный код (оплата, доступ) отдай на ревью другой модели через ask_other_llm и учти замечания.",
 debugging:"Отладка: 1) воспроизведи и назови симптом; 2) бот: getWebhookInfo, деплой: github_status, веб: test_html; 3) одна гипотеза и её проверка; 4) минимальная правка; 5) повторная проверка тем же способом. Не меняй несколько вещей сразу, не угадывай.",
 deploy_cf:"Деплой: scaffold_deploy создаёт wrangler.toml и workflow GitHub Actions; пользователь один раз добавляет секреты репозитория (CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, BOT_TOKEN, BOT_NAME, WEBHOOK_SECRET, SB_URL, SB_KEY, ADMIN_ID); дальше каждый github_push в main выкатывает Worker сам. Лимиты Cloudflare free: 100k запросов в сутки, 50 подзапросов на вызов, ~10 мс CPU, без eval. При failure в github_status смотри упавший шаг.",
@@ -471,7 +488,7 @@ function compactMessages(h){
 let serverConversationId=S("server_conversation_id")||null;
 async function llmOnce(prov,msgs,useTools=true){
  const key=S("agent_key");if(!key)throw new Error("key");
- const body={action:"chat",provider:prov||"auto",messages:compactMessages(msgs),conversation_id:serverConversationId,useTools:!!useTools,tools:useTools?schema:[],system:(S("sys4")||DEF_SYS)+skillsPrompt()+responseLanguagePrompt()};
+ const body={action:"chat",provider:prov||"auto",messages:compactMessages(msgs),conversation_id:serverConversationId,useTools:!!useTools,tools:useTools?schema:[],system:(S("sys4")||DEF_SYS)+skillsPrompt()+strategyEngine(msgs)+responseLanguagePrompt()};
  const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),30000);
  try{
   const r=await fetch(GATEWAY_URL,{method:"POST",headers:{"Content-Type":"application/json","x-agent-key":key,...(S("k_tg")?{"x-telegram-token":S("k_tg")}:{})},body:JSON.stringify(body),signal:controller.signal});
