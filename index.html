@@ -80,7 +80,12 @@ body.dark form{background:var(--bg)}
 
 <div id="set">
 <div class="settings-header"><button class="settings-admin" id="adminBtn" type="button">Кабинет</button><button class="settings-close" id="setClose" aria-label="Закрыть" title="Закрыть">×</button></div>
-<section class="settings-group"><div class="settings-group-title">Общие</div><div class="settings-group-body"><label>Тема</label><select id="theme"><option value="auto">Авто</option><option value="light">Светлая</option><option value="dark">Тёмная</option></select>
+<section class="settings-group"><div class="settings-group-title">Общие</div><div class="settings-group-body">
+<label>Тема</label><select id="theme"><option value="auto">Авто</option><option value="light">Светлая</option><option value="dark">Тёмная</option></select>
+<label>Язык</label><select id="language"><option value="ru">Русский</option><option value="en">English</option></select>
+<label>Уведомления</label><select id="notifications"><option value="1">Вкл</option><option value="0">Выкл</option></select>
+<label>Звук</label><select id="sound"><option value="1">Вкл</option><option value="0">Выкл</option></select>
+<label>Вибрация</label><select id="vibration"><option value="1">Вкл</option><option value="0">Выкл</option></select>
 </div></section>
 <section class="settings-group"><div class="settings-group-title">Навыки</div><div class="settings-group-body">
 <label>Навыки (инструменты) агента</label><div class="skills" id="skillsList">
@@ -225,6 +230,10 @@ const DEF_SYS=`Ты — автономный AI-инженер и операци
 ПРАВИЛА: после изменений проверяй результат (getWebhookInfo, чтение таблиц, preview). Секреты не выводи и не клади в код или репозиторий. С деньгами проверяй логику дважды. Не выдумывай API, если не уверен, так и скажи. Правки существующего проекта: сначала list_files и read_file, меняй точечно.`;
 const S=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}};
 function applyTheme(){const t=S("theme")||"auto";document.body.classList.toggle("dark",t==="dark"||(t==="auto"&&matchMedia("(prefers-color-scheme: dark)").matches))}
+function applyPreferences(){document.documentElement.lang=S("language")==="en"?"en":"ru";document.documentElement.dataset.notifications=S("notifications")==="0"?"off":"on";document.documentElement.dataset.sound=S("sound")==="0"?"off":"on";document.documentElement.dataset.vibration=S("vibration")==="0"?"off":"on"}
+function playUiSound(type="tap"){if(S("sound")==="0")return;try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const a=new AC(),o=a.createOscillator(),g=a.createGain();o.type="sine";o.frequency.value=type==="send"?520:420;g.gain.setValueAtTime(.0001,a.currentTime);g.gain.exponentialRampToValueAtTime(.035,a.currentTime+.01);g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+.07);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+.08);setTimeout(()=>a.close(),120)}catch(e){}}
+function vibrateUi(pattern=10){if(S("vibration")==="0"||!navigator.vibrate)return;try{navigator.vibrate(pattern)}catch(e){}}
+function uiFeedback(type="tap"){if(S("vibration")!=="0")vibrateUi(type==="send"?[10,18,10]:10);if(S("sound")!=="0")playUiSound(type)}
 function agentName(){return "Мой агент"}
 function selectedSkills(){try{return JSON.parse(S("skills")||"[]")}catch(e){return []}}
 function skillsPrompt(){const a=selectedSkills();if(!a.length)return "";return "\n\nАКТИВНЫЕ НАВЫКИ:\n"+a.map(n=>SKILLS[n]?"["+n+"]\n"+SKILLS[n]:"").filter(Boolean).join("\n\n")}
@@ -445,19 +454,27 @@ $("checkAccess").onclick=checkAccess;$("connectTelegram").onclick=async()=>{
 $("gear").onclick=()=>{
  for(const k of KEYS)if($(k))$(k).value=S(k)||"";
  $("agentKey").value=S("agent_key")||"";
- $("theme").value=S("theme")||"light";
+ $("theme").value=S("theme")||"auto";
+ $("language").value=S("language")||"ru";
+ $("notifications").value=S("notifications")==="0"?"0":"1";
+ $("sound").value=S("sound")==="0"?"0":"1";
+ $("vibration").value=S("vibration")==="0"?"0":"1";
  const ss=selectedSkills();document.querySelectorAll("#skillsList input").forEach(x=>x.checked=ss.includes(x.value));
  $("sys").value=S("sys4")||DEF_SYS;$("auto").checked=S("auto")==="1";$("set").classList.add("on")};
 $("save").onclick=()=>{
  S("agent_key",$("agentKey").value.trim());
  for(const k of KEYS)if($(k))S(k,$(k).value.trim());
- S("agentName",$("agentName").value.trim()||"Мой агент");S("theme",$("theme").value);
+ S("theme",$("theme").value||"auto");
+ S("language",$("language").value||"ru");
+ S("notifications",$("notifications").value);
+ S("sound",$("sound").value);
+ S("vibration",$("vibration").value);
  S("skills",JSON.stringify([...document.querySelectorAll("#skillsList input:checked")].map(x=>x.value)));
- S("sys4",$("sys").value);S("auto",$("auto").checked?"1":"");applyTheme();$("set").classList.remove("on");sub()};
+ S("sys4",$("sys").value);S("auto",$("auto").checked?"1":"");applyTheme();applyPreferences();$("set").classList.remove("on");sub()};
 if($("clr"))$("clr").onclick=()=>{hist=[];S("hist","");$("log").innerHTML="";add("a","Контекст очищен.")};
 $("pvx").onclick=()=>{$("pv").style.display="none";$("pvf").srcdoc=""};
 $("setClose").onclick=()=>$("set").classList.remove("on");
-applyTheme();sub();
+applyTheme();applyPreferences();if(window.matchMedia){const mq=window.matchMedia("(prefers-color-scheme: dark)");const sync=()=>{if((S("theme")||"auto")==="auto")applyTheme()};if(mq.addEventListener)mq.addEventListener("change",sync);else if(mq.addListener)mq.addListener(sync)}sub();
 add("a",S("agent_key")?"Готов. Чем помочь?":"Привет! Открой «Настройки», вставь ключ доступа к агенту и нажми «Проверить».");
 
 const ADMIN_SUPABASE_URL="https://dfvztoazthliaobqnndv.supabase.co";
