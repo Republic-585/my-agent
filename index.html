@@ -35,7 +35,7 @@ body.dark .input-island{background:rgba(23,26,30,.94)}
 #set{backdrop-filter:saturate(180%) blur(18px)}
 .settings-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 18px}
 .settings-header h2{margin:0;font-size:28px;letter-spacing:-.03em}
-.settings-close{width:38px;height:38px;min-width:38px;border-radius:50%;padding:0;background:var(--ok);color:var(--ink);font-size:20px;line-height:1}
+.settings-close{min-padding:0;font-size:20px;line-width:44px;height:44px;min-width:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:transparent;color:var(--ink);border:0;box-shadow:none;padding:0;font-size:25px;font-weight:900;line-height:1}
 .settings-group{background:linear-gradient(180deg,rgba(255,255,255,.97),rgba(247,248,250,.94));border:1px solid var(--line);border-radius:16px;margin:0 0 12px;overflow:hidden;box-shadow:0 10px 28px rgba(50,42,30,.06);animation:cardIn .38s ease both}.settings-group:nth-of-type(2){animation-delay:.03s}.settings-group:nth-of-type(3){animation-delay:.06s}.settings-group:nth-of-type(4){animation-delay:.09s}.settings-group:nth-of-type(5){animation-delay:.12s}
 .settings-group-title{padding:13px 15px 8px;font-size:13px;font-weight:650;color:#5d6670;letter-spacing:.02em}
 .settings-group-body{padding:0 15px 14px}
@@ -71,7 +71,7 @@ body.dark form{background:var(--bg)}
 #set.on{display:block}
 #set label{display:block;margin:12px 0 4px;font-weight:600}
 #set p{color:var(--mut);font-size:13px;margin:4px 0}
-.menu-lines{display:flex;flex-direction:column;gap:5px;justify-content:center;align-items:center;width:24px;height:24px}.menu-lines i{display:block;width:17px;height:3px;border-radius:999px;background:currentColor;box-shadow:0 0 .2px currentColor}.head-actions #gear{border:0!important;outline:0;background:transparent;box-shadow:none;border-radius:0;width:36px;height:36px;padding:0;display:flex;align-items:center;justify-content:center;appearance:none;-webkit-appearance:none}</style>
+.menu-lines{display:flex;flex-direction:column;gap:5px;justify-content:center;align-items:center;width:24px;height:24px}.menu-lines i{display:block;width:17px;height:3px;border-radius:999px;background:currentColor;box-shadow:0 0 .2px currentColor}.head-actions #gear{border:0!important;outline:0;background:transparent;box-shadow:none;border-radius:0;width:36px;height:36px;padding:0;display:flex;align-items:center;justify-content:center;appearance:none;-webkit-appearance:none}.settings-close:active{transform:scale(.90);background:#2a5f8f;color:#fff;box-shadow:0 3px 10px rgba(42,95,143,.28)}.settings-close:hover{transform:translateY(-1px) scale(1.02)}</style>
 </head>
 <body>
 <header><div class="head-actions"><button id="gear" aria-label="Настройки" title="Настройки"><span class="menu-lines" aria-hidden="true"><i></i><i></i></span></button></div></header>
@@ -79,7 +79,7 @@ body.dark form{background:var(--bg)}
 <form id="f"><div class="input-island"><button id="attachBtn" class="attach-btn" type="button" aria-label="Прикрепить файл или фото" title="Прикрепить">+</button><input id="fileInput" type="file" hidden multiple accept="image/*,.txt,.md,.csv,.json,.js,.ts,.html,.css,.pdf,.doc,.docx,.xlsx"><div class="input-main"><div id="attachPreview" class="attach-preview"></div><textarea id="q" placeholder="Напишите задачу…" enterkeyhint="enter" rows="1"></textarea></div><button id="sendBtn" type="submit" aria-label="Отправить" title="Отправить"><span class="send-arrow">↑</span></button></div></form>
 
 <div id="set">
-<div class="settings-header"><button class="settings-admin" id="adminBtn" type="button">Админ-панель</button><h2>Настройки</h2><button class="settings-close" id="setClose" aria-label="Закрыть" title="Закрыть">×</button></div>
+<div class="settings-header"><button class="settings-admin" id="adminBtn" type="button">Кабинет</button><button class="settings-close" id="setClose" aria-label="Закрыть" title="Закрыть">×</button></div>
 <section class="settings-group"><div class="settings-group-title">Общие</div><div class="settings-group-body"><label>Имя Агента</label><input id="agentName" placeholder="Мой агент">
 <label>Тема</label><select id="theme"><option value="light">Светлая</option><option value="dark">Тёмная</option></select>
 </div></section>
@@ -147,7 +147,7 @@ body.dark form{background:var(--bg)}
 <div id="adminPanel">
  <div class="admin-wrap">
   <div id="adminLogin" class="admin-login admin-card">
-   <h2>Админ-панель</h2>
+   <h2>Кабинет</h2>
    <p>Вход выполняется через Supabase Auth. Только пользователи из списка администраторов получат доступ.</p>
    <div class="admin-form"><label>Email</label><input id="adminEmail" type="email" autocomplete="username" placeholder="email"></div>
    <div class="admin-form"><label>Пароль</label><input id="adminPassword" type="password" autocomplete="current-password" placeholder="••••••••"></div>
@@ -156,7 +156,7 @@ body.dark form{background:var(--bg)}
   </div>
   <div id="adminApp" style="display:none">
    <div class="admin-top">
-    <div><div class="admin-title">Админ-панель</div><div class="admin-sub" id="adminIdentity"></div></div>
+    <div><div class="admin-title">Кабинет</div><div class="admin-sub" id="adminIdentity"></div></div>
     <div class="admin-actions"><button class="admin-btn secondary" id="adminRefresh">Обновить</button><button class="admin-btn secondary" id="adminLogout">Выйти</button></div>
    </div>
    <div class="admin-tabs">
