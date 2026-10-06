@@ -8,7 +8,7 @@ import {logAiRequest} from "./usage.ts";
 const cors={"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"authorization, apikey, content-type, x-agent-key, x-agent-provider","Access-Control-Allow-Methods":"GET, POST, OPTIONS","Content-Type":"application/json"};
 const json=(b:unknown,s=200)=>new Response(JSON.stringify(b),{status:s,headers:cors});
 function envKeys(){let j:any={};try{j=JSON.parse(Deno.env.get("AI_PROVIDER_KEYS")||"{}")}catch{};return{groq:j.groq||Deno.env.get("GROQ_API_KEY")||"",gemini:j.gemini||Deno.env.get("GEMINI_API_KEY")||"",mistral:j.mistral||Deno.env.get("MISTRAL_API_KEY")||"",openrouter:j.openrouter||Deno.env.get("OPENROUTER_API_KEY")||""}}
-function availableServerTools(){return serverTools.filter(t=>{const n=t.function.name;return n==="github"?!!Deno.env.get("GITHUB_TOKEN"):n==="telegram"?!!Deno.env.get("TELEGRAM_BOT_TOKEN"):true})}
+function availableServerTools(){return serverTools.filter(t=>{const n=t.function.name;return n==="github"?!!Deno.env.get("GITHUB_TOKEN"):n==="telegram"||n.startsWith("telegram_")?!!Deno.env.get("TELEGRAM_BOT_TOKEN"):n==="send_email"?!!Deno.env.get("RESEND_API_KEY")&&!!Deno.env.get("EMAIL_FROM"):true})}
 function providerOrder(requested:string,messages:ChatMessage[]){const first=chooseProvider(requested,messages);const all=Object.keys(PROVIDERS);return [first,...all.filter(x=>x!==first)].filter((x,i,a)=>a.indexOf(x)===i)}
 function clientTools(bodyTools:any[]){return (Array.isArray(bodyTools)?bodyTools:[]).filter(t=>{const n=t?.function?.name;return n&& !serverToolNames.has(n) && !["github","telegram","supabase"].includes(n)}).slice(0,30)}
 async function main(req:Request){
