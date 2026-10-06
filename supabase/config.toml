@@ -11,3 +11,5 @@ verify_jwt = true
 
 [functions.billing-webhook]
 verify_jwt = false
+
+# GitHub Actions deploys this project on changes under supabase/.
