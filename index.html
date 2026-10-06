@@ -403,7 +403,7 @@ async function run(text){
   const m=await llm(prov,msgs);
   msgs.push({role:"assistant",content:m.content||"",...(m.tool_calls?{tool_calls:m.tool_calls}:{})});
   hist.push({role:"assistant",content:m.content||"",...(m.tool_calls?{tool_calls:m.tool_calls}:{})});
-  if(!m.tool_calls?.length){const answer=m.content||"(пустой ответ)";add("a",answer);notifyUser("Ответ агента",String(answer).replace(/<[^>]+>/g,"").slice(0,240));return}
+  if(!m.tool_calls?.length){const answer=m.content||"(пустой ответ)";add("a",answer);playUiSound("receive");notifyUser("Ответ агента",String(answer).replace(/<[^>]+>/g,"").slice(0,240));return}
   for(const c of m.tool_calls){
    let out,args={};
    try{
