@@ -85,7 +85,6 @@ body.dark form{background:var(--bg)}
 <label>Язык</label><select id="language"><option value="ru">Русский</option><option value="en">English</option></select>
 <label>Уведомления</label><select id="notifications"><option value="1">Вкл</option><option value="0">Выкл</option></select>
 <label>Звук</label><select id="sound"><option value="1">Вкл</option><option value="0">Выкл</option></select>
-<label>Вибрация</label><select id="vibration"><option value="1">Вкл</option><option value="0">Выкл</option></select>
 </div></section>
 <section class="settings-group"><div class="settings-group-title">Навыки</div><div class="settings-group-body">
 <label>Навыки (инструменты) агента</label><div class="skills" id="skillsList">
@@ -230,10 +229,29 @@ const DEF_SYS=`Ты — автономный AI-инженер и операци
 ПРАВИЛА: после изменений проверяй результат (getWebhookInfo, чтение таблиц, preview). Секреты не выводи и не клади в код или репозиторий. С деньгами проверяй логику дважды. Не выдумывай API, если не уверен, так и скажи. Правки существующего проекта: сначала list_files и read_file, меняй точечно.`;
 const S=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}};
 function applyTheme(){const t=S("theme")||"auto";document.body.classList.toggle("dark",t==="dark"||(t==="auto"&&matchMedia("(prefers-color-scheme: dark)").matches))}
-function applyPreferences(){document.documentElement.lang=S("language")==="en"?"en":"ru";document.documentElement.dataset.notifications=S("notifications")==="0"?"off":"on";document.documentElement.dataset.sound=S("sound")==="0"?"off":"on";document.documentElement.dataset.vibration=S("vibration")==="0"?"off":"on"}
-function playUiSound(type="tap"){if(S("sound")==="0")return;try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const a=new AC(),o=a.createOscillator(),g=a.createGain();o.type="sine";o.frequency.value=type==="send"?520:420;g.gain.setValueAtTime(.0001,a.currentTime);g.gain.exponentialRampToValueAtTime(.035,a.currentTime+.01);g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+.07);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+.08);setTimeout(()=>a.close(),120)}catch(e){}}
-function vibrateUi(pattern=10){if(S("vibration")==="0"||!navigator.vibrate)return;try{navigator.vibrate(pattern)}catch(e){}}
-function uiFeedback(type="tap"){if(S("vibration")!=="0")vibrateUi(type==="send"?[10,18,10]:10);if(S("sound")!=="0")playUiSound(type)}
+function applyPreferences(){document.documentElement.lang=S("language")==="en"?"en":"ru";document.documentElement.dataset.notifications=S("notifications")==="0"?"off":"on";document.documentElement.dataset.sound=S("sound")==="0"?"off":"on"}
+let audioContext=null;
+function getAudioContext(){const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return null;if(!audioContext)audioContext=new AC();if(audioContext.state==="suspended")audioContext.resume().catch(()=>{});return audioContext}
+function playUiSound(type="tap"){
+ if(S("sound")==="0")return;
+ try{
+  const a=getAudioContext();if(!a)return;
+  const now=a.currentTime;
+  const notes={tap:[520,.045,0.06],send:[620,.055,0.09],receive:[660,.04,0.08],success:[523,.045,0.10],error:[220,.035,0.12]};
+  const n=notes[type]||notes.tap;
+  const o=a.createOscillator(),g=a.createGain();
+  o.type=type==="error"?"sine":"sine";o.frequency.setValueAtTime(n[0],now);
+  g.gain.setValueAtTime(.0001,now);g.gain.exponentialRampToValueAtTime(n[1],now+.012);g.gain.exponentialRampToValueAtTime(.0001,now+n[2]);
+  o.connect(g);g.connect(a.destination);o.start(now);o.stop(now+n[2]+.01);
+  if(type==="receive"||type==="success"){
+   const o2=a.createOscillator(),g2=a.createGain();
+   o2.type="sine";o2.frequency.setValueAtTime(type==="success"?784:880,now+.06);
+   g2.gain.setValueAtTime(.0001,now+.06);g2.gain.exponentialRampToValueAtTime(.026,now+.075);g2.gain.exponentialRampToValueAtTime(.0001,now+.17);
+   o2.connect(g2);g2.connect(a.destination);o2.start(now+.06);o2.stop(now+.18);
+  }
+ }catch(e){}
+}
+function uiFeedback(type="tap"){playUiSound(type)}
 async function requestNotificationPermission(){if(S("notifications")==="0"||!("Notification" in window))return "denied";if(Notification.permission==="granted")return "granted";if(Notification.permission==="denied")return "denied";try{return await Notification.requestPermission()}catch(e){return "denied"}}
 async function notifyUser(title,body){if(S("notifications")==="0"||!("Notification" in window)||document.visibilityState==="visible")return false;try{if(Notification.permission!=="granted")return false;const reg=await (navigator.serviceWorker?.ready||Promise.resolve(null));if(reg?.showNotification){await reg.showNotification(title,{body,tag:"agent-response",renotify:true});return true}new Notification(title,{body,tag:"agent-response"});return true}catch(e){return false}}
 function agentName(){return "Мой агент"}
@@ -431,9 +449,9 @@ $("f").onsubmit=async e=>{
   }
   userContent=parts.length>1?parts:[{type:"text",text:userContent}];
  }
- add("u",t||files.map(x=>x.name).join(", "));$("sendBtn").disabled=true;
+ add("u",t||files.map(x=>x.name).join(", "));playUiSound("send");$("sendBtn").disabled=true;
  const thinking=document.createElement("div");thinking.className="thinking";thinking.textContent="Готовлю ответ";$("log").appendChild(thinking);$("log").scrollTop=1e9;
- try{await run(userContent);aiConnected=true;sub()}catch(err){console.error(err);aiConnected=false;sub();add("a","Не удалось получить ответ. Проверь подключение провайдера в Настройках.")}finally{thinking.remove();$("sendBtn").disabled=false;$("q").focus()}
+ try{await run(userContent);aiConnected=true;sub()}catch(err){console.error(err);aiConnected=false;sub();playUiSound("error");add("a","Не удалось получить ответ. Проверь подключение провайдера в Настройках.")}finally{thinking.remove();$("sendBtn").disabled=false;$("q").focus()}
  S("hist",JSON.stringify((h=>h.slice(Math.max(0,h.findIndex(x=>x.role==="user"))))(hist.slice(-24))));
 };
 function resizeInput(){const q=$("q");q.style.height="38px";q.style.height=Math.min(q.scrollHeight,150)+"px"}
@@ -460,8 +478,7 @@ $("gear").onclick=()=>{
  $("language").value=S("language")||"ru";
  $("notifications").value=S("notifications")==="0"?"0":"1";
  $("sound").value=S("sound")==="0"?"0":"1";
- $("vibration").value=S("vibration")==="0"?"0":"1";
- const ss=selectedSkills();document.querySelectorAll("#skillsList input").forEach(x=>x.checked=ss.includes(x.value));
+  const ss=selectedSkills();document.querySelectorAll("#skillsList input").forEach(x=>x.checked=ss.includes(x.value));
  $("sys").value=S("sys4")||DEF_SYS;$("auto").checked=S("auto")==="1";$("set").classList.add("on")};
 $("save").onclick=()=>{
  S("agent_key",$("agentKey").value.trim());
@@ -470,8 +487,7 @@ $("save").onclick=()=>{
  S("language",$("language").value||"ru");
  S("notifications",$("notifications").value);
  S("sound",$("sound").value);
- S("vibration",$("vibration").value);
- S("skills",JSON.stringify([...document.querySelectorAll("#skillsList input:checked")].map(x=>x.value)));
+  S("skills",JSON.stringify([...document.querySelectorAll("#skillsList input:checked")].map(x=>x.value)));
  S("sys4",$("sys").value);S("auto",$("auto").checked?"1":"");applyTheme();applyPreferences();
  if(S("notifications")==="1")requestNotificationPermission();
  $("set").classList.remove("on");sub()};
