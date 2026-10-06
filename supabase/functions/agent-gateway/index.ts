@@ -1,6 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import type {ChatMessage} from "./types.ts";
-import {consumeAccess} from "./access.ts";
+import {consumeAccess,validateAccess} from "./access.ts";
 import {PROVIDERS,chooseProvider,callProvider} from "./providers.ts";
 import {prepareConversation,loadContext,saveMessages,maybeRemember} from "./context.ts";
 import {serverTools,serverToolNames,executeTool} from "./tools.ts";
@@ -17,8 +17,9 @@ async function main(req:Request){
  if(action==="health"){const keys=envKeys();return json({ok:true,providers:Object.fromEntries(Object.entries(PROVIDERS).map(([k,v])=>[k,{label:v.label,configured:!!keys[k],model:v.model}])),server_tools:availableServerTools().map(x=>x.function.name)})}
  const agentKey=req.headers.get("x-agent-key")?.trim()||"";
  if(!agentKey||agentKey.length<20||agentKey.length>160)return json({error:"invalid_key"},401);
+ if(action==="check_access"){try{const a=await validateAccess(agentKey);return json(a?{ok:true,plan:a.plan,expires_at:a.expires_at}:{ok:false,error:"access_denied"},a?200:403)}catch(e){console.error("access_check_failed",e instanceof Error?e.message:"unknown");return json({ok:false,error:"gateway_db"},503)}}
  if(action==="check_provider"){const p=String(body.provider||"groq");if(!(p in PROVIDERS))return json({error:"invalid_provider"},400);const started=performance.now();try{const r=await callProvider(p,[{role:"user",content:"Ответь только: OK"}],"Проверка соединения.",[]);return json({ok:String(r.message?.content||"").toUpperCase().includes("OK"),provider:p,ms:Math.round(performance.now()-started)})}catch{return json({ok:false,provider:p,ms:Math.round(performance.now()-started)},503)}}
- const access=await consumeAccess(agentKey);if(!access)return json({error:"access_denied"},403);
+ let access;try{access=await consumeAccess(agentKey)}catch(e){console.error("access_consume_failed",e instanceof Error?e.message:"unknown");return json({error:"gateway_db"},503)}if(!access)return json({error:"access_denied"},403);
  const messages=Array.isArray(body.messages)?body.messages as ChatMessage[]:[];if(!messages.length)return json({error:"empty_request"},400);
  const conversationId=await prepareConversation(access.user_id,body.conversation_id||null,String(messages.find(m=>m.role==="user")?.content||""));
  const ctx=await loadContext(access.user_id,conversationId,messages);
