@@ -31,7 +31,6 @@ export async function consumeAccess(key:string):Promise<Access|null>{
   const j=await r.json();
   return Array.isArray(j)?j[0]||null:j||null;
 }
-export {secretKey};
 export async function validateAccess(key:string):Promise<Access|null>{
   const url=Deno.env.get("SUPABASE_URL"),sk=secretKey();
   if(!url||!sk)throw new Error("gateway_db");
