@@ -14,3 +14,4 @@ verify_jwt = false
 
 # GitHub Actions deploys this project on changes under supabase/.
 # Migration history synchronized; unique migration timestamps.
+# Final CI verification.
