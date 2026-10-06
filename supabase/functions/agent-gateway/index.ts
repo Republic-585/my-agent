@@ -51,7 +51,8 @@ async function main(req:Request){
   try{
    const url=Deno.env.get("SUPABASE_URL"),key=(await import("./access.ts")).secretKey();
    if(!url||!key)return json({ok:false,error:"gateway_db"},503);
-   const q=await fetch(url+"/rest/v1/agent_connections?provider=eq.telegram&status=eq.active&select=id,name,user_id,credential_ciphertext,credential_iv,metadata&order=created_at.desc&limit=1",{headers:{apikey:key,Authorization:"Bearer "+key}});
+   const owner=access.user_id===null?"null":encodeURIComponent(String(access.user_id));
+   const q=await fetch(url+"/rest/v1/agent_connections?provider=eq.telegram&status=eq.active&user_id=eq."+owner+"&select=id,name,user_id,credential_ciphertext,credential_iv,metadata&order=created_at.desc&limit=1",{headers:{apikey:key,Authorization:"Bearer "+key}});
    if(!q.ok)throw new Error("connection_lookup_failed");
    const rows=await q.json(); const conn=rows?.[0]; if(!conn)return json({ok:false,error:"telegram_not_connected"},404);
    const token=await decryptCredential(String(conn.credential_ciphertext),String(conn.credential_iv),agentKey);
@@ -77,7 +78,7 @@ async function main(req:Request){
   lastUsage=result.usage||{};lastProvider=result.provider;lastModel=result.model;final=result.message;if(!final?.tool_calls?.length)break;
   const serverCalls=final.tool_calls.filter((c:any)=>serverToolNames.has(c?.function?.name));const clientCalls=final.tool_calls.filter((c:any)=>!serverToolNames.has(c?.function?.name));
   if(clientCalls.length){await logAiRequest({userId:access.user_id,accessKeyId:access.key_id,conversationId,provider:lastProvider,model:lastModel,usage:lastUsage,latencyMs:latency,status:"success"});return json({ok:true,message:final,usage:lastUsage,conversation_id:conversationId})}
-  working.push(final);for(const call of serverCalls){let out="";try{out=String(await executeTool(call.function.name,JSON.parse(call.function.arguments||"{}"),{telegramToken}))}catch(e){out="Ошибка инструмента: "+(e instanceof Error?e.message:"unknown")}working.push({role:"tool",tool_call_id:call.id,name:call.function.name,content:out.slice(0,8000)})}
+  working.push(final);for(const call of serverCalls){let out="";try{const toolName=call.function.name;const toolDef=(serverTools.find((t:any)=>t.function.name===toolName)?.function)||null;const confirmed=body.confirmation===true||body.confirmed===true;if(["github","update_records","send_email"].includes(toolName)&&!confirmed){out="CONFIRMATION_REQUIRED";working.push({role:"tool",tool_call_id:call.id,name:toolName,content:out});continue}out=String(await executeTool(toolName,JSON.parse(call.function.arguments||"{}"),{telegramToken,agentKey,userId:access.user_id}))}catch(e){out="Ошибка инструмента: "+(e instanceof Error?e.message:"unknown")}working.push({role:"tool",tool_call_id:call.id,name:call.function.name,content:out.slice(0,8000)})}
  }
  await logAiRequest({userId:access.user_id,accessKeyId:access.key_id,conversationId,provider:lastProvider,model:lastModel,usage:lastUsage,latencyMs:totalLatency,status:"success"});
  await saveMessages(access.user_id,conversationId,String(messages.find(m=>m.role==="user")?.content||""),final);
