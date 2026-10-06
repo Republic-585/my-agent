@@ -19,3 +19,10 @@ export async function telegramGetMe(token:string){
  if(!r.ok||!j?.ok||!j?.result)throw new Error("telegram_token_invalid");
  return j.result;
 }
+
+export async function telegramGetWebhookInfo(token:string){
+ const r=await fetch("https://api.telegram.org/bot"+token+"/getWebhookInfo");
+ const j=await r.json().catch(()=>null);
+ if(!r.ok||!j?.ok||!j?.result)throw new Error("telegram_webhook_info_failed");
+ return j.result;
+}
