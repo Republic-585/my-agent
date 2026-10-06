@@ -35,3 +35,4 @@ on conflict(name) do update set
 
 create index if not exists agent_tools_enabled_category_idx
   on public.agent_tools(enabled,category);
+-- Registry metadata is deployed through CI.
