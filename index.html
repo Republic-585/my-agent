@@ -359,10 +359,10 @@ async function checkAccess(){
  const key=$("agentKey").value.trim(),st=$("accessStatus");if(!key){st.textContent="Введите ключ доступа.";st.className="access-status bad";return}
  st.textContent="Проверяю доступ…";st.className="access-status";
  try{
-  const r=await fetch(GATEWAY_URL,{method:"POST",headers:{"Content-Type":"application/json","x-agent-key":key},body:JSON.stringify({action:"health"}),signal:AbortSignal.timeout(30000)});
+  const r=await fetch(GATEWAY_URL,{method:"POST",headers:{"Content-Type":"application/json","x-agent-key":key},body:JSON.stringify({action:"check_access"}),signal:AbortSignal.timeout(30000)});
   const j=await r.json().catch(()=>({}));if(!r.ok||!j.ok)throw new Error("access");
   S("agent_key",key);aiConnected=true;st.textContent="✓ Доступ активен · AI готов";st.className="access-status ok";sub();
- }catch(e){aiConnected=false;sub();st.textContent="Ключ не принят или доступ недоступен.";st.className="access-status bad"}
+ }catch(e){aiConnected=false;sub();st.textContent=e.message==="gateway_db"?"Ошибка подключения Gateway к базе Supabase.":"Ключ не принят или доступ недоступен.";st.className="access-status bad"}
 }
 // ---------- agent loop ----------
 async function run(text){
