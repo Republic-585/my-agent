@@ -1,0 +1,2 @@
+-- Migration already applied to the production database.
+-- Kept in repository to reconcile Supabase migration history with Git.
